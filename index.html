@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aura Chat</title><link rel="icon" href="https://gxaura.net/assets/images/image06.png?v=36df2ea8">
+<style>
+:root{--accent:#f00;--muted:rgba(255,255,255,.8);--line:color-mix(in srgb,var(--accent) 38%,transparent);--hov:color-mix(in srgb,var(--accent) 14%,transparent);--font:Inter,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:var(--font);font-size:14px;color:var(--muted);background:var(--bgc,linear-gradient(135deg,#000,#300000 50%,#4c0000)) fixed}
+#app{display:grid;grid-template-columns:76px 270px 1fr 270px;gap:12px;padding:12px;height:100vh}
+#app[hidden]{display:none}
+.p{background:rgba(0,0,0,var(--pa,.45));border:2px solid var(--line);border-radius:var(--rad,10px);box-shadow:0 0 var(--glow,0px) var(--accent);min-height:0;min-width:0;display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(6px)}
+button,input,select,textarea{font:inherit}
+.btn{padding:9px 14px;border-radius:8px;border:0;background:var(--accent);color:#100;font-weight:800;cursor:pointer}
+.btn.g{background:rgba(255,255,255,.06);color:var(--muted);border:2px solid rgba(255,255,255,.1)}
+.btn.sm{padding:5px 9px;font-size:12px}
+.in{width:100%;padding:9px;border-radius:8px;border:2px solid var(--line);background:#0b0b0b;color:var(--muted)}
+input[type=color]{padding:2px;height:36px}
+label{display:block;font-size:12px;opacity:.65;margin:12px 0 5px;text-transform:uppercase}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#rail{align-items:center;padding:10px 6px;gap:2px}
+.brand{font-weight:900;color:var(--accent);margin-bottom:8px;display:flex;justify-content:center}.alogo{width:46px;height:46px;max-width:100%;border-radius:8px;border:2px solid var(--line,rgba(255,0,0,.35));object-fit:cover;flex:none}.authlogo{display:block;margin:0 auto 10px;width:64px;height:64px}
+.sb{position:relative;width:100%;padding:10px 0;background:none;border:0;color:var(--muted);font-weight:800;font-size:12px;border-radius:8px;cursor:pointer}
+.sb:hover,.sb.on{color:var(--accent);background:var(--hov)}
+.sb b{position:absolute;top:4px;right:6px;background:var(--accent);color:#100;border-radius:9px;padding:0 5px;font-size:10px}
+.sp{flex:1}
+.me{background:none;border:0;cursor:pointer;padding:6px}
+.av{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:none;font-weight:800;color:#fff;text-shadow:0 0 4px #0009}
+.dot{position:absolute;right:-2px;bottom:-2px;width:28%;height:28%;min-width:10px;min-height:10px;border-radius:50%;border:2px solid #120000;background:#6b6b6b}
+.dot.on{background:#3ddc84}.dot.idle{background:#ffc107}.dot.dnd{background:#ff3b3b}
+.lh,.h{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:2px solid var(--line)}
+.lh{justify-content:space-between}
+.h small{display:block;opacity:.6;font-size:12px}.h .mu{opacity:.6;font-weight:600}
+.h>div{flex:1;min-width:0}
+.pad{padding:10px}
+.tabs{display:flex;gap:6px;padding:0 10px 8px}
+.tabs button{flex:1;padding:7px;border-radius:8px;border:2px solid var(--line);background:none;color:var(--muted);cursor:pointer;font-weight:700}
+.tabs button.on{background:var(--accent);color:#100;border-color:var(--accent)}
+.sc{flex:1;overflow:auto;padding:8px}
+.gl{font-size:12px;opacity:.55;padding:10px 8px 4px;font-weight:700}
+.row{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;cursor:pointer}
+.row:hover,.row.on{background:var(--hov)}
+.gr{flex:1;min-width:0}.gr b,.gr small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gr small{opacity:.6;font-size:12px}
+.gi{display:inline-flex;width:36px;height:36px;border-radius:10px;align-items:center;justify-content:center;background:rgba(255,255,255,.07);font-size:20px;flex:none}
+.gt{padding:6px 14px;font-size:16px;display:flex;align-items:center;gap:8px}
+.empty{opacity:.5;padding:20px;text-align:center}
+.credit{padding:10px 14px;border-top:2px solid var(--line);font-size:12px}.credit small{display:block;opacity:.5;margin-top:3px}
+#ml{flex:1;overflow:auto;padding:10px 0}
+.m{display:flex;gap:10px;padding:2px 16px}.m:not(.c){margin-top:12px}.m.c{padding-left:64px}
+.m:hover{background:rgba(255,255,255,.03)}
+.m>div{min-width:0}.mt small{opacity:.5;margin-left:6px;font-size:11px}.mt b{cursor:pointer}
+.x{overflow-wrap:anywhere;line-height:1.45}
+#mi{display:flex;gap:8px;padding:12px;border-top:2px solid var(--line)}
+#tx{flex:1;resize:none;max-height:120px;padding:10px;border-radius:8px;border:2px solid var(--line);background:#0b0b0b;color:var(--muted)}
+.card{border-radius:10px;overflow:hidden;border:2px solid color-mix(in srgb,var(--a) 50%,transparent);background:#0f0f0f}
+.bn{aspect-ratio:7/2;background-size:cover}.cb{padding:0 14px 14px}.ca{margin-top:-38px;display:inline-block;border:4px solid #0f0f0f;border-radius:50%;line-height:0}
+.card h3{margin:8px 0 2px;color:var(--a)}.card h3 small{opacity:.5;margin-left:4px}
+.card p{margin:8px 0;line-height:1.4;overflow-wrap:anywhere}.card small{opacity:.6}
+.st .dot{position:static;display:inline-block;width:10px;height:10px;border:0;min-width:0;min-height:0}
+.cbt{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9;display:none;align-items:center;justify-content:center}.ov.open{display:flex}
+.modal{background:#0f0f0f;border:2px solid var(--line);border-radius:12px;padding:20px;width:460px;max-width:94%;max-height:92vh;overflow:auto}
+.modal h3{margin:0 0 10px;color:var(--accent)}
+.or{text-align:center;font-size:12px;opacity:.55;margin-top:12px}
+.err{color:#ff6b6b;font-size:13px;margin-top:8px}.conn{margin-top:14px;font-size:13px}.conn a{color:var(--accent);cursor:pointer;margin-left:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pres{display:flex;flex-wrap:wrap;gap:6px}
+.pre{width:54px;height:34px;border-radius:8px;border:2px solid var(--line);cursor:pointer;color:#fff;font-size:9px;display:flex;align-items:flex-end;padding:2px 3px;text-shadow:0 0 3px #000;overflow:hidden}
+.ck{display:flex;gap:8px;align-items:center;padding:5px 0}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1a0000;border:2px solid var(--line);border-radius:10px;padding:10px 16px;z-index:20;display:none}
+.bk,.info{display:none}
+@media(max-width:1000px){#app{grid-template-columns:76px 270px 1fr}#side{display:none;position:fixed;right:12px;top:12px;bottom:12px;width:min(300px,90vw);z-index:8;background:#0b0000}#side.open{display:flex}.info{display:inline-block}}
+@media(max-width:760px){#app{grid-template-columns:64px 1fr;padding:8px;gap:8px}#main{display:none}#app.chat #list{display:none}#app.chat #main{display:flex}.bk{display:inline-block}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.m{position:relative}.tb{display:none;position:absolute;right:16px;top:-12px;background:#140000;border:2px solid var(--line);border-radius:8px;padding:2px;gap:2px;z-index:2}.m:hover .tb{display:flex}.tb button{background:none;border:0;color:var(--muted);font-size:12px;padding:3px 7px;cursor:pointer;border-radius:6px}.tb button:hover{background:var(--hov);color:var(--accent)}
+.rc{background:rgba(255,255,255,.06);border:2px solid transparent;border-radius:12px;color:var(--muted);padding:1px 8px;margin:4px 4px 0 0;cursor:pointer;font-size:13px}.rc.me{border-color:var(--accent);background:var(--hov)}
+.rp{font-size:12px;opacity:.65;border-left:3px solid var(--line);padding-left:8px;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ds{display:flex;align-items:center;gap:10px;font-size:11px;opacity:.55;margin:14px 16px 2px}.ds:before,.ds:after{content:"";flex:1;height:1px;background:var(--line)}
+.mimg{max-width:min(360px,100%);max-height:300px;border-radius:8px;margin-top:6px;display:block}pre{background:#080808;border:1px solid var(--line);border-radius:8px;padding:8px;overflow:auto;margin:4px 0}code{background:#080808;border-radius:4px;padding:1px 5px}.x a{color:var(--accent)}.mn{background:var(--hov);color:var(--accent);border-radius:4px;padding:0 3px}.sp{background:#000;color:#000;border-radius:4px;cursor:pointer}.sp.sh{color:inherit;background:rgba(255,255,255,.1)}
+.m.ping{background:rgba(255,193,7,.08);box-shadow:inset 3px 0 #ffc107}.m.pn:before{content:"Pinned";position:absolute;right:18px;top:2px;font-size:10px;opacity:.5}.ub{background:var(--accent);color:#100;border-radius:9px;padding:0 6px;font-size:10px}
+#ty{height:18px;padding:0 16px;font-size:12px;opacity:.7}#rb{display:none;padding:6px 14px;border-top:2px solid var(--line);font-size:12px;justify-content:space-between}#rb.on{display:flex}#mi .btn{align-self:flex-end}
+.egr{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.egr button{font-size:22px;background:none;border:0;cursor:pointer;border-radius:8px;padding:6px}.egr button:hover{background:var(--hov)}
+.cmp .m:not(.c){margin-top:4px}.cmp .av{transform:scale(.8)}.chd{display:flex;align-items:center;justify-content:space-between}.srv{border-left:4px solid var(--c,#f00)}
+.pk .cats{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}.pk .cats button{background:none;border:2px solid var(--line);border-radius:8px;color:var(--muted);cursor:pointer;padding:3px 8px;font-size:12px}.pk .cats button.on{background:var(--accent);color:#100}
+.pg{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;max-height:300px;overflow:auto}.pg button{font-size:22px;background:none;border:0;cursor:pointer;border-radius:8px;padding:4px}.pg button:hover{background:var(--hov)}
+.gg{columns:2;column-gap:6px;max-height:340px;overflow:auto;margin-top:8px}.gg img{width:100%;margin-bottom:6px;border-radius:8px;cursor:pointer;display:block;background:#111;min-height:40px}
+.modal:has(.pk){width:580px}.gc{position:relative;break-inside:avoid;margin-bottom:6px}.gc img{margin:0!important}.gs{position:absolute;top:4px;right:4px;background:#000a;border:0;color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer;opacity:.75}.gs.on{color:#ffc107;opacity:1}.gc:hover .gs{opacity:1}
+.pk select.in{padding:5px 8px}
+.modal:has(.pk){width:480px}
+.pk .tabs{justify-content:flex-start}.pk .tabs button{flex:none;border:0;background:none;padding:6px 12px;border-radius:6px;font-size:13px}.pk .tabs button.on{background:var(--hov);color:var(--accent)}
+.gg{columns:auto;display:block;max-height:390px;overflow-y:auto;overflow-x:hidden}.gcol{columns:2;column-gap:6px}
+.gt{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:390px;overflow:auto;margin-top:8px}
+.gt button{position:relative;height:96px;border:0;border-radius:6px;overflow:hidden;cursor:pointer;background:#222 center/cover no-repeat;color:#fff;font-weight:700;font-size:15px;text-shadow:0 1px 3px #000;padding:0}
+.gt button::before{content:"";position:absolute;inset:0;background:#0008;transition:background .15s}.gt button:hover::before{background:#0003}
+.gt button span{position:relative}.gt .fv{background-color:var(--accent)}
+.gbar{display:flex;align-items:center;gap:10px;margin-top:8px}.gbar b{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tgp{margin-top:8px}.tgp summary{cursor:pointer;font-weight:700;font-size:13px;padding:6px 2px;display:flex;justify-content:space-between}.tgp summary small{opacity:.55}
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:4px 0 6px}
+.tt{position:relative;height:50px;border-radius:8px;border:2px solid var(--line);cursor:pointer;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:flex-end;padding:3px 6px 6px;text-shadow:0 0 3px #000,0 0 6px #000;overflow:hidden}.tt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}.tt:hover{filter:brightness(1.15)}.tt.cur{border-color:var(--accent);outline:2px solid var(--accent)}
+.tt .tx{position:absolute;top:2px;right:4px;font-size:11px;opacity:0;background:#000a;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center}.tt:hover .tx{opacity:1}
+.crv{position:relative;overflow:hidden;background:#000;margin:0 auto;touch-action:none;cursor:grab;border-radius:6px}.crv:active{cursor:grabbing}.crv img{position:absolute;max-width:none;user-select:none;pointer-events:none}
+.crm{position:absolute;inset:0;pointer-events:none;box-shadow:0 0 0 999px rgba(0,0,0,.62);outline:2px solid rgba(255,255,255,.55);outline-offset:-2px}
+
+
+</style></head><body>
+<div id="auth" class="ov open"><div class="modal" id="ab">Connecting...</div></div>
+<div id="app" hidden>
+<nav class="p" id="rail"></nav><section class="p" id="list"></section>
+<main class="p" id="main"><div id="mh"></div><div id="ml"></div><div id="ty"></div><div id="rb"></div><form id="mi"><button type="button" class="btn g sm" data-a="attach" title="Attach image or .gif">+</button><textarea id="tx" rows="1" placeholder="Write a message. Markdown, @mentions and /shrug work." maxlength="2000"></textarea><button type="button" class="btn g sm" data-a="emo">Emoji</button><button type="button" class="btn g sm" data-a="gif">GIF</button><button class="btn">Send</button></form></main>
+<aside class="p" id="side"></aside></div>
+<div class="ov" id="md"><div class="modal" id="mb"></div></div><input type="file" id="uf" accept="image/*" hidden><input type="file" id="tf" accept=".json,.txt,application/json,text/plain" multiple hidden><input type="file" id="ig" accept="image/*" hidden><div id="toast"></div>
+<script type="module">
+const CFG={apiKey:"AIzaSyAZeHxAOMQPzNfGoQgtawAq97AHmSTOQfU",authDomain:"aura-chat-84036.firebaseapp.com",projectId:"aura-chat-84036",storageBucket:"aura-chat-84036.firebasestorage.app",messagingSenderId:"987977914771",appId:"1:987977914771:web:e4777902e296131c9c7066",measurementId:"G-W7VMDZ4PYE"};
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const EM=['😀','😂','🥹','😍','😎','🤔','😮','😢','😡','👍','👎','❤️','🔥','🎉','👀','💯','🙏','👏','💀','✨','🫡','🤝','😴','🥳'];
+const THEMES=[['Aura','#ff1a1a','#7a0000','#000','n'],['NERV','#ff6a00','#2a0a00','#000','g'],['MAGI','#ffb000','#3a2a00','#000','g'],['EVA-01','#7cff3a','#3b1a6b','#0a2a0a','s'],['EVA-00','#4fc3ff','#0b2a55','#d9d9d9','n'],['EVA-02','#ff2a2a','#8a0000','#2a0000','s'],['Third Impact','#ff5577','#3a0014','#000','d'],['LCL Sea','#ff9a3c','#7a2a00','#1a0500','n'],['Monika','#3ddc84','#0d4d2a','#06150d','d'],['Sayori','#5ab0ff','#1e3a8a','#fbb6d6','n'],['Natsuki','#ff7eb6','#8a1f55','#2a0a1a','d'],['Yuri','#b388ff','#3b1a6b','#0d0518','s'],['Deep Space','#7aa2ff','#0a0f2a','#000','s'],['Nebula','#e040fb','#3a0a5a','#0a1a4a','s'],['Ringed Planet','#ffd54f','#3a2a0a','#0a0a1a','s'],['Meteor Shower','#ffffff','#101830','#000','s'],['Spider','#ff2d3d','#0a1a6b','#6b0000','g'],['Godzilla','#ff6a3d','#1a1a1a','#401000','g'],['Ultrakill','#ffd400','#7a0000','#1a1a1a','s'],['Ocean','#26c6da','#004d66','#001a24','n'],['Forest','#66bb6a','#1b4d2a','#07140b','d'],['Sunset','#ff8a65','#8a2a4a','#ff9a3c','n'],['Mono','#e0e0e0','#444','#111','g']];
+const toTh=a=>({a:a[1],b1:a[2],b2:a[3],p:a[4],d:a[5]??135,...(a[6]||{})});
+const CT=()=>{try{return JSON.parse(localStorage.aura_chat_themes||'[]')}catch(e){return[]}},ALLT=()=>[...THEMES,...CT()];
+const hex=c=>/^#[0-9a-f]{6}$/i.test(c)?c:null;
+/* Themes importer: reads Aura_Files theme exports (aura-themes.json) and Customization Studio codes (AURA1:) */
+function fromHub(t){if(!t||typeof t!=='object'||!hex(t.accent))return null;const g=t.bgx||{},fx=(t.fx&&t.fx.type)||'none',p=/star|space|snow|rain|meteor/i.test(fx)?'s':/matrix|grid|scan|hex/i.test(fx)?'g':fx==='none'?'n':'d',u=t.ux||{},x={};
+ if(t.font&&t.font!=='default'&&/^[\w \-]{2,40}$/.test(t.font))x.f=t.font;if(u.r!=null&&isFinite(u.r))x.r=Math.max(0,Math.min(30,+u.r));if(u.gl!=null&&isFinite(u.gl))x.gl=Math.max(0,Math.min(40,+u.gl));if(hex(u.text)||/^#[0-9a-f]{8}$/i.test(u.text||''))x.tx=u.text;if(u.pa!=null&&isFinite(u.pa))x.pa=Math.max(.2,Math.min(1,+u.pa));
+ return[String(t.themeName||'Imported').slice(0,20),t.accent,hex(g.c3)||hex(g.c2)||'#600000',hex(g.c1)||'#000000',p,Number.isFinite(+g.angle)?+g.angle:135,x]}
+function parseImport(txt){const out=[],add=t=>{const x=fromHub(t);x&&out.push(x)};
+ function walk(d){if(Array.isArray(d))d.forEach(walk);else if(d&&typeof d==='object'){if(d.accent&&(d.themeName||d.bgx||d.fx))add(d);else{['themes','hub_saved_themes','saved'].forEach(k=>d[k]&&walk(d[k]));d.hub_settings&&walk(d.hub_settings)}}}
+ const codes=txt.match(/AURA1:[A-Za-z0-9+\/=_-]+/g)||[];codes.forEach(c=>{try{add(JSON.parse(decodeURIComponent(escape(atob(c.slice(6))))))}catch(e){}});
+ if(!codes.length){try{walk(JSON.parse(txt))}catch(e){}}return out}
+const PF={snd:1,nt:0,cmp:0,h24:0,fs:14,...JSON.parse(localStorage.aura_chat_pref||'{}')},RD=JSON.parse(localStorage.aura_chat_read||'{}');
+const rd=id=>{RD[id]=Date.now();localStorage.aura_chat_read=JSON.stringify(RD)},ub=r=>r.last>(RD[r.id]||0)&&S.sel?.id!==r.id?'<b class="ub">new</b>':'';
+function ux(t){t=t||{};const r=document.documentElement.style,s=(k,v)=>v==null||v===''?r.removeProperty(k):r.setProperty(k,v);r.setProperty('--accent',t.a||'#f00');s('--rad',t.r!=null?t.r+'px':null);s('--glow',t.gl!=null?t.gl+'px':null);s('--muted',t.tx);s('--pa',t.pa);s('--font',t.f?`"${t.f}",Inter,"Segoe UI",sans-serif`:null);s('--bgc',t.b1?`linear-gradient(${t.d??135}deg,#000,color-mix(in srgb,${t.b1} 40%,#000) 55%,color-mix(in srgb,${t.b2||'#000'} 45%,#000))`:null)}
+function prefs(){document.body.style.fontSize=PF.fs+'px';document.body.classList.toggle('cmp',!!PF.cmp)}prefs();
+const fmt=s=>esc(s).replace(/```([\s\S]+?)```/g,'<pre>$1</pre>').replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|\W)\*(?!\s)(.+?)\*(?=\W|$)/g,'$1<i>$2</i>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/~~(.+?)~~/g,'<s>$1</s>').replace(/\|\|(.+?)\|\|/g,'<span class="sp" onclick="this.classList.add(\'sh\')">$1</span>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>').replace(/@(everyone|\w+)/g,'<span class="mn">@$1</span>');
+const EMD={"Smileys":[["☠️","skull and crossbones",0],["☹️","white frowning face",0],["☺️","white smiling face",0],["💆","face massage",1],["💩","pile of poo",0],["😀","grinning face",0],["😁","grinning face with smiling eyes",0],["😂","face with tears of joy",0],["😃","smiling face with open mouth",0],["😄","smiling face with open mouth and smiling eyes",0],["😅","smiling face with open mouth and cold sweat",0],["😆","smiling face with open mouth and tightly closed eyes",0],["😇","smiling face with halo",0],["😈","smiling face with horns",0],["😉","winking face",0],["😊","smiling face with smiling eyes",0],["😋","face savouring delicious food",0],["😌","relieved face",0],["😍","smiling face with heart shaped eyes",0],["😎","smiling face with sunglasses",0],["😏","smirking face",0],["😐","neutral face",0],["😑","expressionless face",0],["😒","unamused face",0],["😓","face with cold sweat",0],["😔","pensive face",0],["😕","confused face",0],["😖","confounded face",0],["😗","kissing face",0],["😘","face throwing a kiss",0],["😙","kissing face with smiling eyes",0],["😚","kissing face with closed eyes",0],["😛","face with stuck out tongue",0],["😜","face with stuck out tongue and winking eye",0],["😝","face with stuck out tongue and tightly closed eyes",0],["😞","disappointed face",0],["😟","worried face",0],["😠","angry face",0],["😡","pouting face",0],["😢","crying face",0],["😣","persevering face",0],["😤","face with look of triumph",0],["😥","disappointed but relieved face",0],["😦","frowning face with open mouth",0],["😧","anguished face",0],["😨","fearful face",0],["😩","weary face",0],["😪","sleepy face",0],["😫","tired face",0],["😬","grimacing face",0],["😭","loudly crying face",0],["😮","face with open mouth",0],["😯","hushed face",0],["😰","face with open mouth and cold sweat",0],["😱","face screaming in fear",0],["😲","astonished face",0],["😳","flushed face",0],["😴","sleeping face",0],["😵","dizzy face",0],["😶","face without mouth",0],["😷","face with medical mask",0],["😸","grinning cat face with smiling eyes",0],["😹","cat face with tears of joy",0],["😺","smiling cat face with open mouth",0],["😻","smiling cat face with heart shaped eyes",0],["😼","cat face with wry smile",0],["😽","kissing cat face with closed eyes",0],["😾","pouting cat face",0],["😿","crying cat face",0],["🙀","weary cat face",0],["🙁","slightly frowning face",0],["🙂","slightly smiling face",0],["🙃","upside down face",0],["🙄","face with rolling eyes",0],["🙅","face with no good gesture",1],["🙆","face with ok gesture",1],["🙎","person with pouting face",1],["🤐","zipper mouth face",0],["🤑","money mouth face",0],["🤒","face with thermometer",0],["🤓","nerd face",0],["🤔","thinking face",0],["🤕","face with head bandage",0],["🤖","robot face",0],["🤗","hugging face",0],["🤠","face with cowboy hat",0],["🤡","clown face",0],["🤢","nauseated face",0],["🤤","drooling face",0],["🤥","lying face",0],["🤦","face palm",1],["🤧","sneezing face",0],["🤨","face with one eyebrow raised",0],["🤩","grinning face with star eyes",0],["🤪","grinning face with one large and one small eye",0],["🤫","face with finger covering closed lips",0],["🤬","serious face with symbols covering mouth",0],["🤭","smiling face with smiling eyes and hand covering mouth",0],["🤮","face with open mouth vomiting",0],["🤯","shocked face with exploding head",0],["🥰","smiling face with smiling eyes and three hearts",0],["🥱","yawning face",0],["🥲","smiling face with tear",0],["🥳","face with party horn and party hat",0],["🥴","face with uneven eyes and wavy mouth",0],["🥵","overheated face",0],["🥶","freezing face",0],["🥸","disguised face",0],["🥹","face holding back tears",0],["🥺","face with pleading eyes",0],["🧐","face with monocle",0],["🫠","melting face",0],["🫡","saluting face",0],["🫢","face with open eyes and hand over mouth",0],["🫣","face with peeking eye",0],["🫤","face with diagonal mouth",0],["🫥","dotted line face",0],["🫨","shaking face",0]],"People":[["☝️","white up pointing index",1],["⛹️","person with ball",1],["✊","raised fist",1],["✋","raised hand",1],["✌️","victory hand",1],["✍️","writing hand",1],["👀","eyes",0],["👁️","eye",0],["👂","ear",1],["👃","nose",1],["👄","mouth",0],["👅","tongue",0],["👆","white up pointing backhand index",1],["👇","white down pointing backhand index",1],["👈","white left pointing backhand index",1],["👉","white right pointing backhand index",1],["👊","fisted hand sign",1],["👋","waving hand sign",1],["👌","ok hand sign",1],["👍","thumbs up sign",1],["👎","thumbs down sign",1],["👏","clapping hands sign",1],["👐","open hands sign",1],["👑","crown",0],["👒","womans hat",0],["👓","eyeglasses",0],["👔","necktie",0],["👕","t shirt",0],["👖","jeans",0],["👗","dress",0],["👘","kimono",0],["👙","bikini",0],["👚","womans clothes",0],["👛","purse",0],["👜","handbag",0],["👝","pouch",0],["👞","mans shoe",0],["👟","athletic shoe",0],["👠","high heeled shoe",0],["👡","womans sandal",0],["👢","womans boots",0],["👣","footprints",0],["👤","bust in silhouette",0],["👥","busts in silhouette",0],["👦","boy",1],["👧","girl",1],["👨","man",1],["👩","woman",1],["👪","family",1],["👫","man and woman holding hands",1],["👬","two men holding hands",1],["👭","two women holding hands",1],["👮","police officer",1],["👯","woman with bunny ears",1],["👰","bride with veil",1],["👱","person with blond hair",1],["👲","man with gua pi mao",1],["👳","man with turban",1],["👴","older man",1],["👵","older woman",1],["👶","baby",1],["👷","construction worker",1],["👸","princess",1],["👹","japanese ogre",0],["👺","japanese goblin",0],["👻","ghost",0],["👼","baby angel",1],["👽","extraterrestrial alien",0],["👾","alien monster",0],["👿","imp",0],["💀","skull",0],["💁","information desk person",1],["💂","guardsman",1],["💃","dancer",1],["💄","lipstick",0],["💅","nail polish",1],["💇","haircut",1],["🕴️","man in business suit levitating",1],["🕵️","sleuth or spy",1],["🕺","man dancing",1],["🙇","person bowing deeply",1],["🙈","see no evil monkey",0],["🙉","hear no evil monkey",0],["🙊","speak no evil monkey",0],["🙋","happy person raising one hand",1],["🙌","person raising both hands in celebration",1],["🙍","person frowning",1],["🙏","person with folded hands",1],["🛋️","couch and lamp",0],["🛌","sleeping accommodation",1],["🤌","pinched fingers",1],["🤍","white heart",0],["🤎","brown heart",0],["🤏","pinching hand",1],["🤘","sign of the horns",1],["🤙","call me hand",1],["🤚","raised back of hand",1],["🤛","left facing fist",1],["🤜","right facing fist",1],["🤝","handshake",1],["🤞","hand with index and middle fingers crossed",1],["🤟","i love you hand sign",1],["🤰","pregnant woman",1],["🤱","breast feeding",1],["🤲","palms up together",1],["🤳","selfie",1],["🤴","prince",1],["🤵","man in tuxedo",1],["🤶","mother christmas",1],["🤷","shrug",1],["🤸","person doing cartwheel",1],["🤹","juggling",1],["🦰","emoji component red hair",0],["🦱","emoji component curly hair",0],["🦲","emoji component bald",0],["🦳","emoji component white hair",0],["🦴","bone",0],["🦵","leg",1],["🦶","foot",1],["🦷","tooth",0],["🦸","superhero",1],["🦹","supervillain",1],["🦺","safety vest",0],["🦻","ear with hearing aid",1],["🦼","motorized wheelchair",0],["🦽","manual wheelchair",0],["🦾","mechanical arm",0],["🦿","mechanical leg",0],["🧍","standing person",1],["🧎","kneeling person",1],["🧏","deaf person",1],["🧑","adult",1],["🧒","child",1],["🧓","older adult",1],["🧔","bearded person",1],["🧕","person with headscarf",1],["🧖","person in steamy room",1],["🧗","person climbing",1],["🧘","person in lotus position",1],["🧙","mage",1],["🧚","fairy",1],["🧛","vampire",1],["🧜","merperson",1],["🧝","elf",1],["🧞","genie",0],["🧟","zombie",0],["🧠","brain",0],["🫀","anatomical heart",0],["🫁","lungs",0],["🫂","people hugging",0],["🫃","pregnant man",1],["🫄","pregnant person",1],["🫅","person with crown",1],["🫰","hand with index finger and thumb crossed",1],["🫱","rightwards hand",1],["🫲","leftwards hand",1],["🫳","palm down hand",1],["🫴","palm up hand",1],["🫵","index pointing at the viewer",1],["🫶","heart hands",1],["🫷","leftwards pushing hand",1],["🫸","rightwards pushing hand",1]],"Nature":[["☀️","black sun with rays",0],["☁️","cloud",0],["☂️","umbrella",0],["☃️","snowman",0],["☄️","comet",0],["☔","umbrella with rain drops",0],["⚡","high voltage sign",0],["⛄","snowman without snow",0],["⛅","sun behind cloud",0],["✨","sparkles",0],["❄️","snowflake",0],["⭐","white medium star",0],["🌀","cyclone",0],["🌁","foggy",0],["🌂","closed umbrella",0],["🌃","night with stars",0],["🌄","sunrise over mountains",0],["🌅","sunrise",0],["🌆","cityscape at dusk",0],["🌇","sunset over buildings",0],["🌈","rainbow",0],["🌉","bridge at night",0],["🌊","water wave",0],["🌋","volcano",0],["🌌","milky way",0],["🌑","new moon symbol",0],["🌒","waxing crescent moon symbol",0],["🌓","first quarter moon symbol",0],["🌔","waxing gibbous moon symbol",0],["🌕","full moon symbol",0],["🌖","waning gibbous moon symbol",0],["🌗","last quarter moon symbol",0],["🌘","waning crescent moon symbol",0],["🌙","crescent moon",0],["🌚","new moon with face",0],["🌛","first quarter moon with face",0],["🌜","last quarter moon with face",0],["🌝","full moon with face",0],["🌞","sun with face",0],["🌟","glowing star",0],["🌠","shooting star",0],["🌡️","thermometer",0],["🌤️","white sun with small cloud",0],["🌥️","white sun behind cloud",0],["🌦️","white sun behind cloud with rain",0],["🌧️","cloud with rain",0],["🌨️","cloud with snow",0],["🌩️","cloud with lightning",0],["🌪️","cloud with tornado",0],["🌫️","fog",0],["🌬️","wind blowing face",0],["🌭","hot dog",0],["🌮","taco",0],["🌯","burrito",0],["🌰","chestnut",0],["🌱","seedling",0],["🌲","evergreen tree",0],["🌳","deciduous tree",0],["🌴","palm tree",0],["🌵","cactus",0],["🌶️","hot pepper",0],["🌷","tulip",0],["🌸","cherry blossom",0],["🌹","rose",0],["🌺","hibiscus",0],["🌻","sunflower",0],["🌼","blossom",0],["🌽","ear of maize",0],["🌾","ear of rice",0],["🌿","herb",0],["🍀","four leaf clover",0],["🍁","maple leaf",0],["🍂","fallen leaf",0],["🍃","leaf fluttering in wind",0],["🍄","mushroom",0],["🐀","rat",0],["🐁","mouse",0],["🐂","ox",0],["🐃","water buffalo",0],["🐄","cow",0],["🐅","tiger",0],["🐆","leopard",0],["🐇","rabbit",0],["🐈","cat",0],["🐉","dragon",0],["🐊","crocodile",0],["🐋","whale",0],["🐌","snail",0],["🐍","snake",0],["🐎","horse",0],["🐏","ram",0],["🐐","goat",0],["🐑","sheep",0],["🐒","monkey",0],["🐓","rooster",0],["🐔","chicken",0],["🐕","dog",0],["🐖","pig",0],["🐗","boar",0],["🐘","elephant",0],["🐙","octopus",0],["🐚","spiral shell",0],["🐛","bug",0],["🐜","ant",0],["🐝","honeybee",0],["🐞","lady beetle",0],["🐟","fish",0],["🐠","tropical fish",0],["🐡","blowfish",0],["🐢","turtle",0],["🐣","hatching chick",0],["🐤","baby chick",0],["🐥","front facing baby chick",0],["🐦","bird",0],["🐧","penguin",0],["🐨","koala",0],["🐩","poodle",0],["🐪","dromedary camel",0],["🐫","bactrian camel",0],["🐬","dolphin",0],["🐭","mouse face",0],["🐮","cow face",0],["🐯","tiger face",0],["🐰","rabbit face",0],["🐱","cat face",0],["🐲","dragon face",0],["🐳","spouting whale",0],["🐴","horse face",0],["🐵","monkey face",0],["🐶","dog face",0],["🐷","pig face",0],["🐸","frog face",0],["🐹","hamster face",0],["🐺","wolf face",0],["🐻","bear face",0],["🐼","panda face",0],["🐽","pig nose",0],["🐾","paw prints",0],["🐿️","chipmunk",0],["💐","bouquet",0],["💧","droplet",0],["🔥","fire",0],["🕊️","dove of peace",0],["🦀","crab",0],["🦁","lion face",0],["🦂","scorpion",0],["🦃","turkey",0],["🦄","unicorn face",0],["🦅","eagle",0],["🦆","duck",0],["🦇","bat",0],["🦈","shark",0],["🦉","owl",0],["🦊","fox face",0],["🦋","butterfly",0],["🦌","deer",0],["🦍","gorilla",0],["🦎","lizard",0],["🦏","rhinoceros",0],["🦐","shrimp",0],["🦑","squid",0],["🦒","giraffe face",0],["🦓","zebra face",0],["🦔","hedgehog",0],["🦕","sauropod",0],["🦖","t rex",0],["🦗","cricket",0],["🦘","kangaroo",0],["🦙","llama",0],["🦚","peacock",0],["🦛","hippopotamus",0],["🦜","parrot",0],["🦝","raccoon",0],["🦞","lobster",0],["🦟","mosquito",0],["🦠","microbe",0],["🦡","badger",0],["🦢","swan",0],["🦣","mammoth",0],["🦤","dodo",0],["🦥","sloth",0],["🦦","otter",0],["🦧","orangutan",0],["🦨","skunk",0],["🦩","flamingo",0],["🦪","oyster",0],["🦫","beaver",0],["🦬","bison",0],["🦭","seal",0],["🦮","guide dog",0],["🪰","fly",0],["🪱","worm",0],["🪲","beetle",0],["🪳","cockroach",0],["🪴","potted plant",0],["🪵","wood",0],["🪶","feather",0],["🪷","lotus",0],["🪸","coral",0],["🪹","empty nest",0],["🪺","nest with eggs",0],["🪻","hyacinth",0],["🪼","jellyfish",0],["🪽","wing",0],["🪾","emoji",0],["🪿","goose",0]],"Food":[["☕","hot beverage",0],["🍅","tomato",0],["🍆","aubergine",0],["🍇","grapes",0],["🍈","melon",0],["🍉","watermelon",0],["🍊","tangerine",0],["🍋","lemon",0],["🍌","banana",0],["🍍","pineapple",0],["🍎","red apple",0],["🍏","green apple",0],["🍐","pear",0],["🍑","peach",0],["🍒","cherries",0],["🍓","strawberry",0],["🍔","hamburger",0],["🍕","slice of pizza",0],["🍖","meat on bone",0],["🍗","poultry leg",0],["🍘","rice cracker",0],["🍙","rice ball",0],["🍚","cooked rice",0],["🍛","curry and rice",0],["🍜","steaming bowl",0],["🍝","spaghetti",0],["🍞","bread",0],["🍟","french fries",0],["🍠","roasted sweet potato",0],["🍡","dango",0],["🍢","oden",0],["🍣","sushi",0],["🍤","fried shrimp",0],["🍥","fish cake with swirl design",0],["🍦","soft ice cream",0],["🍧","shaved ice",0],["🍨","ice cream",0],["🍩","doughnut",0],["🍪","cookie",0],["🍫","chocolate bar",0],["🍬","candy",0],["🍭","lollipop",0],["🍮","custard",0],["🍯","honey pot",0],["🍰","shortcake",0],["🍱","bento box",0],["🍲","pot of food",0],["🍳","cooking",0],["🍴","fork and knife",0],["🍵","teacup without handle",0],["🍶","sake bottle and cup",0],["🍷","wine glass",0],["🍸","cocktail glass",0],["🍹","tropical drink",0],["🍺","beer mug",0],["🍻","clinking beer mugs",0],["🍼","baby bottle",0],["🍽️","fork and knife with plate",0],["🍾","bottle with popping cork",0],["🍿","popcorn",0],["🥐","croissant",0],["🥑","avocado",0],["🥒","cucumber",0],["🥓","bacon",0],["🥔","potato",0],["🥕","carrot",0],["🥖","baguette bread",0],["🥗","green salad",0],["🥘","shallow pan of food",0],["🥙","stuffed flatbread",0],["🥚","egg",0],["🥛","glass of milk",0],["🥜","peanuts",0],["🥝","kiwifruit",0],["🥞","pancakes",0],["🥟","dumpling",0],["🥠","fortune cookie",0],["🥡","takeout box",0],["🥢","chopsticks",0],["🥣","bowl with spoon",0],["🥤","cup with straw",0],["🥥","coconut",0],["🥦","broccoli",0],["🥧","pie",0],["🥨","pretzel",0],["🥩","cut of meat",0],["🥪","sandwich",0],["🥫","canned food",0],["🥬","leafy green",0],["🥭","mango",0],["🥮","moon cake",0],["🥯","bagel",0],["🧀","cheese wedge",0],["🧁","cupcake",0],["🧂","salt shaker",0],["🧃","beverage box",0],["🧄","garlic",0],["🧅","onion",0],["🧆","falafel",0],["🧇","waffle",0],["🧈","butter",0],["🧉","mate drink",0],["🧊","ice cube",0],["🧋","bubble tea",0],["🫐","blueberries",0],["🫑","bell pepper",0],["🫒","olive",0],["🫓","flatbread",0],["🫔","tamale",0],["🫕","fondue",0],["🫖","teapot",0],["🫗","pouring liquid",0],["🫘","beans",0],["🫙","jar",0],["🫚","ginger root",0],["🫛","pea pod",0]],"Activities":[["⚽","soccer ball",0],["⚾","baseball",0],["🎀","ribbon",0],["🎁","wrapped present",0],["🎂","birthday cake",0],["🎃","jack o lantern",0],["🎄","christmas tree",0],["🎅","father christmas",1],["🎆","fireworks",0],["🎇","firework sparkler",0],["🎈","balloon",0],["🎉","party popper",0],["🎊","confetti ball",0],["🎋","tanabata tree",0],["🎌","crossed flags",0],["🎍","pine decoration",0],["🎎","japanese dolls",0],["🎏","carp streamer",0],["🎐","wind chime",0],["🎑","moon viewing ceremony",0],["🎒","school satchel",0],["🎓","graduation cap",0],["🎖️","military medal",0],["🎗️","reminder ribbon",0],["🎙️","studio microphone",0],["🎚️","level slider",0],["🎛️","control knobs",0],["🎞️","film frames",0],["🎟️","admission tickets",0],["🎠","carousel horse",0],["🎡","ferris wheel",0],["🎢","roller coaster",0],["🎣","fishing pole and fish",0],["🎤","microphone",0],["🎥","movie camera",0],["🎦","cinema",0],["🎧","headphone",0],["🎨","artist palette",0],["🎩","top hat",0],["🎪","circus tent",0],["🎫","ticket",0],["🎬","clapper board",0],["🎭","performing arts",0],["🎮","video game",0],["🎯","direct hit",0],["🎰","slot machine",0],["🎱","billiards",0],["🎲","game die",0],["🎳","bowling",0],["🎴","flower playing cards",0],["🎵","musical note",0],["🎶","multiple musical notes",0],["🎷","saxophone",0],["🎸","guitar",0],["🎹","musical keyboard",0],["🎺","trumpet",0],["🎻","violin",0],["🎼","musical score",0],["🎽","running shirt with sash",0],["🎾","tennis racquet and ball",0],["🎿","ski and ski boot",0],["🏀","basketball and hoop",0],["🏁","chequered flag",0],["🏂","snowboarder",1],["🏃","runner",1],["🏄","surfer",1],["🏅","sports medal",0],["🏆","trophy",0],["🏇","horse racing",1],["🏈","american football",0],["🏉","rugby football",0],["🏊","swimmer",1],["🏏","cricket bat and ball",0],["🏐","volleyball",0],["🏑","field hockey stick and ball",0],["🏒","ice hockey stick and puck",0],["🏓","table tennis paddle and ball",0],["🏸","badminton racquet and shuttlecock",0],["🏹","bow and arrow",0],["🤺","fencer",0],["🤼","wrestlers",1],["🤽","water polo",1],["🤾","handball",1],["🤿","diving mask",0],["🥀","wilted flower",0],["🥁","drum with drumsticks",0],["🥂","clinking glasses",0],["🥃","tumbler glass",0],["🥄","spoon",0],["🥅","goal net",0],["🥇","first place medal",0],["🥈","second place medal",0],["🥉","third place medal",0],["🥊","boxing glove",0],["🥋","martial arts uniform",0],["🥌","curling stone",0],["🥍","lacrosse stick and ball",0],["🥎","softball",0],["🥏","flying disc",0],["🧩","jigsaw puzzle piece",0],["🪀","yo yo",0],["🪁","kite",0],["🪂","parachute",0],["🪃","boomerang",0],["🪄","magic wand",0],["🪅","pinata",0],["🪆","nesting dolls",0],["🪇","maracas",0],["🪈","flute",0],["🪉","emoji",0],["🪊","emoji",0],["🪎","emoji",0],["🪏","emoji",0]],"Travel":[["⌚","watch",0],["⌛","hourglass",0],["⏰","alarm clock",0],["⏱️","stopwatch",0],["⏲️","timer clock",0],["⏳","hourglass with flowing sand",0],["⚓","anchor",0],["⛲","fountain",0],["⛳","flag in hole",0],["⛴️","ferry",0],["⛵","sailboat",0],["⛺","tent",0],["⛽","fuel pump",0],["✈️","airplane",0],["🌍","earth globe europe africa",0],["🌎","earth globe americas",0],["🌏","earth globe asia australia",0],["🌐","globe with meridians",0],["🏔️","snow capped mountain",0],["🏕️","camping",0],["🏖️","beach with umbrella",0],["🏗️","building construction",0],["🏘️","house buildings",0],["🏙️","cityscape",0],["🏚️","derelict house building",0],["🏛️","classical building",0],["🏜️","desert",0],["🏝️","desert island",0],["🏞️","national park",0],["🏟️","stadium",0],["🏠","house building",0],["🏡","house with garden",0],["🏢","office building",0],["🏣","japanese post office",0],["🏤","european post office",0],["🏥","hospital",0],["🏦","bank",0],["🏧","automated teller machine",0],["🏨","hotel",0],["🏩","love hotel",0],["🏪","convenience store",0],["🏫","school",0],["🏬","department store",0],["🏭","factory",0],["🏮","izakaya lantern",0],["🏯","japanese castle",0],["🏰","european castle",0],["🕐","clock face one oclock",0],["🕑","clock face two oclock",0],["🕒","clock face three oclock",0],["🕓","clock face four oclock",0],["🕔","clock face five oclock",0],["🕕","clock face six oclock",0],["🕖","clock face seven oclock",0],["🕗","clock face eight oclock",0],["🕘","clock face nine oclock",0],["🕙","clock face ten oclock",0],["🕚","clock face eleven oclock",0],["🕛","clock face twelve oclock",0],["🕜","clock face one thirty",0],["🕝","clock face two thirty",0],["🕞","clock face three thirty",0],["🕟","clock face four thirty",0],["🕠","clock face five thirty",0],["🕡","clock face six thirty",0],["🕢","clock face seven thirty",0],["🕣","clock face eight thirty",0],["🕤","clock face nine thirty",0],["🕥","clock face ten thirty",0],["🕦","clock face eleven thirty",0],["🕧","clock face twelve thirty",0],["🗺️","world map",0],["🗻","mount fuji",0],["🗼","tokyo tower",0],["🗽","statue of liberty",0],["🗾","silhouette of japan",0],["🗿","moyai",0],["🚀","rocket",0],["🚁","helicopter",0],["🚂","steam locomotive",0],["🚃","railway car",0],["🚄","high speed train",0],["🚅","high speed train with bullet nose",0],["🚆","train",0],["🚇","metro",0],["🚈","light rail",0],["🚉","station",0],["🚊","tram",0],["🚋","tram car",0],["🚌","bus",0],["🚍","oncoming bus",0],["🚎","trolleybus",0],["🚏","bus stop",0],["🚐","minibus",0],["🚑","ambulance",0],["🚒","fire engine",0],["🚓","police car",0],["🚔","oncoming police car",0],["🚕","taxi",0],["🚖","oncoming taxi",0],["🚗","automobile",0],["🚘","oncoming automobile",0],["🚙","recreational vehicle",0],["🚚","delivery truck",0],["🚛","articulated lorry",0],["🚜","tractor",0],["🚝","monorail",0],["🚞","mountain railway",0],["🚟","suspension railway",0],["🚠","mountain cableway",0],["🚡","aerial tramway",0],["🚢","ship",0],["🚣","rowboat",1],["🚤","speedboat",0],["🚥","horizontal traffic light",0],["🚦","vertical traffic light",0],["🚧","construction sign",0],["🚨","police cars revolving light",0],["🚩","triangular flag on post",0],["🚪","door",0],["🚫","no entry sign",0],["🚬","smoking symbol",0],["🚭","no smoking symbol",0],["🚮","put litter in its place symbol",0],["🚯","do not litter symbol",0],["🚰","potable water symbol",0],["🚱","non potable water symbol",0],["🚲","bicycle",0],["🚳","no bicycles",0],["🚴","bicyclist",1],["🚵","mountain bicyclist",1],["🚶","pedestrian",1],["🚷","no pedestrians",0],["🚸","children crossing",0],["🚹","mens symbol",0],["🚺","womens symbol",0],["🚻","restroom",0],["🚼","baby symbol",0],["🚽","toilet",0],["🚾","water closet",0],["🚿","shower",0],["🛀","bath",1],["🛁","bathtub",0],["🛂","passport control",0],["🛃","customs",0],["🛄","baggage claim",0],["🛅","left luggage",0],["🛐","place of worship",0],["🛑","octagonal sign",0],["🛒","shopping trolley",0],["🛕","hindu temple",0],["🛖","hut",0],["🛗","elevator",0],["🛘","emoji",0],["🛜","wireless",0],["🛝","playground slide",0],["🛞","wheel",0],["🛟","ring buoy",0],["🛠️","hammer and wrench",0],["🛡️","shield",0],["🛢️","oil drum",0],["🛣️","motorway",0],["🛤️","railway track",0],["🛥️","motor boat",0],["🛩️","small airplane",0],["🛫","airplane departure",0],["🛬","airplane arriving",0],["🛰️","satellite",0],["🛳️","passenger ship",0],["🛴","scooter",0],["🛵","motor scooter",0],["🛶","canoe",0],["🛷","sled",0],["🛸","flying saucer",0],["🛹","skateboard",0],["🛺","auto rickshaw",0],["🛻","pickup truck",0],["🛼","roller skate",0]],"Objects":[["⌨️","keyboard",0],["☎️","black telephone",0],["⚒️","hammer and pick",0],["⚔️","crossed swords",0],["⚕️","staff of aesculapius",0],["⚖️","scales",0],["⚗️","alembic",0],["⚙️","gear",0],["⛏️","pick",0],["⛑️","helmet with white cross",0],["⛓️","chains",0],["✉️","envelope",0],["✏️","pencil",0],["✒️","black nib",0],["💡","electric light bulb",0],["💢","anger symbol",0],["💣","bomb",0],["💤","sleeping symbol",0],["💥","collision symbol",0],["💦","splashing sweat symbol",0],["💨","dash symbol",0],["💪","flexed biceps",1],["💫","dizzy symbol",0],["💬","speech balloon",0],["💭","thought balloon",0],["💮","white flower",0],["💯","hundred points symbol",0],["💰","money bag",0],["💱","currency exchange",0],["💲","heavy dollar sign",0],["💳","credit card",0],["💴","banknote with yen sign",0],["💵","banknote with dollar sign",0],["💶","banknote with euro sign",0],["💷","banknote with pound sign",0],["💸","money with wings",0],["💹","chart with upwards trend and yen sign",0],["💺","seat",0],["💻","personal computer",0],["💼","briefcase",0],["💽","minidisc",0],["💾","floppy disk",0],["💿","optical disc",0],["📀","dvd",0],["📁","file folder",0],["📂","open file folder",0],["📃","page with curl",0],["📄","page facing up",0],["📅","calendar",0],["📆","tear off calendar",0],["📇","card index",0],["📈","chart with upwards trend",0],["📉","chart with downwards trend",0],["📊","bar chart",0],["📋","clipboard",0],["📌","pushpin",0],["📍","round pushpin",0],["📎","paperclip",0],["📏","straight ruler",0],["📐","triangular ruler",0],["📑","bookmark tabs",0],["📒","ledger",0],["📓","notebook",0],["📔","notebook with decorative cover",0],["📕","closed book",0],["📖","open book",0],["📗","green book",0],["📘","blue book",0],["📙","orange book",0],["📚","books",0],["📛","name badge",0],["📜","scroll",0],["📝","memo",0],["📞","telephone receiver",0],["📟","pager",0],["📠","fax machine",0],["📡","satellite antenna",0],["📢","public address loudspeaker",0],["📣","cheering megaphone",0],["📤","outbox tray",0],["📥","inbox tray",0],["📦","package",0],["📧","e mail symbol",0],["📨","incoming envelope",0],["📩","envelope with downwards arrow above",0],["📪","closed mailbox with lowered flag",0],["📫","closed mailbox with raised flag",0],["📬","open mailbox with raised flag",0],["📭","open mailbox with lowered flag",0],["📮","postbox",0],["📯","postal horn",0],["📰","newspaper",0],["📱","mobile phone",0],["📲","mobile phone with rightwards arrow at left",0],["📳","vibration mode",0],["📴","mobile phone off",0],["📵","no mobile phones",0],["📶","antenna with bars",0],["📷","camera",0],["📸","camera with flash",0],["📹","video camera",0],["📺","television",0],["📻","radio",0],["📼","videocassette",0],["📽️","film projector",0],["📿","prayer beads",0],["🔇","speaker with cancellation stroke",0],["🔈","speaker",0],["🔉","speaker with one sound wave",0],["🔊","speaker with three sound waves",0],["🔋","battery",0],["🔌","electric plug",0],["🔍","left pointing magnifying glass",0],["🔎","right pointing magnifying glass",0],["🔏","lock with ink pen",0],["🔐","closed lock with key",0],["🔑","key",0],["🔒","lock",0],["🔓","open lock",0],["🔔","bell",0],["🔖","bookmark",0],["🔗","link symbol",0],["🔘","radio button",0],["🔙","back with leftwards arrow above",0],["🔚","end with leftwards arrow above",0],["🔛","on with exclamation mark with left right arrow above",0],["🔜","soon with rightwards arrow above",0],["🔝","top with upwards arrow above",0],["🔞","no one under eighteen symbol",0],["🔟","keycap ten",0],["🔠","input symbol for latin capital letters",0],["🔡","input symbol for latin small letters",0],["🔢","input symbol for numbers",0],["🔣","input symbol for symbols",0],["🔤","input symbol for latin letters",0],["🔦","electric torch",0],["🔧","wrench",0],["🔨","hammer",0],["🔩","nut and bolt",0],["🔪","hocho",0],["🔫","pistol",0],["🔬","microscope",0],["🔭","telescope",0],["🔮","crystal ball",0],["🕯️","candle",0],["🕰️","mantelpiece clock",0],["🕳️","hole",0],["🕶️","dark sunglasses",0],["🕷️","spider",0],["🕸️","spider web",0],["🕹️","joystick",0],["🖇️","linked paperclips",0],["🖊️","lower left ballpoint pen",0],["🖋️","lower left fountain pen",0],["🖌️","lower left paintbrush",0],["🖍️","lower left crayon",0],["🖐️","raised hand with fingers splayed",1],["🖕","reversed hand with middle finger extended",1],["🖖","raised hand with part between middle and ring fingers",1],["🖤","black heart",0],["🖥️","desktop computer",0],["🖨️","printer",0],["🖱️","three button mouse",0],["🖲️","trackball",0],["🖼️","frame with picture",0],["🗂️","card index dividers",0],["🗃️","card file box",0],["🗄️","file cabinet",0],["🗑️","wastebasket",0],["🗒️","spiral note pad",0],["🗓️","spiral calendar pad",0],["🗜️","compression",0],["🗝️","old key",0],["🗞️","rolled up newspaper",0],["🗡️","dagger knife",0],["🗣️","speaking head in silhouette",0],["🗨️","left speech bubble",0],["🗯️","right anger bubble",0],["🗳️","ballot box with ballot",0],["🧡","orange heart",0],["🧢","billed cap",0],["🧣","scarf",0],["🧤","gloves",0],["🧥","coat",0],["🧦","socks",0],["🧧","red gift envelope",0],["🧨","firecracker",0],["🧪","test tube",0],["🧫","petri dish",0],["🧬","dna double helix",0],["🧭","compass",0],["🧮","abacus",0],["🧯","fire extinguisher",0],["🧰","toolbox",0],["🧱","brick",0],["🧲","magnet",0],["🧳","luggage",0],["🧴","lotion bottle",0],["🧵","spool of thread",0],["🧶","ball of yarn",0],["🧷","safety pin",0],["🧸","teddy bear",0],["🧹","broom",0],["🧺","basket",0],["🧻","roll of paper",0],["🧼","bar of soap",0],["🧽","sponge",0],["🧾","receipt",0],["🧿","nazar amulet",0],["🩰","ballet shoes",0],["🩱","one piece swimsuit",0],["🩲","briefs",0],["🩳","shorts",0],["🩴","thong sandal",0],["🩵","light blue heart",0],["🩶","grey heart",0],["🩷","pink heart",0],["🩸","drop of blood",0],["🩹","adhesive bandage",0],["🩺","stethoscope",0],["🩻","x ray",0],["🩼","crutch",0],["🪐","ringed planet",0],["🪑","chair",0],["🪒","razor",0],["🪓","axe",0],["🪔","diya lamp",0],["🪕","banjo",0],["🪖","military helmet",0],["🪗","accordion",0],["🪘","long drum",0],["🪙","coin",0],["🪚","carpentry saw",0],["🪛","screwdriver",0],["🪜","ladder",0],["🪝","hook",0],["🪞","mirror",0],["🪟","window",0],["🪠","plunger",0],["🪡","sewing needle",0],["🪢","knot",0],["🪣","bucket",0],["🪤","mouse trap",0],["🪥","toothbrush",0],["🪦","headstone",0],["🪧","placard",0],["🪨","rock",0],["🪩","mirror ball",0],["🪪","identification card",0],["🪫","low battery",0],["🪬","hamsa",0],["🪭","folding hand fan",0],["🪮","hair pick",0],["🪯","khanda",0]],"Symbols":[["‼️","double exclamation mark",0],["⁉️","exclamation question mark",0],["™️","trade mark sign",0],["ℹ️","information source",0],["↔️","left right arrow",0],["↕️","up down arrow",0],["↖️","north west arrow",0],["↗️","north east arrow",0],["↘️","south east arrow",0],["↙️","south west arrow",0],["↩️","leftwards arrow with hook",0],["↪️","rightwards arrow with hook",0],["⏏️","eject symbol",0],["⏩","black right pointing double triangle",0],["⏪","black left pointing double triangle",0],["⏫","black up pointing double triangle",0],["⏬","black down pointing double triangle",0],["⏭️","black right pointing double triangle with vertical bar",0],["⏮️","black left pointing double triangle with vertical bar",0],["⏯️","black right pointing triangle with double vertical bar",0],["⏸️","double vertical bar",0],["⏹️","black square for stop",0],["⏺️","black circle for record",0],["Ⓜ️","circled latin capital letter m",0],["▪️","black small square",0],["▫️","white small square",0],["▶️","black right pointing triangle",0],["◀️","black left pointing triangle",0],["◻️","white medium square",0],["◼️","black medium square",0],["◽","white medium small square",0],["◾","black medium small square",0],["☑️","ballot box with check",0],["☘️","shamrock",0],["☢️","radioactive sign",0],["☣️","biohazard sign",0],["☦️","orthodox cross",0],["☪️","star and crescent",0],["☮️","peace symbol",0],["☯️","yin yang",0],["☸️","wheel of dharma",0],["♀️","female sign",0],["♂️","male sign",0],["♈","aries",0],["♉","taurus",0],["♊","gemini",0],["♋","cancer",0],["♌","leo",0],["♍","virgo",0],["♎","libra",0],["♏","scorpius",0],["♐","sagittarius",0],["♑","capricorn",0],["♒","aquarius",0],["♓","pisces",0],["♟️","black chess pawn",0],["♠️","black spade suit",0],["♣️","black club suit",0],["♥️","black heart suit",0],["♦️","black diamond suit",0],["♨️","hot springs",0],["♻️","black universal recycling symbol",0],["♾️","permanent paper sign",0],["♿","wheelchair symbol",0],["⚛️","atom symbol",0],["⚜️","fleur de lis",0],["⚠️","warning sign",0],["⚧️","male with stroke and male and female sign",0],["⚪","medium white circle",0],["⚫","medium black circle",0],["⚰️","coffin",0],["⚱️","funeral urn",0],["⛈️","thunder cloud and rain",0],["⛎","ophiuchus",0],["⛔","no entry",0],["⛩️","shinto shrine",0],["⛪","church",0],["⛰️","mountain",0],["⛱️","umbrella on ground",0],["⛷️","skier",0],["⛸️","ice skate",0],["✂️","black scissors",0],["✅","white heavy check mark",0],["✔️","heavy check mark",0],["✖️","heavy multiplication x",0],["✝️","latin cross",0],["✡️","star of david",0],["✳️","eight spoked asterisk",0],["✴️","eight pointed black star",0],["❇️","sparkle",0],["❌","cross mark",0],["❎","negative squared cross mark",0],["❓","black question mark ornament",0],["❔","white question mark ornament",0],["❕","white exclamation mark ornament",0],["❗","heavy exclamation mark symbol",0],["❣️","heavy heart exclamation mark ornament",0],["❤️","heavy black heart",0],["➕","heavy plus sign",0],["➖","heavy minus sign",0],["➗","heavy division sign",0],["➡️","black rightwards arrow",0],["➰","curly loop",0],["➿","double curly loop",0],["⤴️","arrow pointing rightwards then curving upwards",0],["⤵️","arrow pointing rightwards then curving downwards",0],["⬅️","leftwards black arrow",0],["⬆️","upwards black arrow",0],["⬇️","downwards black arrow",0],["⬛","black large square",0],["⬜","white large square",0],["⭕","heavy large circle",0],["〰️","wavy dash",0],["〽️","part alternation mark",0],["㊗️","circled ideograph congratulation",0],["㊙️","circled ideograph secret",0],["🀄","mahjong tile red dragon",0],["🃏","playing card black joker",0],["🅰️","negative squared latin capital letter a",0],["🅱️","negative squared latin capital letter b",0],["🅾️","negative squared latin capital letter o",0],["🅿️","negative squared latin capital letter p",0],["🆎","negative squared ab",0],["🆑","squared cl",0],["🆒","squared cool",0],["🆓","squared free",0],["🆔","squared id",0],["🆕","squared new",0],["🆖","squared ng",0],["🆗","squared ok",0],["🆘","squared sos",0],["🆙","squared up with exclamation mark",0],["🆚","squared vs",0],["🈁","squared katakana koko",0],["🈂️","squared katakana sa",0],["🈚","squared cjk unified ideograph 7121",0],["🈯","squared cjk unified ideograph 6307",0],["🈲","squared cjk unified ideograph 7981",0],["🈳","squared cjk unified ideograph 7a7a",0],["🈴","squared cjk unified ideograph 5408",0],["🈵","squared cjk unified ideograph 6e80",0],["🈶","squared cjk unified ideograph 6709",0],["🈷️","squared cjk unified ideograph 6708",0],["🈸","squared cjk unified ideograph 7533",0],["🈹","squared cjk unified ideograph 5272",0],["🈺","squared cjk unified ideograph 55b6",0],["🉐","circled ideograph advantage",0],["🉑","circled ideograph accept",0],["🏋️","weight lifter",1],["🏌️","golfer",1],["🏍️","racing motorcycle",0],["🏎️","racing car",0],["🏳️","waving white flag",0],["🏴","waving black flag",0],["🏵️","rosette",0],["🏷️","label",0],["🏺","amphora",0],["💈","barber pole",0],["💉","syringe",0],["💊","pill",0],["💋","kiss mark",0],["💌","love letter",0],["💍","ring",0],["💎","gem stone",0],["💏","kiss",1],["💑","couple with heart",1],["💒","wedding",0],["💓","beating heart",0],["💔","broken heart",0],["💕","two hearts",0],["💖","sparkling heart",0],["💗","growing heart",0],["💘","heart with arrow",0],["💙","blue heart",0],["💚","green heart",0],["💛","yellow heart",0],["💜","purple heart",0],["💝","heart with ribbon",0],["💞","revolving hearts",0],["💟","heart decoration",0],["💠","diamond shape with a dot inside",0],["🔀","twisted rightwards arrows",0],["🔁","clockwise rightwards and leftwards open circle arrows",0],["🔂","clockwise rightwards and leftwards open circle arrows with circled one overlay",0],["🔃","clockwise downwards and upwards open circle arrows",0],["🔄","anticlockwise downwards and upwards open circle arrows",0],["🔅","low brightness symbol",0],["🔆","high brightness symbol",0],["🔕","bell with cancellation stroke",0],["🔯","six pointed star with middle dot",0],["🔰","japanese symbol for beginner",0],["🔱","trident emblem",0],["🔲","black square button",0],["🔳","white square button",0],["🔴","large red circle",0],["🔵","large blue circle",0],["🔶","large orange diamond",0],["🔷","large blue diamond",0],["🔸","small orange diamond",0],["🔹","small blue diamond",0],["🔺","up pointing red triangle",0],["🔻","down pointing red triangle",0],["🔼","up pointing small red triangle",0],["🔽","down pointing small red triangle",0],["🕉️","om symbol",0],["🕋","kaaba",0],["🕌","mosque",0],["🕍","synagogue",0],["🕎","menorah with nine branches",0],["🛍️","shopping bags",0],["🛎️","bellhop bell",0],["🛏️","bed",0],["🟠","large orange circle",0],["🟡","large yellow circle",0],["🟢","large green circle",0],["🟣","large purple circle",0],["🟤","large brown circle",0],["🟥","large red square",0],["🟦","large blue square",0],["🟧","large orange square",0],["🟨","large yellow square",0],["🟩","large green square",0],["🟪","large purple square",0],["🟫","large brown square",0],["🟰","heavy equals sign",0],["🤣","rolling on the floor laughing",0],["🥷","ninja",1],["🥻","sari",0],["🥼","lab coat",0],["🥽","goggles",0],["🥾","hiking boot",0],["🥿","flat shoe",0],["🦯","probing cane",0],["🧌","troll",0],["🫆","emoji",0],["🫈","emoji",0],["🫍","emoji",0],["🫎","moose",0],["🫏","donkey",0],["🫜","emoji",0],["🫟","emoji",0],["🫦","biting lip",0],["🫧","bubbles",0],["🫩","emoji",0],["🫪","emoji",0],["🫯","emoji",0]]};
+const CATS=Object.keys(EMD),FX=[['🏁','chequered flag',0],['🚩','triangular flag',0],['🎌','crossed flags',0],['🏴','black flag',0],['🏳️','white flag',0],['🏳️‍🌈','rainbow flag',0],['🏴‍☠️','pirate flag',0]],TONES=['','🏻','🏼','🏽','🏾','🏿'],P={tab:'e',cat:'Smileys',q:'',tone:'',mode:'ins',gn:0},GIFRE=/^https:\/\/\S+\.(gif|webp)(\?\S*)?$|^https:\/\/(media\d*\.tenor\.com|media\d*\.giphy\.com|i\.giphy\.com|static\.klipy\.com|media\.klipy\.com)\/\S+$/i;
+let FL=null;const RC=()=>{try{return JSON.parse(localStorage.aura_chat_recent||'[]')}catch(e){return[]}},sp=()=>localStorage.aura_chat_pref=JSON.stringify(PF);
+function flags(){if(FL)return FL;FL=[];try{const dn=new Intl.DisplayNames(['en'],{type:'region'});for(let i=0;i<26;i++)for(let j=0;j<26;j++){const c=String.fromCharCode(65+i,65+j);let n;try{n=dn.of(c)}catch(e){continue}if(n&&n!==c&&!/unknown|pseudo/i.test(n)&&!['QO','XA','XB'].includes(c))FL.push([String.fromCodePoint(0x1F1E6+i,0x1F1E6+j),n.toLowerCase(),0])}}catch(e){}return FL}
+function items(){const q=P.q.trim().toLowerCase();if(q){const L=[];CATS.forEach(c=>EMD[c].forEach(e=>e[1].includes(q)&&L.push(e)));flags().concat(FX).forEach(e=>e[1].includes(q)&&L.push(e));return L}return P.cat==='Recent'?RC().map(c=>[c,'',0]):P.cat==='Flags'?flags().concat(FX):EMD[P.cat]||[]}
+function pg(){const el=$('#pg');if(!el)return;el.innerHTML=items().slice(0,600).map(e=>{const c=e[2]&&P.tone?e[0].replace(/\uFE0F/g,'')+P.tone:e[0];return `<button data-a="pe" data-v="${c}" title="${esc(e[1])}">${c}</button>`}).join('')||'<div class="empty">No emoji found.</div>'}
+function pk(mode,tab){P.mode=mode;P.tab=mode==='react'?'e':tab;const e=P.tab==='e';if(e&&P.cat==='Recent'&&!RC().length)P.cat='Smileys';
+ modal(`<div class="pk"><div class="tabs" style="padding:0 0 8px">${(mode==='ins'?[['g','GIFs'],['s','Stickers'],['e','Emoji']]:[['e','Emoji']]).map(([k,n])=>`<button class="${P.tab===k?'on':''}" data-a="ptab" data-v="${k}">${n}</button>`).join('')}</div>${e?`<input class="in" id="pq" placeholder="Search ${CATS.reduce((n,c)=>n+EMD[c].length,0)}+ emoji" value="${esc(P.q)}" autocomplete="off"><div class="cats">${['Recent',...CATS,'Flags'].map(c=>`<button class="${P.cat===c&&!P.q?'on':''}" data-a="pcat" data-v="${c}">${c}</button>`).join('')}</div><div class="cats"><span style="font-size:12px;opacity:.6;align-self:center">Skin tone</span>${TONES.map(t=>`<button class="${P.tone===t?'on':''}" data-a="ptone" data-v="${t}">${'✋'+t}</button>`).join('')}</div><div class="pg" id="pg"></div>`:gifBody()}<div class="cbt" style="margin-top:12px"><button class="btn g sm" data-a="close">Close</button></div></div>`);
+ if(e)pg();else{gstart();const q=$('#gq');if(q&&!q.value)q.focus()}}
+const PRV={all:{n:'All sources (GIFs + stickers)'},klipy:{n:'KLIPY',key:'klipy.com/developers',ty:1},giphy:{n:'GIPHY',key:'developers.giphy.com',ty:1},
+ nekos:{n:'Anime reactions (nekos.best)',cat:['baka','bite','blush','bored','cry','cuddle','dance','facepalm','feed','handhold','handshake','happy','highfive','hug','kick','kiss','laugh','lurk','nod','nom','nope','pat','peck','poke','pout','punch','run','shoot','shrug','slap','sleep','smile','smug','stare','think','thumbsup','tickle','wave','wink','yawn','yeet']},
+ waifu:{n:'Anime GIFs (waifu.pics)',cat:['bully','cuddle','cry','hug','kiss','lick','pat','smug','bonk','yeet','blush','smile','wave','highfive','handhold','nom','bite','glomp','slap','kick','happy','wink','poke','dance','cringe']},
+ wiki:{n:'Wikimedia Commons'},meme:{n:'Memes (Imgflip, images)'}},
+ TAGS=['happy','sad','lol','wow','love','angry','dance','thumbs up','facepalm','cheers','bored','hello','bye','yes','no','shrug','omg','sleepy','celebrate','cool','cat','dog','gaming','anime'],LIM=24;
+PF.keys=PF.keys||(PF.gk?{[PF.gp||'klipy']:PF.gk}:{});let MEMES=null;const SHARED_KEYS={klipy:'7ASrEZ8Zwh43JtplCtTSOyKCKP2oPkkqEvOPbdgs7a687DH1ZVxsltwukbc73po0',giphy:'j2Pe4cNHRPrJGs2Fkw0DSVQ6dsnSpdUi'},KEY=k=>PF.keys[k]||SHARED_KEYS[k]||'';
+const FAV=()=>S.me?.favg||JSON.parse(localStorage.aura_chat_fav||'[]'),RG=()=>{try{return JSON.parse(localStorage.aura_chat_rgif||'[]')}catch(e){return[]}};
+function togFav(t,f){let l=FAV().filter(x=>x),on=l.some(x=>x.f===f);l=on?l.filter(x=>x.f!==f):[{t,f},...l].slice(0,150);localStorage.aura_chat_fav=JSON.stringify(l);S.me&&B.patch('users',S.me.id,{favg:l});if(S.me)S.me.favg=l;return!on}
+const hasKey=()=>!PRV[P.pv].key||KEY(P.pv);
+const GT=[['hello','wave'],['lol','laugh'],['love','hug'],['happy birthday','dance'],['thank you','handshake'],['good night','sleep'],['yes','nod'],['no','nope'],['omg','shocked'],['sad','cry'],['angry','angry'],['facepalm','facepalm'],['cheers','sip'],['shrug','shrug'],['clap','clap'],['bye','salute']],TP=(()=>{try{return JSON.parse(localStorage.aura_chat_tiles||'{}')}catch(e){return{}}})();
+function tprev(c,el){const set=u=>{if(el&&el.isConnected)el.style.backgroundImage=`url("${u}")`};if(TP[c])return set(TP[c]);fetch(`https://nekos.best/api/v2/${c}`).then(r=>r.json()).then(j=>{const u=j.results?.[0]?.url;if(u){TP[c]=u;try{localStorage.aura_chat_tiles=JSON.stringify(TP)}catch(e){}set(u)}}).catch(()=>{})}
+const MY=()=>{try{return JSON.parse(localStorage.aura_chat_mygif||'[]')}catch(e){return[]}},favItems=()=>[...MY().map(x=>({t:x.t,f:x.t,my:x.id})),...FAV().filter(x=>x)];
+function saveMy(d){if(d.length>700000){toast('That GIF is too big (max about 500 KB).');return 0}let l=MY();if(l.some(x=>x.t===d)){toast('That GIF is already in your favorites.');return 0}l=[{id:'g'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:d},...l].slice(0,10);try{localStorage.aura_chat_mygif=JSON.stringify(l)}catch(e){toast('Browser storage is full. Remove some uploaded GIFs first.');return 0}return 1}
+function addMyGif(f){if(!f||f.type!=='image/gif')return toast('Only .gif files can be added.');const r=new FileReader();r.onload=()=>{if(saveMy(r.result)){toast('GIF added to your favorites.');if($('#gg')&&!P.q&&P.vw==='fav'){P.items=favItems();gdraw()}}};r.readAsDataURL(f)}
+function attachGif(f){const r=new FileReader();r.onload=()=>{if(r.result.length>700000)return toast('That GIF is too big (max about 500 KB).');S.im=r.result;rb();const t=$('#tx');if(t)t.focus()};r.readAsDataURL(f)}
+function gifBody(){P.pv='all';if(!P.vw)P.vw='home';const st=P.tab==='s';P.ty=st?'stickers':'gifs';
+ return `<input class="in" id="gq" placeholder="Search ${st?'Stickers':'GIFs'}" value="${esc(P.q)}" autocomplete="off"><div id="gh"></div><div class="gg" id="gg"></div><div id="gm" style="text-align:center"></div>`}
+function ghead(){const h=$('#gh'),g=$('#gg');if(!h||!g)return;const st=P.tab==='s',home=!P.q&&P.vw==='home';
+ if(home){const f=FAV()[0];h.innerHTML=`<div class="gt"><button class="fv" data-a="gview" data-v="fav"${f?` style="background-image:url('${esc(f.t)}')"`:''}><span>Favorites</span></button><button id="gtr" data-a="gview" data-v="trend"><span>📈 Trending ${st?'Stickers':'GIFs'}</span></button>${RG().length?'<button data-a="gview" data-v="recent"><span>Recently sent</span></button>':''}${GT.map(([t,c])=>`<button data-a="gtag" data-v="${t}" data-c="${c}"><span>${t}</span></button>`).join('')}</div>`;g.style.display='none';$('#gm').innerHTML='';h.querySelectorAll('[data-c]').forEach(b=>tprev(b.dataset.c,b));tprev('happy',$('#gtr'));return}
+ g.style.display='';const fv=!P.q&&P.vw==='fav';
+ h.innerHTML=`<div class="gbar"><button class="btn g sm" data-a="gview" data-v="home">‹ Back</button><b>${esc(P.q?'Results for “'+P.q+'”':fv?'Favorites':P.vw==='recent'?'Recently sent':'Trending '+(st?'Stickers':'GIFs'))}</b>${fv?'<button class="btn sm" data-a="gup">Upload GIF</button>':''}</div>`}
+const pu=(o,sz,fm)=>{for(const s of sz)for(const f of fm){const u=o?.[s]?.[f]?.url;if(u)return u}};
+async function gf1(pv,ty,q,pg){const K=encodeURIComponent(KEY(pv)),e=encodeURIComponent(q),J=async u=>(await fetch(u)).json(),cats=PRV[pv].cat,mc=()=>{const s=q.toLowerCase().trim();return cats.find(c=>c===s)||cats.find(c=>c.includes(s)||s.includes(c))};
+ if(pv==='giphy'){const j=await J(`https://api.giphy.com/v1/${ty}/${q?'search':'trending'}?api_key=${K}&limit=${LIM}&offset=${pg*LIM}&rating=pg-13${q?'&q='+e:''}`);if(j.meta&&j.meta.status>=400)throw 0;const a=(j.data||[]).map(i=>({t:i.images?.fixed_width_small?.url||i.images?.fixed_width?.url,f:i.images?.downsized_medium?.url||i.images?.original?.url})).filter(x=>x.t&&x.f);return{items:a,more:a.length>=LIM}}
+ if(pv==='klipy'){const j=await J(`https://api.klipy.com/api/v1/${K}/${ty}/${q?'search':'trending'}?per_page=${LIM}&page=${pg+1}&customer_id=${S.me.id}${q?'&q='+e:''}`),a=(j.data?.data||j.data||j.results||[]).map(it=>{const any=(JSON.stringify(it).match(/https:[^"]+?\.(gif|webp|png)/)||[])[0],t=pu(it.file,['sm','xs','md','hd'],['gif','webp','png'])||any;return{t,f:pu(it.file,['md','hd','sm'],['gif','webp','png'])||t}}).filter(x=>x.t);if(j.result===false)throw 0;return{items:a,more:a.length>=LIM}}
+ if(pv==='nekos'){const c=q?mc():null;if(q&&!c)return{items:[],more:false};const l=c?[c]:['hug','pat','dance','happy','wave','laugh'],r=await Promise.all(l.map(x=>J(`https://nekos.best/api/v2/${x}?amount=${c?20:5}`)));return{items:r.flatMap(j=>(j.results||[]).map(i=>({t:i.url,f:i.url}))),more:!!c}}
+ if(pv==='waifu'){const c=q?mc():null;if(q&&!c)return{items:[],more:false};const l=c?[c]:['hug','pat','smile','wave'],r=await Promise.all(l.map(x=>fetch(`https://api.waifu.pics/many/sfw/${x}`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(r=>r.json())));return{items:r.flatMap(j=>(j.files||[]).slice(0,c?30:8).map(u=>({t:u,f:u}))),more:!!c}}
+ if(pv==='wiki'){const j=await J(`https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrlimit=${LIM}&gsroffset=${pg*LIM}&gsrsearch=${encodeURIComponent('filemime:gif '+(q||'reaction'))}&prop=imageinfo&iiprop=url|mime&iiurlwidth=480&format=json&origin=*`),a=Object.values(j.query?.pages||{}).sort((x,y)=>x.index-y.index).map(p=>{const i=p.imageinfo?.[0],u=i?.thumburl||i?.url;return{t:u,f:u}}).filter(x=>x.t);return{items:a,more:a.length>=LIM}}
+ MEMES=MEMES||(await J('https://api.imgflip.com/get_memes')).data.memes;const a=MEMES.filter(m=>!q||m.name.toLowerCase().includes(q.toLowerCase())),s=a.slice(pg*LIM,pg*LIM+LIM).map(m=>({t:m.url,f:m.url}));return{items:s,more:a.length>pg*LIM+LIM}}
+async function gfetch(pv,ty,q,pg){const mix=A=>{const seen=new Set,o=[],n=Math.max(0,...A.map(a=>a.items.length));for(let i=0;i<n;i++)A.forEach(a=>{const g=a.items[i];if(g&&!seen.has(g.f)){seen.add(g.f);o.push(g)}});return{items:o,more:A.some(a=>a.more)}},ok=r=>r.filter(x=>x.status==='fulfilled').map(x=>x.value);
+ if(pv==='all'){const L=['klipy','giphy','nekos','waifu'].filter(k=>(!PRV[k].key||KEY(k))&&(ty!=='stickers'||PRV[k].ty)),A=ok(await Promise.allSettled(L.map(k=>gfetch(k,ty,q,pg))));if(!A.length)throw 0;return mix(A)}
+ if(ty==='all'&&PRV[pv].ty){const A=ok(await Promise.allSettled([gf1(pv,'gifs',q,pg),gf1(pv,'stickers',q,pg)]));if(!A.length)throw 0;return mix(A)}
+ return gf1(pv,ty,q,pg)}
+function gdraw(){const el=$('#gg');if(!el)return;const fv=new Set(FAV().map(x=>x.f));el.innerHTML=P.items.length?'<div class="gcol">'+P.items.map(g=>g.my?`<div class="gc"><img loading="lazy" src="${g.t}" data-a="gmy" data-v="${g.my}" alt="GIF"><button class="gs" data-a="gdel" data-v="${g.my}" title="Remove">✕</button></div>`:`<div class="gc"><img loading="lazy" src="${esc(g.t)}" data-a="gsend" data-v="${esc(g.f)}" data-t="${esc(g.t)}" alt="GIF"><button class="gs${fv.has(g.f)?' on':''}" data-a="gfav" data-v="${esc(g.f)}" data-t="${esc(g.t)}" title="Favorite">★</button></div>`).join('')+'</div>':`<div class="empty">${!P.q&&P.vw==='fav'?'No favorites yet. Tap ★ on any GIF, or upload your own .gif.':!P.q&&P.vw==='recent'?'GIFs you send will show up here.':'Nothing found. Try another search.'}</div>`;const m=$('#gm');if(m)m.innerHTML=P.more?'<button class="btn g sm" data-a="gmore">Load more</button>':''}
+async function gnext(){const el=$('#gg');if(!el)return;const n=++P.gn;if(!P.items.length)el.innerHTML='<div class="empty">Loading...</div>';try{const r=await gfetch(P.pv,P.ty,P.q,P.pg);if(n!==P.gn||!$('#gg'))return;P.items=P.items.concat(r.items);P.more=r.more;P.pg++;gdraw()}catch(x){if(n===P.gn&&$('#gg'))$('#gg').innerHTML='<div class="empty">Could not load GIFs. Check your connection and try again.</div>'}}
+function gstart(){ghead();P.gn++;if(!P.q&&P.vw==='home')return;P.items=[];P.more=false;P.pg=0;if(!P.q&&(P.vw==='fav'||P.vw==='recent')){P.items=P.vw==='fav'?favItems():RG();gdraw();return}gnext()}
+function gsearch(q){P.q=q.trim();gstart()}
+async function sendM(m){const s=S.sel;if(!s)return;if(S.rp){m.rp=S.rp;S.rp=null;rb()}if(s.kind==='dm')await B.patch('rooms',s.id,{type:'dm',members:[S.me.id,s.uid],last:m.t});else if(s.kind==='server')await B.patch('rooms',s.sid,{last:m.t,lastc:{[s.chan]:m.t}});else await B.patch('rooms',s.id,{last:m.t});B.msg(s.id,m);rd(s.id)}
+const srvOf=id=>[...S.rooms,...S.pub].find(r=>r.id===id);
+function beep(){try{const c=new AudioContext(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=720;g.gain.value=.05;o.start();o.stop(c.currentTime+.12)}catch(e){}}
+function addThemes(list){const cur=CT(),seen=new Set(cur.map(t=>t[0].toLowerCase()+t[1]));let n=0;list.forEach(t=>{if(t&&!seen.has(t[0].toLowerCase()+t[1])){seen.add(t[0].toLowerCase()+t[1]);cur.unshift(t);n++}});localStorage.aura_chat_themes=JSON.stringify(cur.slice(0,200));return n}
+const PAT={n:'',d:'radial-gradient(rgba(255,255,255,.25) 1.5px,transparent 1.6px) 0 0/14px 14px,',g:'linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px) 0 0/16px 16px,linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px) 0 0/16px 16px,',s:'radial-gradient(rgba(255,255,255,.9) 1px,transparent 1.5px) 0 0/37px 41px,radial-gradient(rgba(255,255,255,.55) 1px,transparent 1.5px) 13px 17px/53px 47px,'};
+const banner=t=>`background:${PAT[t.p||'n']}linear-gradient(${t.d??135}deg,${t.b1||'#600'},${t.b2||'#000'})`;
+const LBL={on:'Online',idle:'Idle',dnd:'Do not disturb',off:'Offline'},PAL=['#ff1a1a','#ff6a00','#3ddc84','#5ab0ff','#b388ff','#ff7eb6','#ffd54f'];
+const on=u=>!!u&&u.status!=='invisible'&&Date.now()-(u.seen||0)<70000;
+const st=u=>!on(u)?'off':u.status==='dnd'?'dnd':(u.status==='idle'||u.idle)?'idle':'on';
+const tm=t=>{const d=new Date(t),s=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:!PF.h24});return d.toDateString()===new Date().toDateString()?'Today '+s:d.toLocaleDateString()+' '+s};
+const newUser=n=>({name:n||'User',tag:String(1000+Math.random()*9000|0),bio:'',activity:'',status:'online',seen:Date.now(),idle:false,created:Date.now(),av:{c1:PAL[Math.random()*7|0],c2:'#2a0000',sh:'c',txt:(n||'U').slice(0,2).toUpperCase(),img:''},th:toTh(THEMES[0])});
+function av(u,z=40,dot=1){const a=u?.av||{},r={c:'50%',r:'30%',s:'8%'}[a.sh||'c'];return `<span class="av" style="width:${z}px;height:${z}px;border-radius:${r};font-size:${z*.4}px;background:${a.img?`url(${a.img}) center/cover`:`linear-gradient(135deg,${a.c1||'#f00'},${a.c2||'#400'})`}">${a.img?'':esc((a.txt||u?.name||'?').slice(0,2))}${dot?`<i class="dot ${st(u)}"></i>`:''}</span>`}
+
+/* ---------- Firebase backend ---------- */
+async function initFB(){
+ const g='https://www.gstatic.com/firebasejs/10.12.2/',I=f=>import(g+f);
+ const [A,Au,F]=await Promise.all([I('firebase-app.js'),I('firebase-auth.js'),I('firebase-firestore.js')]);
+ const app=A.initializeApp(CFG);I('firebase-analytics.js').then(m=>m.getAnalytics(app)).catch(()=>{});
+ const au=Au.getAuth(app),db=F.getFirestore(app),C=n=>F.collection(db,n),err=e=>toast(e.code==='permission-denied'?'Permission denied by Firestore rules. Publish firestore.rules in your Firebase console.':e.message||'Firebase error');
+ const cv=p=>Object.fromEntries(Object.entries(p).map(([k,v])=>[k,v&&v.$add!==undefined?F.arrayUnion(v.$add):v&&v.$del!==undefined?F.arrayRemove(v.$del):v]));
+ const arr=s=>s.docs.map(d=>({id:d.id,...d.data()}));
+ return{name:'Firebase',
+  sub(k,a,cb){
+   if(k==='users'){const acc={},us=[];for(let i=0;i<a.length;i+=30)us.push(F.onSnapshot(F.query(C('users'),F.where(F.documentId(),'in',a.slice(i,i+30))),s=>{s.docs.forEach(d=>acc[d.id]={id:d.id,...d.data()});cb({...acc})},err));return()=>us.forEach(u=>u())}
+   const q={'my-rooms':()=>F.query(C('rooms'),F.where('members','array-contains',a)),'pub-rooms':()=>F.query(C('rooms'),F.where('public','==',true)),reqs:()=>F.query(C('requests'),F.where('members','array-contains',a)),game:()=>F.query(C('users'),F.where('games','array-contains',a)),msgs:()=>F.query(F.collection(db,'rooms',a,'messages'),F.orderBy('t'),F.limitToLast(150))}[k]();
+   return F.onSnapshot(q,s=>cb(arr(s)),err)},
+  patch:(c,id,p)=>F.setDoc(F.doc(db,c,id),cv(p),{merge:true}).catch(err),
+  del:(c,id)=>F.deleteDoc(F.doc(db,c,id)).catch(err),
+  msg:(r,m)=>F.addDoc(F.collection(db,'rooms',r,'messages'),m).catch(err),
+  patchMsg:(r,id,p)=>F.setDoc(F.doc(db,'rooms',r,'messages',id),p,{merge:true}).catch(err),delMsg:(r,id)=>F.deleteDoc(F.doc(db,'rooms',r,'messages',id)).catch(err),
+  async find(n,t){const s=await F.getDocs(F.query(C('users'),F.where('name','==',n),F.where('tag','==',t)));return s.docs[0]&&{id:s.docs[0].id,...s.docs[0].data()}},
+  async google(){const u=(await Au.signInWithPopup(au,new Au.GoogleAuthProvider())).user;return{uid:u.uid,name:(u.displayName||u.email||'User').split('@')[0].slice(0,20),photo:u.photoURL}},
+  up:(e,p)=>Au.createUserWithEmailAndPassword(au,e,p).then(r=>r.user.uid),
+  in:(e,p)=>Au.signInWithEmailAndPassword(au,e,p).then(r=>r.user.uid),
+  out:()=>Au.signOut(au),onAuth:cb=>Au.onAuthStateChanged(au,u=>cb(u&&u.uid))}}
+
+/* ---------- Local demo backend (this browser only, syncs across tabs) ---------- */
+const bc=new BroadcastChannel('aura_chat'),K='aura_chat_v1',LD=()=>({users:{},rooms:{},msgs:{},acc:{},requests:{},...JSON.parse(localStorage[K]||'{}')});
+const L={d:LD(),s:new Set(),save(){localStorage[K]=JSON.stringify(L.d);bc.postMessage(1);L.fire()},fire(){L.s.forEach(f=>f())}};
+bc.onmessage=()=>{L.d=LD();L.fire()};
+const LB={name:'Local',
+ sub(k,a,cb){const f=()=>{const D=L.d,R=Object.entries(D.rooms).map(([id,r])=>({id,...r}));
+  cb(k==='users'?Object.fromEntries(a.filter(i=>D.users[i]).map(i=>[i,{id:i,...D.users[i]}])):k==='my-rooms'?R.filter(r=>(r.members||[]).includes(a)):k==='pub-rooms'?R.filter(r=>r.public):k==='reqs'?Object.entries(D.requests).filter(([,r])=>(r.members||[]).includes(a)).map(([id,r])=>({id,...r})):k==='game'?Object.entries(D.users).filter(([,u])=>(u.games||[]).includes(a)).map(([id,u])=>({id,...u})):(D.msgs[a]||[]).slice(-150))};
+  L.s.add(f);f();return()=>L.s.delete(f)},
+ patch(c,id,p){const o=L.d[c][id]=L.d[c][id]||{};for(const[k,v]of Object.entries(p)){if(v&&v.$add!==undefined)o[k]=[...new Set([...(o[k]||[]),v.$add])];else if(v&&v.$del!==undefined)o[k]=(o[k]||[]).filter(x=>x!==v.$del);else if(v&&typeof v==='object'&&!Array.isArray(v))o[k]={...(o[k]||{}),...v};else o[k]=v}L.save()},
+ del(c,id){delete L.d[c][id];L.save()},
+ msg(r,m){m.id=Math.random().toString(36).slice(2,10);(L.d.msgs[r]=L.d.msgs[r]||[]).push(m);L.save()},
+ patchMsg(r,id,p){const m=(L.d.msgs[r]||[]).find(x=>x.id===id);if(!m)return;for(const[k,v]of Object.entries(p))m[k]=k==='re'?{...(m.re||{}),...v}:v;L.save()},delMsg(r,id){L.d.msgs[r]=(L.d.msgs[r]||[]).filter(x=>x.id!==id);L.save()},
+ async find(n,t){const e=Object.entries(L.d.users).find(([,u])=>u.name===n&&u.tag===t);return e&&{id:e[0],...e[1]}},
+ async up(e,p){if(L.d.acc[e])throw Error('That email is already registered in this browser.');const id='u'+Math.random().toString(36).slice(2,10);L.d.acc[e]={p,id};L.save();return id},
+ async in(e,p){const a=L.d.acc[e];if(!a||a.p!==p)throw Error('Wrong email or password.');return a.id},
+ async out(){sessionStorage.removeItem('aura_me');LB.cb(null)},
+ onAuth(cb){LB.cb=cb;cb(sessionStorage.aura_me||null)}};
+
+/* ---------- App ---------- */
+const S={me:null,uid:null,U:{},rooms:[],pub:[],sec:'home',sel:null,tab:'all',game:null,msgs:[],gm:[],R:[]};
+const pid=(a,b)=>[a,b].sort().join('_');
+const rel=()=>{const m=S.uid,f=[],i=[],o=[];S.R.forEach(r=>{const x=r.from===m?r.to:r.from;if(r.status==='accepted')f.push(x);else if(r.to===m)i.push(x);else o.push(x)});return{friends:f,incoming:i,outgoing:o}};
+let B=LB,FB=null,ua=null,uw=()=>{},wk='',cm=()=>{},cg=()=>{},seeded=0,lastIn=Date.now(),AM='in';
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3500)}
+function modal(h){$('#mb').innerHTML=h;$('#md').classList.add('open')}
+function use(b){ua&&ua();B=b;ua=B.onAuth(enter)||null;auth()}
+function auth(){$('#ab').innerHTML=`<img class="alogo authlogo" src="https://gxaura.net/assets/images/image06.png?v=36df2ea8" alt="Aura" onerror="this.style.display='none'"><h3 style="text-align:center">Aura Chat</h3><div class="tabs" style="padding:0">${[['in','Sign in'],['up','Create account']].map(([k,t])=>`<button class="${AM===k?'on':''}" data-a="am" data-v="${k}">${t}</button>`).join('')}</div>${B.name==='Firebase'?'<button class="btn g" data-a="google" style="width:100%;margin-top:14px">Continue with Google</button><div class="or">or use email</div>':''}<form id="af2">${AM==='up'?'<label>Display name</label><input class="in" id="an" maxlength="20" required>':''}<label>Email</label><input class="in" id="ae" type="email" required><label>Password</label><input class="in" id="ap" type="password" minlength="6" required><div id="aer" class="err"></div><button class="btn" style="width:100%;margin-top:14px">${AM==='in'?'Sign in':'Create account'}</button></form><div class="conn">Connection: <b>${B.name}</b><a data-a="conn">${B.name==='Firebase'?'Use local demo mode':'Use Firebase'}</a></div>${B.name==='Local'?'<small style="opacity:.6">Local mode keeps everything in this browser. Open two tabs and sign in as different people to try chat and presence.</small>':''}`}
+function enter(uid){
+ stop();S.uid=uid;if(!uid){$('#auth').classList.add('open');$('#app').hidden=true;return}
+ let first=1;S.sq=B.sub('reqs',uid,r=>{S.R=r;if(S.me){Object.assign(S.me,rel());S.U[S.uid]=S.me;watch();draw();drawMsgs()}});
+ S.sm=B.sub('users',[uid],m=>{const me=m[uid];if(!me)return;S.me={...me,...rel()};S.U[uid]=S.me;if(!S.dr)ux(me.th);if(first){first=0;boot()}else{watch();draw()}});
+ setTimeout(()=>{if(S.uid===uid&&!S.me)B.patch('users',uid,newUser('User'))},3500)}
+function stop(){[S.sm,S.sq,S.sr,S.sp,uw,cm,cg].forEach(f=>f&&f());clearInterval(S.hb);Object.assign(S,{me:null,R:[],rooms:[],pub:[],sel:null,msgs:[],gm:[],game:null,sec:'home'});wk='';seeded=0}
+function boot(){$('#auth').classList.remove('open');$('#app').hidden=false;$('#app').classList.remove('chat');
+ S.sr=B.sub('my-rooms',S.me.id,r=>{S.rooms=r;watch();draw()});
+ S.sp=B.sub('pub-rooms',0,r=>{S.pub=r;if(!seeded){seeded=1;[['lounge','Lounge','Hang out and chat about anything'],['music','Music','Share what you are listening to'],['help','Help desk','Questions about Aura Chat']].forEach(([id,name,topic])=>{if(!r.find(x=>x.id===id))B.patch('rooms',id,{type:'room',name,topic,public:true,owner:'',members:[]})})}draw()});
+ beat();S.hb=setInterval(()=>{beat();draw()},25000);draw()}
+const beat=()=>S.me&&B.patch('users',S.me.id,{seen:Date.now(),idle:Date.now()-lastIn>3e5});
+['mousemove','keydown','pointerdown'].forEach(e=>addEventListener(e,()=>lastIn=Date.now(),{passive:true}));
+addEventListener('pagehide',()=>{S.me&&B.patch('users',S.me.id,{seen:0})});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)beat()});
+function watch(){const s=new Set([S.me.id,...(S.me.friends||[]),...(S.me.incoming||[]),...(S.me.outgoing||[])]);S.rooms.forEach(r=>(r.members||[]).forEach(m=>s.add(m)));S.msgs.forEach(m=>s.add(m.u));const a=[...s].slice(0,150),k=a.join();if(k===wk)return;wk=k;uw();uw=B.sub('users',a,m=>{Object.assign(S.U,m);draw();drawMsgs()})}
+function open(sel){S.sel=sel;S.msgs=[];S.snap=1;S.q='';S.ed=S.rp=null;S.lastId=null;rd(sel.id);rb();cm();cm=B.sub('msgs',sel.id,m=>{S.msgs=m;watch();drawMsgs()});$('#app').classList.add('chat');draw();drawMsgs();$('#tx').focus()}
+const dmId=u=>'dm_'+[S.me.id,u].sort().join('_');
+const urow=(i,k)=>{const u=S.U[i]||{name:'Loading',tag:''};return `<div class="row${S.sel?.uid===i?' on':''}" data-a="${k==='f'?'dm':'card'}" data-v="${i}">${av(u,36)}<div class="gr"><b>${esc(u.name)}</b><small>${esc(u.activity||LBL[st(u)])}</small></div>${k==='in'?`<button class="btn sm" data-a="acc" data-v="${i}">Accept</button><button class="btn g sm" data-a="dec" data-v="${i}">Decline</button>`:k==='out'?`<button class="btn g sm" data-a="can" data-v="${i}">Cancel</button>`:''}</div>`};
+const rrow=(r,j)=>`<div class="row${S.sel?.id===r.id?' on':''}" data-a="${j?'room':'join'}" data-v="${r.id}"><span class="gi">#</span><div class="gr"><b>${esc(r.name)}</b><small>${esc(r.topic||(r.members||[]).length+' members')}</small></div>${j?ub(r):'<button class="btn sm">Join</button>'}</div>`;
+function card(u,nb){const t=u.th||{},me=S.me,fr=(me.friends||[]).includes(u.id),inn=(me.incoming||[]).includes(u.id),out=(me.outgoing||[]).includes(u.id);
+ const b=nb?'':u.id===me.id?'<button class="btn" data-a="set">Edit profile</button>':`<button class="btn" data-a="dm" data-v="${u.id}">Message</button>${fr?`<button class="btn g" data-a="rem" data-v="${u.id}">Remove friend</button>`:inn?`<button class="btn g" data-a="acc" data-v="${u.id}">Accept request</button>`:out?`<button class="btn g" data-a="can" data-v="${u.id}">Cancel request</button>`:`<button class="btn g" data-a="req" data-v="${u.id}">Add friend</button>`}`;
+ return `<div class="card" style="--a:${t.a||'#f00'}"><div class="bn" style="${banner(t)}${u.bi?`;background:url(${u.bi}) center/cover no-repeat`:''}"></div><div class="cb"><div class="ca">${av(u,76)}</div><h3>${esc(u.name)}<small>#${esc(u.tag)}</small></h3><div class="st"><i class="dot ${st(u)}"></i> ${esc(u.activity||LBL[st(u)])}</div>${u.bio?`<p>${esc(u.bio)}</p>`:''}<small>Member since ${new Date(u.created||Date.now()).toLocaleDateString()}</small><div class="cbt">${b}</div></div></div>`}
+const credit='<div class="credit">Made by Aaron<small>blah blah blah blah blah blah blah blah.</small></div>';
+function srvList(){const m=S.me,mine=S.rooms.filter(r=>r.type==='server'),dis=S.pub.filter(r=>r.type==='server'&&!(r.members||[]).includes(m.id)),sv=S.sv&&srvOf(S.sv);
+ if(sv){const own=sv.owner===m.id;return `<div class="lh"><button class="btn g sm" data-a="sback">Servers</button><button class="btn g sm" data-a="sleave">${own?'Delete':'Leave'}</button></div><div class="gt"><b>${esc(sv.name)}</b></div><div class="gl">Text channels ${own?'<a data-a="addch" style="cursor:pointer;color:var(--accent)">+ add</a>':''}</div><div class="sc">${(sv.chs||['general']).map(c=>`<div class="row${S.sel?.id==='srv_'+sv.id+'_'+c?' on':''}" data-a="schan" data-v="${sv.id}|${c}"><b># ${esc(c)}</b><span style="flex:1"></span>${(sv.lastc?.[c]||0)>(RD['srv_'+sv.id+'_'+c]||0)&&S.sel?.id!=='srv_'+sv.id+'_'+c?'<b class="ub">new</b>':''}${own&&c!=='general'?`<button class="btn g sm" data-a="delch" data-v="${c}">x</button>`:''}</div>`).join('')}<div class="gl">Invite code</div><div class="pad"><input class="in" readonly value="${esc(sv.id)}" onclick="this.select()"></div></div>`}
+ return `<div class="lh"><b>Servers</b><button class="btn sm" data-a="newsrv">New server</button></div><form id="js" class="pad"><input class="in" id="ji" placeholder="Join with an invite code" autocomplete="off"></form><div class="sc"><div class="gl">Your servers</div>${mine.map(r=>`<div class="row srv" style="--c:${r.c||'#f00'}" data-a="srv" data-v="${r.id}"><span class="gi">${esc((r.name||'S')[0].toUpperCase())}</span><div class="gr"><b>${esc(r.name)}</b><small>${(r.members||[]).length} members</small></div>${ub(r)}</div>`).join('')||'<div class="empty">Create a server or join one.</div>'}<div class="gl">Discover</div>${dis.map(r=>`<div class="row" data-a="sjoin" data-v="${r.id}"><span class="gi">${esc((r.name||'S')[0].toUpperCase())}</span><div class="gr"><b>${esc(r.name)}</b><small>${(r.members||[]).length} members</small></div><button class="btn sm">Join</button></div>`).join('')||'<div class="empty">Nothing to discover yet.</div>'}</div>`}
+function draw(){if(!S.me)return;rail();list();side();if(document.activeElement?.id!=='qs')$('#mh').innerHTML=mh()}
+function rail(){const n=(S.me.incoming||[]).length;$('#rail').innerHTML=`<div class="brand" title="Aura"><img class="alogo" src="https://gxaura.net/assets/images/image06.png?v=36df2ea8" alt="Aura" onerror="this.style.display='none'"></div>${[['home','Home'],['rooms','Rooms'],['groups','Groups'],['servers','Servers']].map(([k,t])=>`<button class="sb${S.sec===k?' on':''}" data-a="sec" data-v="${k}">${t}${k==='home'&&n?`<b>${n}</b>`:''}</button>`).join('')}<div class="sp"></div><button class="sb" data-a="themes">Themes</button><button class="sb" data-a="prefs">Settings</button><button class="sb" data-a="qs" title="Ctrl+K">Find</button><button class="me" data-a="set" title="Edit profile">${av(S.me,44)}</button>`}
+function list(){const m=S.me,old=$('#fi'),ov=old&&old.value,of=old&&document.activeElement===old;let h='';
+ if(S.sec==='home'){const f=m.friends||[],inc=m.incoming||[],out=m.outgoing||[],rows=S.tab==='pending'?[...inc.map(i=>[i,'in']),...out.map(i=>[i,'out'])]:f.filter(i=>S.tab==='all'||on(S.U[i])).map(i=>[i,'f']);
+  h=`<div class="lh"><b>Friends</b><small>${esc(m.name)}#${m.tag}</small></div><form id="af" class="pad"><input class="in" id="fi" placeholder="Add friend: name#1234" autocomplete="off"></form><div class="tabs">${['all','online','pending'].map(t=>`<button class="${S.tab===t?'on':''}" data-a="tab" data-v="${t}">${t[0].toUpperCase()+t.slice(1)}${t==='pending'&&inc.length?` (${inc.length})`:''}</button>`).join('')}</div><div class="sc">${rows.map(([i,k])=>urow(i,k)).join('')||'<div class="empty">No one here yet. Add a friend using their name and tag.</div>'}</div>`}
+ else if(S.sec==='rooms'){const rms=S.pub.filter(r=>r.type!=='server'),mine=rms.filter(r=>(r.members||[]).includes(m.id)),oth=rms.filter(r=>!(r.members||[]).includes(m.id));
+  h=`<div class="lh"><b>Chat rooms</b><button class="btn sm" data-a="newroom">New room</button></div><div class="sc"><div class="gl">Joined</div>${mine.map(r=>rrow(r,1)).join('')||'<div class="empty">Join a room below.</div>'}<div class="gl">Browse</div>${oth.map(r=>rrow(r,0)).join('')}</div>`}
+ else if(S.sec==='groups'){const gs=S.rooms.filter(r=>r.type==='group');
+  h=`<div class="lh"><b>Group chats</b><button class="btn sm" data-a="newgroup">New group</button></div><div class="sc">${gs.map(r=>`<div class="row${S.sel?.id===r.id?' on':''}" data-a="grp" data-v="${r.id}"><span class="gi">${esc((r.name||'G')[0].toUpperCase())}</span><div class="gr"><b>${esc(r.name)}</b><small>${(r.members||[]).length} members</small></div>${ub(r)}</div>`).join('')||'<div class="empty">No group chats yet. Create one with your friends.</div>'}</div>`}
+ else h=srvList();
+ $('#list').innerHTML=h+credit;const fi=$('#fi');if(fi){fi.value=ov||'';if(of)fi.focus()}}
+const mrow=u=>`<div class="row" data-a="card" data-v="${u.id}">${av(u,34)}<div class="gr"><b>${esc(u.name)}</b><small>${esc(u.activity||LBL[st(u)])}</small></div></div>`;
+function side(){const s=S.sel;let h;
+ if(!s||s.kind==='dm'){const u=s?S.U[s.uid]:S.me;h=u?`<div class="sc">${card(u)}</div>`:''}
+ else{const ids=([...S.rooms,...S.pub].find(r=>r.id===(s.sid||s.id))?.members||[]),us=[...new Set(ids)].map(i=>S.U[i]).filter(Boolean),o=us.filter(on),f=us.filter(u=>!on(u));
+  h=`<div class="lh"><b>Members (${us.length})</b></div><div class="sc"><div class="gl">Online (${o.length})</div>${o.map(mrow).join('')}<div class="gl">Offline (${f.length})</div>${f.map(mrow).join('')}</div>`}
+ $('#side').innerHTML=h}
+function mh(){const s=S.sel;if(!s)return'<div class="h"><b>Aura Chat</b></div>';let t,sub='',lv='';
+ if(s.kind==='dm'){const u=S.U[s.uid]||{};t=esc(u.name||'Friend');sub=esc(u.activity||LBL[st(u)])}
+ else if(s.kind==='server'){const r=srvOf(s.sid)||{};t='<span class="mu"># </span>'+esc(s.chan);sub=esc(r.name||'')+' · '+(r.members||[]).length+' members'}
+ else{const r=[...S.rooms,...S.pub].find(r=>r.id===s.id)||{};t=(s.kind==='room'?'# ':'')+esc(r.name||'');sub=esc(r.topic||(r.members||[]).length+' members');lv='<button class="btn g sm" data-a="leave">Leave</button>'}
+ return `<div class="h"><button class="btn g sm bk" data-a="back">Back</button><div><b>${t}</b><small>${sub}</small></div>${lv}<input class="in" id="qs" placeholder="Search" value="${esc(S.q||'')}" style="width:130px;padding:5px 8px"><button class="btn g sm" data-a="pins">Pins</button><button class="btn g sm info" data-a="info">Info</button></div>`}
+function rb(){const e=$('#rb');if(!e)return;e.className=S.rp||S.ed||S.im?'on':'';e.innerHTML=S.ed?'<span>Editing message</span><a data-a="canc" style="cursor:pointer">Cancel</a>':S.rp?`<span>Replying to ${esc(S.rp.n)}</span><a data-a="canc" style="cursor:pointer">Cancel</a>`:S.im?'<span>Image attached</span><a data-a="canc" style="cursor:pointer">Remove</a>':''}
+function drawMsgs(){const el=$('#ml');if(!S.sel){el.innerHTML='<div class="empty">Pick a friend, room, group chat or server channel to start talking.</div>';return}
+ const near=el.scrollHeight-el.scrollTop-el.clientHeight<80,q=(S.q||'').toLowerCase(),L=q?S.msgs.filter(m=>(m.x||'').toLowerCase().includes(q)):S.msgs,sv=S.sel.sid&&srvOf(S.sel.sid),own=!!sv&&sv.owner===S.me.id,fn=(S.me.name||'').split(' ')[0].toLowerCase();let pu='',pt=0,pd='';
+ el.innerHTML=L.length?L.map(m=>{const u=S.U[m.u]||{name:m.n},d=new Date(m.t).toDateString(),sep=d!==pd?`<div class="ds"><span>${new Date(m.t).toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'})}</span></div>`:'',c=!sep&&!m.rp&&pu===m.u&&m.t-pt<3e5,mine=m.u===S.me.id,ping=!mine&&(/@everyone\b/i.test(m.x||'')||(fn&&(m.x||'').toLowerCase().includes('@'+fn)));pd=d;pu=m.u;pt=m.t;
+  const re=Object.entries(m.re||{}).filter(([,a])=>a&&a.length).map(([e,a])=>`<button class="rc${a.includes(S.me.id)?' me':''}" data-a="react" data-v="${m.id}|${e}">${e} ${a.length}</button>`).join('');
+  return `${sep}<div class="m${c?' c':''}${ping?' ping':''}${m.pin?' pn':''}"><div class="tb"><button data-a="rpl" data-v="${m.id}">Reply</button><button data-a="rmore" data-v="${m.id}">React</button>${m.gif||/^data:image\/gif/.test(m.img||'')?`<button data-a="mfav" data-v="${m.id}">Save GIF</button>`:''}<button data-a="pin" data-v="${m.id}">${m.pin?'Unpin':'Pin'}</button>${mine?`<button data-a="edt" data-v="${m.id}">Edit</button>`:''}${mine||own?`<button data-a="dmsg" data-v="${m.id}">Delete</button>`:''}</div>${c?'':`<span data-a="card" data-v="${m.u}" style="cursor:pointer">${av(u,38,0)}</span>`}<div><div class="mt">${c?'':`<b data-a="card" data-v="${m.u}" style="color:${u.th?.a||'#fff'}">${esc(u.name||m.n)}</b><small>${tm(m.t)}</small>`}</div>${m.rp?`<div class="rp">Replying to <b>${esc(m.rp.n)}</b>: ${esc(m.rp.x)}</div>`:''}<div class="x">${fmt(m.x||'').replace(/\n/g,'<br>')}${m.ed?' <small style="opacity:.45">(edited)</small>':''}</div>${m.img?`<img class="mimg" src="${m.img}" alt="attachment">`:''}${m.gif&&/^https:\/\//.test(m.gif)?`<img class="mimg" loading="lazy" src="${esc(m.gif)}" alt="GIF">`:''}<div>${re}</div></div></div>`}).join(''):`<div class="empty">${q?'No messages match your search.':'No messages yet. Say hello.'}</div>`;
+ if(near||S.snap)el.scrollTop=el.scrollHeight;S.snap=0;
+ const last=S.msgs[S.msgs.length-1];if(last&&last.id!==S.lastId){const fresh=S.lastId!=null;S.lastId=last.id;if(!document.hidden)rd(S.sel.id);if(fresh&&last.u!==S.me.id){if(PF.snd)beep();if(document.hidden&&PF.nt&&window.Notification&&Notification.permission==='granted')new Notification(last.n||'Aura Chat',{body:(last.x||'Image').slice(0,100)})}}
+ const ty=Object.values(S.U).filter(u=>u.id!==S.me.id&&u.typing&&u.typing.r===S.sel.id&&Date.now()-u.typing.t<5000).map(u=>u.name);$('#ty').textContent=ty.length?ty.slice(0,3).join(', ')+(ty.length>1?' are':' is')+' typing...':''}
+setInterval(()=>S.sel&&drawMsgs(),4000);
+function sm(){const d=S.dr,o=(v,t)=>`<option value="${v}">${t}</option>`;
+ const sel=(f,list,cur)=>`<select class="in" data-f="${f}">${list.map(([v,t])=>`<option value="${v}"${v===cur?' selected':''}>${t}</option>`).join('')}</select>`;
+ const y=$('#mb').scrollTop;
+ modal(`<h3>Your profile</h3><div id="pv"></div><label>Display name</label><input class="in" data-f="name" maxlength="20" value="${esc(d.name)}"><label>Status</label>${sel('status',[['online','Online'],['idle','Idle'],['dnd','Do not disturb'],['invisible','Invisible']],d.status)}<label>Activity</label><input class="in" data-f="activity" maxlength="40" placeholder="Playing Minecraft" value="${esc(d.activity)}"><label>Bio</label><textarea class="in" data-f="bio" rows="2" maxlength="160">${esc(d.bio)}</textarea>
+ <h3 style="margin-top:18px">Avatar</h3><div class="g2"><div><label>Initials</label><input class="in" data-f="av.txt" maxlength="2" value="${esc(d.av.txt)}"></div><div><label>Shape</label>${sel('av.sh',[['c','Circle'],['r','Rounded'],['s','Square']],d.av.sh)}</div><div><label>Color 1</label><input class="in" type="color" data-f="av.c1" value="${d.av.c1}"></div><div><label>Color 2</label><input class="in" type="color" data-f="av.c2" value="${d.av.c2}"></div></div><div class="cbt"><button class="btn g sm" data-a="upl">Upload image</button><button class="btn g sm" data-a="noimg">Remove image</button></div>
+ <h3 style="margin-top:18px">Profile theme</h3><div class="pres">${ALLT().map((t,i)=>`<div class="pre" data-a="preset" data-v="${i}" title="${t[0]}" style="${banner(toTh(t))}">${t[0]}</div>`).join('')}</div><div class="cbt" style="margin-top:10px"><button class="btn g sm" data-a="imp">Import from Aura Files / Studio</button></div><div class="g2"><div><label>Accent</label><input class="in" type="color" data-f="th.a" value="${d.th.a}"></div><div><label>Pattern</label>${sel('th.p',[['n','None'],['d','Dots'],['g','Grid'],['s','Stars']],d.th.p)}</div><div><label>Banner color 1</label><input class="in" type="color" data-f="th.b1" value="${d.th.b1}"></div><div><label>Banner color 2</label><input class="in" type="color" data-f="th.b2" value="${d.th.b2}"></div></div><label>Banner angle</label><input type="range" min="0" max="360" data-f="th.d" value="${d.th.d}" style="width:100%"><div class="cbt" style="margin-top:8px"><button class="btn g sm" data-a="bnup">Upload banner image</button><button class="btn g sm" data-a="bnno">Remove banner image</button></div>
+ <div class="cbt" style="margin-top:18px"><button class="btn" data-a="save">Save</button><button class="btn g" data-a="close">Cancel</button><button class="btn g" data-a="out">Sign out</button></div>`);$('#mb').scrollTop=y;pv()}
+const pv=()=>{$('#pv').innerHTML=card({...S.me,...S.dr},1);ux(S.dr.th)};
+const setP=(o,p,v)=>{const k=p.split('.');while(k.length>1)o=o[k.shift()];o[k[0]]=v};
+/* ---------- Aura Files themes (imported from the Aura Files studio build) ---------- */
+const AFL={ps:"PlayStation 4",sig:"Signature",classic:"Aura Classic",au:"Aura Storm",ac:"Aura Classic Variants",ax:"Aura Hybrids",y1:"Aura Alerts II",y2:"Aura Elements",y3:"Aura Districts",eva:"Evangelion",ddlc:"Doki Doki Literature Club",space:"Space",spidey:"Spider-Man: Heroes & Variants",spvil:"Spider-Man: Villains",shin:"Shin Godzilla",uk:"Ultrakill",ks:"KonoSuba",hol:"Holidays",rz:"Re:Zero",og:"Oregairu",dn:"Death Note",cp:"Cyberpunk 2077",er:"Edgerunners",ol:"Overlord",zm:"Zom 100",sl:"Slime",sh:"Shield Hero",ms:"Mashle",dd:"Dandadan",fn:"FNAF",pal:"Popular Palettes",xl:"Landscapes",xr:"Retro & Neon",xg:"Gems & Metals",xs:"Sweets",xm:"Mythic",xw:"Weather & Time",rp:"Rainbow & Prism",pd:"Pastel Dreams",cs:"Cosmic",se:"Seasons",ct:"Cities of the World"},AFT=`ps|PS4 Classic|#4aa8ff|#1f6fff|#00051a|d|165
+ps|PS4 Midnight|#7fb4ff|#0d2a6a|#000000|d|170
+ps|PS4 Dusk|#c58bff|#d4508a|#07021a|d|160
+ps|PS4 Sunrise|#ffc46b|#ff9a4a|#0a0420|d|165
+ps|PS4 Shapes|#ffffff|#133a9a|#00081f|d|160
+ps|PS4 Pro|#2f8bff|#06142e|#000000|d|135
+ps|PS4 Auto|#ffb46b|#ff9a5a|#0a0420|d|165
+sig|Aurora Peaks|#4dffc3|#000000|#000000|d|135
+sig|Neon Kyoto Rain|#ff3ea5|#000000|#000000|d|135
+sig|Abyssal Bloom|#3affd0|#000000|#000000|d|135
+sig|Ember Citadel|#ff7a1a|#000000|#000000|d|135
+sig|Ringed Horizon|#ffc46a|#000000|#000000|d|135
+sig|Blackout Tokyo|#ff2a2a|#000000|#000000|d|135
+sig|Cobalt Lighthouse|#3a8bff|#000000|#000000|d|135
+sig|Toxic Reactor|#7dff3a|#000000|#000000|d|135
+sig|Riot Drive|#ff3ad0|#000000|#000000|d|135
+sig|Eclipse Dunes|#ffab00|#000000|#000000|d|135
+classic|Classic|#ff0000|#4c0000|#000000|n|135
+au|Blackout Red|#ff2a2a|#5a0000|#000000|d|180
+au|Cobalt Storm|#3a8bff|#003a9a|#000510|d|180
+au|Toxic Alert|#7dff3a|#2a5a00|#000a00|d|180
+au|Amber Alert|#ffab00|#7a3800|#0a0400|d|180
+au|Violet Tempest|#b06aff|#3a0a7a|#05000f|d|180
+au|Magenta Riot|#ff3ad0|#7a0a5a|#0a0010|d|170
+au|Ice Storm|#bfefff|#1a6a8a|#00060f|d|180
+au|Siren Night|#ff2a2a|#2a0010|#000008|d|180
+au|Kanji Rain|#ff2a2a|#400000|#000000|s|180
+au|Hazard Zone|#ffd000|#5a4a00|#050400|d|180
+au|Shockwave|#ff7a00|#8a3a00|#080200|d|180
+au|Ashfall|#ff5a1a|#3a2a20|#050403|d|180
+au|Neon Tokyo|#ff4fb0|#0a4a7a|#06000f|d|160
+au|Thunderhead|#9fb4c8|#1a2a40|#02040a|d|180
+au|Radar Alert|#ff2a2a|#2a0000|#000000|d|180
+au|Aurora Storm|#3affb0|#0a6a5a|#000a08|d|170
+au|Solar Flare|#ffc400|#ffaa00|#0a0200|d|135
+au|Void Storm|#8a5cff|#1a0050|#000000|d|135
+au|Aura Star|#ff1a1a|#5a0000|#000000|d|180
+ac|Classic Embers|#ff2a2a|#4c0000|#000000|d|135
+ac|Classic Stars|#ff3a3a|#4c0000|#000000|s|135
+ac|Classic Ruby|#ff1a4a|#6a0030|#050005|d|135
+ac|Classic Gold|#ffaa00|#4c3000|#000000|d|135
+ac|Classic Lime|#8aff3a|#206000|#000000|d|135
+ac|Classic Emerald|#10d080|#004c30|#000000|d|135
+ac|Classic Teal|#00d5c0|#00505a|#000000|d|135
+ac|Classic Cobalt|#3a8bff|#00204c|#000000|d|135
+ac|Classic Indigo|#6a6aff|#1a1060|#000000|d|135
+ac|Classic Violet|#b04aff|#38004c|#000000|d|135
+ac|Classic Rose|#ff5c8a|#601030|#000000|d|135
+ac|Classic Sakura|#ffb0d0|#7a4060|#0a0508|d|135
+ac|Classic Frost|#cfefff|#3a6a80|#000a10|d|135
+ac|Classic Steel|#b0c0d0|#2a3038|#000000|d|135
+ac|Classic Mono|#ffffff|#222222|#000000|d|135
+ac|Classic Sunset|#ff8a3a|#ff8a3d|#1a0b2e|d|160
+ac|Classic Rainbow|#ffffff|#ff2a2a|#6a00ff|s|0
+ac|Classic Noir|#ff0000|#120000|#000000|d|135
+ax|Rainbow Emergency|#ffffff|#202020|#000000|s|180
+ax|Matrix Alert|#00ff41|#003a14|#000000|g|180
+ax|Sakura Storm|#ff7aa8|#7a2a50|#0a0006|d|180
+ax|Ocean Alert|#19b5c9|#19b5c9|#00111f|d|180
+ax|Cyber Aura|#00e5ff|#00404a|#02000a|d|170
+ax|Aura Eclipse|#ffb04a|#1a0a00|#000000|d|135
+ax|Dragon Fire|#ff4a1a|#a02a00|#0a0000|d|180
+ax|Spirit Gate|#ff3a3a|#5a0a1a|#05000a|d|180
+ax|Pixel Alert|#ff2a2a|#300000|#000000|d|180
+ax|Lightning Gold|#ffe14a|#5a4a00|#050400|d|180
+y1|Code Crimson|#ff3344|#ef6706|#120203|d|150
+y1|Code Orange|#ff8533|#efd706|#120902|d|179
+y1|Code Yellow|#ffe433|#99ef06|#121002|d|208
+y1|Code Green|#33ff66|#06efb5|#021206|d|237
+y1|Code Blue|#3388ff|#1906ef|#020912|d|266
+y1|Code Violet|#a033ff|#ef06e7|#0b0212|d|295
+y1|Code Cyan|#33eeff|#0667ef|#021112|d|324
+y1|Code Pink|#ff3399|#ef0606|#12020a|d|353
+y1|Code White|#3399ff|#0606ef|#020a12|d|22
+y1|Code Black|#ff2a2a|#72665a|#0b0a0a|d|51
+y1|Red Lockdown|#ff3a33|#ef8206|#120302|d|80
+y1|Meltdown|#99ff33|#06ef06|#0a1202|d|109
+y1|Perimeter Breach|#ffaa33|#dbef06|#120c02|d|138
+y1|Signal Lost|#33bbff|#062def|#020d12|d|167
+y1|System Failure|#ff4e33|#ef9906|#120402|d|196
+y1|Overload|#fff833|#82ef06|#121202|d|225
+y1|Quarantine|#55ff33|#06ef54|#051202|d|254
+y1|Storm Warning|#3355ff|#5406ef|#020512|d|283
+y1|Flash Flood|#33ccff|#0640ef|#020e12|d|312
+y1|Last Stand|#ff3355|#ef5406|#120205|d|341
+y2|Inferno|#ff5c33|#efa906|#120502|d|150
+y2|Tidal|#33bbff|#062def|#020d12|d|179
+y2|Gale|#33ffdd|#06a1ef|#021210|d|208
+y2|Quake|#ff9933|#efef06|#120a02|d|237
+y2|Lightning|#ffee33|#8eef06|#121102|d|266
+y2|Frost|#33ccff|#0640ef|#020e12|d|295
+y2|Aura Venom|#77ff33|#06ef2d|#071202|d|324
+y2|Shadow|#9933ff|#ef06ef|#0a0212|d|353
+y2|Radiance|#ffd633|#a9ef06|#120f02|d|22
+y2|Nature|#33ff44|#06ef8e|#021203|d|51
+y2|Metal|#3388ff|#1906ef|#020912|d|80
+y2|Blood|#ff3341|#ef6b06|#120203|d|109
+y2|Ember Rain|#ff7733|#efc806|#120702|d|138
+y2|Storm Surge|#3399ff|#0606ef|#020a12|d|167
+y2|Sandstorm|#ffb433|#d0ef06|#120c02|d|196
+y2|Aether|#6633ff|#b506ef|#060212|d|225
+y2|Plasma|#ff33ff|#ef067a|#120212|d|254
+y2|Magma|#ff6933|#efb806|#120602|d|283
+y2|Spirit|#33ffff|#067aef|#021212|d|312
+y2|Void|#cc33ff|#ef06b5|#0e0212|d|341
+y3|Neon Alley|#ff3388|#ef1906|#120209|d|150
+y3|Harbor Lights|#33aaff|#061aef|#020c12|d|179
+y3|Shibuya Night|#ff33cc|#ef0640|#12020e|d|208
+y3|Akihabara|#aa33ff|#ef06db|#0c0212|d|237
+y3|Kabukicho|#ff3344|#ef6706|#120203|d|266
+y3|Chinatown|#ff4e33|#ef9906|#120402|d|295
+y3|Downtown Rain|#3377ff|#2d06ef|#020712|d|324
+y3|Aura Rooftop|#3333ff|#7a06ef|#020212|d|353
+y3|Subway|#33ff99|#06efef|#02120a|d|22
+y3|Industrial Zone|#ff9233|#efe706|#120a02|d|51
+y3|Casino Row|#ffcc33|#b5ef06|#120e02|d|80
+y3|Arcade Strip|#dd33ff|#ef06a1|#100212|d|109
+y3|Night Market|#ff7033|#efc006|#120702|d|138
+y3|Skyline|#7733ff|#c806ef|#070212|d|167
+y3|Dockyard|#33ddff|#0654ef|#021012|d|196
+y3|Red Light|#ff334e|#ef5b06|#120204|d|225
+y3|Data Center|#33ffdd|#06a1ef|#021210|d|254
+y3|Back Alley|#5533ff|#a106ef|#050212|d|283
+y3|Undercity|#33ff55|#06efa1|#021205|d|312
+y3|Megacity|#33bbff|#062def|#020d12|d|341
+eva|EVA-01|#8cf03c|#3fbf3f|#0a0412|d|150
+eva|EVA-00|#5ab0ff|#9fc8ff|#02060f|d|150
+eva|EVA-02|#ff3a1a|#ff7a1a|#1a0000|d|150
+eva|NERV|#ff6a00|#ff5a00|#050000|d|160
+eva|MAGI|#ffa000|#7a4a00|#000000|d|150
+eva|Third Impact|#ffffff|#000000|#000000|d|135
+eva|LCL Sea|#ffa04a|#ffb060|#1a0800|d|180
+eva|Lance of Longinus|#ff3030|#ff3a2a|#000010|d|150
+eva|Red Crosses|#ff2a2a|#444444|#000000|d|150
+eva|Ramiel|#3fd0ff|#0a5a8a|#00030a|d|180
+eva|Sync Rate|#ff9a2a|#8a3f08|#0d0400|d|180
+eva|SEELE Monolith|#ff2a2a|#4a0000|#000000|d|180
+eva|Tree of Life|#ffc400|#4a2a0a|#06000f|d|170
+ddlc|Monika|#3ddc84|#8be8b3|#07140d|d|150
+ddlc|Sayori|#ff6b6b|#ffb09a|#1f0d12|d|160
+ddlc|Natsuki|#ff5fa2|#ffc9e0|#2a0b1c|d|150
+ddlc|Yuri|#b79cff|#b79cff|#0f0a1f|d|150
+ddlc|Sayori's Sky|#ff6b6b|#ffd3b8|#3f8fe8|d|180
+ddlc|Natsuki's Bakeshop|#ff5fa2|#c4407f|#ffa3c8|d|160
+ddlc|Yuri's Library|#b79cff|#3b1a5e|#07020f|d|180
+ddlc|Just Monika|#3ddc84|#0c5a36|#020a05|d|180
+ddlc|Act 3 Glitch|#ff2a4a|#2e0012|#000000|d|170
+ddlc|Cherry Blossom Path|#ff8fb8|#8a3f7a|#ffd9e6|d|170
+ddlc|Festival Fireworks|#b79cff|#4a1f5a|#05030f|d|180
+ddlc|Poem Game|#ff6fae|#6a2a5a|#1a0a1c|d|160
+ddlc|Monika's Piano|#3ddc84|#0a4a30|#010806|d|180
+ddlc|Sayori · Dream Sky|#ff8fc4|#b9b4ec|#f6b4dc|d|200
+ddlc|Sayori · Dream Sky (Night)|#ff8fc4|#6a3a8a|#150c30|d|200
+ddlc|Natsuki · Music Room|#ff6fae|#f48fb1|#ffd1e0|d|180
+ddlc|Natsuki · Music Room (Night)|#ff6fae|#b03a7a|#240a1c|d|180
+ddlc|Yuri · Butterfly Library|#c28bff|#c3c9a0|#f59cc4|d|120
+ddlc|Yuri · Butterfly Library (Night)|#c28bff|#a0627a|#150c22|d|120
+ddlc|Monika · Autumn Breeze|#6fd6a0|#a8d8bc|#f4e6cc|d|160
+ddlc|Monika · Autumn Breeze (Night)|#6fd6a0|#8a6a4a|#0e1d18|d|160
+ddlc|Sayori Sunshine|#ffc93c|#ffd86b|#2a1400|d|165
+ddlc|Sayori Sky|#6bc7ff|#bfe8ff|#071a33|d|170
+ddlc|Sayori Bedroom|#ff8a8a|#ffc2cc|#2a0a14|d|150
+ddlc|Sayori Bow|#ff5a5a|#ff6b6b|#1a0000|d|0
+ddlc|Cereal Morning|#ffb347|#ffe6b0|#2a1400|d|160
+ddlc|Natsuki Kitchen|#ff6fb0|#ffc0dc|#2a0a1c|d|155
+ddlc|Natsuki Manga Day|#ff4f9a|#ff7eb6|#1a0010|d|140
+ddlc|Natsuki Parfait|#ff9ac8|#ffe0ee|#2a1030|d|170
+ddlc|Natsuki Cat Ears|#ff7eb6|#ff5fa2|#12000a|d|0
+ddlc|Natsuki Bakery|#ffb3d0|#ffd9c0|#2a1408|d|160
+ddlc|Yuri Amethyst|#b79cff|#9a7aff|#0a0016|d|160
+ddlc|Yuri Library|#a98aff|#6a4aa0|#0a0612|d|170
+ddlc|Yuri Tea Time|#c4a8ff|#d0b0ff|#140a22|d|165
+ddlc|Yuri Candlelight|#ffb86b|#8a3a50|#0e0614|d|170
+ddlc|Yuri Ink Well|#8a6aff|#2a1a5a|#000000|d|135
+ddlc|Violet Night Sky|#a98aff|#4a2a8a|#04000f|d|170
+ddlc|Monika Classroom|#3ddc84|#a0ffc0|#001a0a|d|165
+ddlc|Monika Piano|#3ddc84|#2ad08a|#00100a|d|160
+ddlc|Monika Space Room|#3ddc84|#0a5a40|#000805|d|170
+ddlc|Your Reality|#3ddc84|#00a050|#000a05|d|0
+ddlc|Monika Garden|#7cffa8|#7cffa8|#031a0c|d|160
+ddlc|Club President|#3ddc84|#3ddc84|#001408|d|150
+ddlc|Green Glitch|#00ff66|#005a28|#000a02|d|180
+ddlc|Monika Typewriter|#3ddc84|#1a6a4a|#00100a|d|165
+ddlc|Literature Club Meeting|#ff9ac0|#ffe0b0|#2a1608|d|160
+ddlc|Poem Sharing|#ffd0a0|#ffd9b8|#2a1a10|d|155
+ddlc|Poem Game Night|#b8a0ff|#7a5acd|#0a0420|d|170
+ddlc|Festival Fireworks ✦|#ffd24a|#ffd24a|#1a0f2e|d|150
+ddlc|Cherry Blossom Path ✦|#ff9ac0|#ffd0e0|#2a0a1a|d|165
+ddlc|School Rooftop|#ffb0c8|#ff9a7a|#10162e|d|170
+ddlc|Sunset Walk|#ff8a5a|#ff8a3d|#1a0b2e|d|160
+ddlc|Rainy Club Day|#8ab8e0|#6a90b0|#07101a|d|180
+ddlc|Snowy Club Room|#cfe6ff|#cfe6ff|#07101a|d|175
+ddlc|Autumn Club|#ff9a4a|#ffb060|#1a0a00|d|160
+ddlc|Halloween Club|#ff8a1a|#ff6a00|#0a0010|d|170
+ddlc|Christmas Club|#ff4a4a|#1a6a3a|#08140a|d|165
+ddlc|Valentine Doki|#ff4f8a|#ff7ab0|#1a0010|d|150
+ddlc|Dokis Together|#ff9ac0|#ff9ac0|#1a0a1a|d|155
+ddlc|Chibi Club|#ff9ac0|#ffc0e8|#2a0a2a|d|160
+ddlc|Pastel Poem|#ffb3d9|#ffd9ec|#2a1030|d|165
+ddlc|Good Ending|#ffd23f|#ffd23f|#1a1030|d|160
+ddlc|Normal Ending|#9a9ac0|#6a6a90|#0a0a14|d|170
+ddlc|Club Room Night|#ffb36b|#8a5a2a|#0a0610|d|170
+ddlc|Act 2 Glitch|#ff2a4a|#4a0014|#000000|d|180
+ddlc|File Not Found|#00ff66|#003a14|#000000|d|180
+ddlc|Ghost Menu|#e8e0ff|#3a2a60|#05030a|d|170
+space|Deep Space|#8fb4ff|#10103a|#000005|s|160
+space|Nebula|#c77dff|#8a2fa8|#050010|d|135
+space|Ringed Planet|#ff9a3c|#10103a|#000005|d|160
+space|Meteor Shower|#bfefff|#2a1050|#000000|s|160
+spidey|Classic Suit|#e01010|#10308a|#1a0000|d|120
+spidey|Miles Morales|#ff2a2a|#e01010|#000000|d|160
+spidey|Spider-Gwen|#ff4fb0|#4fd8ff|#0a0a12|d|150
+spidey|Spider-Noir|#e0e0e0|#8a8a8a|#000000|s|160
+spidey|Spider-Punk|#ffe600|#ffe600|#0a0a0a|d|135
+spidey|Spider-Man 2099|#3aa0ff|#ff2a2a|#000010|g|150
+spidey|Peni Parker|#ff7ab8|#ff7ab8|#0a0a2a|g|140
+spidey|Spider-Ham|#ffb0d0|#ffe0f0|#2b0a3d|d|150
+spidey|Scarlet Spider|#ff3a1a|#ff6a2a|#120000|d|170
+spidey|Superior Spider-Man|#ff3030|#3a3a3a|#0a0a0a|d|160
+spidey|Advanced Suit|#ffffff|#ffffff|#0a1020|d|150
+spidey|Raimi Era|#d02020|#2a60c0|#0a1030|d|165
+spidey|Spider-Woman|#ffcc00|#ffcc00|#1a0000|d|140
+spidey|Pavitr Prabhakar|#ff9a1a|#ffb020|#1a0a00|d|150
+spidey|Spider-Verse Portal|#ff2a8a|#ff2a8a|#050010|d|135
+spidey|Symbiote Spider-Man|#ffffff|#2a2a3a|#000000|d|185
+spvil|Green Goblin|#7cff3a|#9a30ff|#050a00|d|150
+spvil|Venom|#ffffff|#2a2a3a|#000000|d|180
+spvil|Carnage|#ff1a1a|#ff1a1a|#100000|d|200
+spvil|Doctor Octopus|#ffa020|#ffa020|#0a0a00|d|160
+spvil|Sandman|#e0b060|#f0d090|#1a1000|d|170
+spvil|Electro|#4fd8ff|#4fd8ff|#000010|d|150
+spvil|Vulture|#7cd05a|#8a9a3a|#050a05|s|160
+spvil|Mysterio|#7dffb2|#7dffb2|#000a08|d|135
+spvil|The Lizard|#5fe02d|#7ad02a|#020a02|g|150
+spvil|Kingpin|#ffffff|#8a8a8a|#000000|d|135
+spvil|Kraven the Hunter|#d08a3a|#d08a3a|#0a0500|d|160
+spvil|Rhino|#9aa0a8|#8a9098|#0a0a0a|d|150
+spvil|The Spot|#ffffff|#303030|#000000|d|135
+spvil|Sinister Six|#ff3030|#ff3030|#0a0a0a|d|150
+spvil|Mister Negative|#ff4fd8|#ff4fd8|#000000|d|150
+shin|Fourth Form|#ff4a1a|#c0300a|#050000|d|170
+shin|Atomic Breath|#c070ff|#c070ff|#000008|d|180
+shin|Kamata-kun|#e08a7a|#d09080|#0a0505|d|160
+shin|Third Form|#ff8a5a|#ff6a3a|#0a0504|d|165
+shin|Tokyo Emergency|#ff2a2a|#5a0000|#000000|d|180
+shin|Operation Yashiro|#ffcc00|#ffcc00|#050505|d|135
+shin|Frozen Godzilla|#bfefff|#bfefff|#020a14|s|170
+shin|Fallout|#a0a0a0|#6a5a4a|#050505|d|180
+shin|Burning Tokyo|#ff7a1a|#ff7a1a|#050000|d|190
+shin|JSDF Radar|#00ff41|#00aa44|#000a05|d|150
+shin|Aura Storm|#ff0000|#5a0000|#000000|d|180
+uk|V1|#ff2a2a|#ff2a2a|#050000|d|160
+uk|V1 Wings|#ffc400|#ff8a00|#0a0a00|d|135
+uk|Mankind Is Dead|#ff2a2a|#8a0000|#000000|d|180
+uk|Blood Is Fuel|#ff1a1a|#e00000|#1a0000|d|200
+uk|Hell Is Full|#ff5a1a|#ffa000|#100000|d|190
+uk|Limbo|#c0d0d0|#8a9a9a|#0a0a0a|d|170
+uk|Lust|#ff4fb0|#ff4fb0|#10001a|d|150
+uk|Gluttony|#9aba3a|#7a9a2a|#050a00|d|170
+uk|Greed|#ffd04a|#c0a020|#0a0a00|d|165
+uk|Wrath|#ff3a00|#ff3a00|#000000|d|200
+uk|Gabriel|#ffd070|#ff8a3a|#04061a|d|135
+uk|Heavens Halo|#ffe08a|#ffe08a|#0a0a14|d|135
+uk|Cybergrind|#00ff41|#00aa30|#000a00|g|180
+uk|Style Meter|#ffc400|#ffc400|#000000|d|150
+uk|Rainbow Ring|#ffffff|#ff2a2a|#6a00ff|d|0
+ks|Kazuma|#4fbf6a|#8a6a3a|#050a05|d|150
+ks|Aqua|#4fc3f7|#7fe0ff|#001028|d|160
+ks|Megumin|#ff4a1a|#ff6a1a|#0a0005|d|135
+ks|Darkness|#e8c070|#e8c070|#0a0a10|d|160
+ks|Wiz|#9aa0ff|#9aa0ff|#050514|s|150
+ks|Yunyun|#b06aff|#c090ff|#0a0514|d|150
+ks|Chris|#9ad0ff|#9ad0ff|#050a14|d|160
+ks|Eris|#ffb0d0|#ffe0f0|#14101a|d|150
+ks|Iris|#ffd870|#ffd870|#0a0a1a|s|150
+ks|Komekko|#ff8a9a|#ffa0a0|#0a0508|d|150
+ks|Chomusuke|#a88aff|#6a4ad0|#000000|d|135
+ks|Vanir|#ff6a3a|#ff6a3a|#000000|d|135
+ks|Sylvia|#ff4aa0|#ff4aa0|#0a0010|d|150
+ks|Wolbach|#9a50ff|#9a50ff|#05000a|d|170
+ks|Hans|#5adf8a|#5adf8a|#020a05|d|150
+ks|Beldia|#ff5a1a|#ff7a1a|#0a0000|d|180
+ks|Verdia|#c04aff|#8a2ac0|#050008|d|170
+ks|Cecily|#ff6aa0|#ff9ac0|#10050a|d|150
+ks|Dust|#d0a050|#d0a050|#0a0805|d|160
+ks|Luna|#7ac0ff|#7ac0ff|#050a14|d|150
+ks|Mitsurugi|#ffe040|#ffe040|#0a0a14|d|150
+ks|Sena|#c0c8d8|#8a98b0|#05060a|g|150
+ks|Zesta|#4fd8ff|#4fd8ff|#001020|d|160
+ks|Alderp|#e0a0ff|#c080e0|#0a0510|d|150
+ks|EXPLOSION!|#ff3a00|#ffb020|#000000|s|135
+ks|Axis Order|#4fc3f7|#a0e8ff|#000a1a|d|0
+hol|Christmas|#ff3a3a|#b01010|#021a0a|s|160
+hol|Halloween|#ff7a1a|#ff6a00|#080008|d|170
+hol|Valentines Day|#ff4f8a|#ff7aa8|#1a0010|d|150
+hol|New Years Eve|#ffd24a|#ffd24a|#02020f|d|170
+hol|Fourth of July|#ff3a4a|#d01a2a|#050a2a|d|160
+hol|Thanksgiving|#e8923a|#e8923a|#140a02|d|165
+hol|Easter|#ff9ad0|#ffd6ec|#1a1030|d|150
+hol|St Patricks Day|#4adf6a|#a0f070|#021a08|d|150
+hol|Hanukkah|#7ac0ff|#e8f4ff|#020a2a|s|160
+hol|Diwali|#ffb020|#ffb020|#100008|d|135
+hol|Lunar New Year|#ffd24a|#ffd24a|#1a0000|d|165
+hol|Birthday|#ff6ad0|#ff9ae0|#1a0a30|d|150
+rz|Subaru|#4fb0ff|#4fb0ff|#050a18|s|160
+rz|Emilia|#c0b0ff|#e0d8ff|#0a0a1a|s|150
+rz|Rem|#4fa8ff|#4fa8ff|#000a1a|d|155
+rz|Ram|#ff6a9a|#ff6a9a|#14050a|d|155
+rz|Beatrice|#ffc0e0|#ffc0e0|#0a0510|d|135
+rz|Puck|#bfefff|#bfefff|#05101a|s|150
+rz|Roswaal|#ff4ad0|#ff4ad0|#0a0010|d|160
+rz|Echidna|#f0f0ff|#e8e8ff|#05050a|d|150
+rz|Satella|#a24bff|#6a1ab0|#000000|d|135
+rz|Felt|#ffd24a|#ffd24a|#0a0a05|d|160
+rz|Reinhard|#ff3a3a|#ffd0a0|#05050f|d|150
+rz|Wilhelm|#c0c8d8|#c0c8d8|#05060a|d|160
+rz|Crusch|#3ac0ff|#3ac0ff|#000a14|d|160
+rz|Priscilla|#ff5a1a|#ff9a30|#140400|d|165
+rz|Anastasia|#e8c070|#e8c070|#0a0805|d|150
+rz|Julius|#6aa0ff|#6aa0ff|#05081a|s|150
+rz|Petra|#ff8a4a|#ff8a4a|#100804|d|150
+rz|Otto|#7adf8a|#7adf8a|#040a05|d|150
+rz|Garfiel|#ffb020|#ffb020|#0a0a00|d|165
+rz|Frederica|#ffa060|#ffa060|#0a0604|d|150
+rz|Elsa|#dc143c|#dc143c|#0a0000|s|170
+rz|Betelgeuse|#a0ff3a|#a0ff3a|#050a00|d|160
+rz|Regulus|#ffe040|#ffe040|#0a0a1a|d|150
+rz|Ferris|#ff9ac0|#ffb0d0|#14080e|d|150
+rz|Capella|#ff4a8a|#ff4a8a|#10000a|d|160
+rz|Pandora|#ffffff|#ffffff|#050505|d|135
+rz|Return by Death|#8a2aff|#8a2aff|#000000|d|0
+rz|Lugunica|#e8c070|#e8c070|#0a0f1a|s|160
+rz|Sanctuary|#5adf8a|#5adf8a|#020a05|d|150
+rz|Pleiades Watchtower|#7ac0ff|#c0e0ff|#050a14|d|170
+og|Hachiman|#7a9ab0|#8aa0b0|#0a0f14|d|160
+og|Yukino|#8ad0ff|#cdeeff|#050a14|s|150
+og|Yui|#ff9ac0|#ffc0d8|#14080e|d|150
+og|Iroha|#ffb04a|#ffd080|#140a02|d|150
+og|Saki|#b0b8ff|#b0b8ff|#0a0a14|d|160
+og|Shizuka|#c0a0ff|#c0a0ff|#0a0510|d|160
+og|Haruno|#ff7a9a|#ff9ab0|#12060a|d|150
+og|Komachi|#ffd070|#ffd070|#140f02|d|150
+og|Taishi|#5adfff|#5adfff|#021014|d|160
+og|Hayato|#6ab0ff|#6ab0ff|#05101a|s|150
+og|Yumiko|#ff6aa0|#ff6aa0|#14050a|d|150
+og|Tobe|#ffe040|#ffe040|#0a0a00|d|160
+og|Zaimokuza|#ff8a3a|#ff8a3a|#0a0502|d|165
+og|Saika|#ffb0d0|#ffe0f0|#14080e|d|150
+og|Hina|#ff8aff|#ff8aff|#0f0514|d|150
+og|Meguri|#7adf9a|#7adf9a|#04100a|d|150
+og|Sagami|#ffaa4a|#ffaa4a|#140a02|d|160
+og|Rumi|#c0c8ff|#c0c8ff|#0a0a14|s|160
+og|Service Club|#7ab0ff|#7ab0ff|#05080f|d|160
+og|MAX Coffee|#ffd24a|#ffd24a|#0f0a02|d|170
+og|Sobu High|#4a9aff|#4a9aff|#05101a|s|160
+og|Rooftop|#9ad0ff|#d0ecff|#0a1020|d|160
+og|Sunset Classroom|#ff8a5a|#ffb06a|#140505|d|170
+og|Rainy Day|#7a9ac0|#7a9ac0|#050a10|s|180
+og|Library|#d0b080|#d0b080|#0a0805|d|160
+og|Prom|#ff6ad0|#ff6ad0|#0a0514|d|150
+og|Chiba Night|#6a8aff|#ff6a9a|#02020f|s|170
+og|Amusement Park|#ff9a3a|#ffb040|#0f0514|d|150
+og|Festival Stage|#ffd24a|#ffd24a|#050514|d|160
+og|Snowy Walk|#bfefff|#e8f8ff|#05101a|s|170
+dn|Light Yagami|#ff3a3a|#8a1010|#000000|d|160
+dn|L Lawliet|#e0e0e0|#e0e0e0|#050505|g|160
+dn|Misa|#ff4a9a|#ff4a9a|#0a0008|d|150
+dn|Ryuk|#ff2a2a|#6a0a0a|#000000|d|170
+dn|Rem Shinigami|#e8e8f0|#c0c0d0|#05050a|d|160
+dn|Near|#f0f0f0|#f0f0f0|#0a0a0f|d|150
+dn|Mello|#b06a3a|#b06a3a|#0a0502|d|170
+dn|Matsuda|#6a8aaa|#6a8aaa|#05080a|d|150
+dn|Soichiro|#8a9ab0|#8a9ab0|#05060a|d|160
+dn|Watari|#c0c0c8|#c0c0c8|#050508|d|150
+dn|Mikami|#a0a0ff|#a0a0ff|#05050f|g|160
+dn|Kiyomi|#ff8aa0|#ff8aa0|#0f0508|d|150
+dn|Sayu|#ffb0c0|#ffb0c0|#14080a|d|150
+dn|Naomi Misora|#4a7aaa|#4a7aaa|#02080f|s|160
+dn|Aizawa|#c09a6a|#c09a6a|#0a0805|d|160
+dn|Mogi|#6aaa8a|#6aaa8a|#040a08|d|150
+dn|Ide|#4a9aff|#4a9aff|#02080f|d|160
+dn|Sidoh|#8a4aff|#8a4aff|#05000a|d|170
+dn|Higuchi|#ffa040|#ffa040|#0a0502|d|160
+dn|Kira|#dc143c|#dc143c|#000000|d|135
+dn|Shinigami Realm|#7a7a8a|#4a4a55|#000000|d|135
+dn|The Death Note|#ffffff|#3a3a3a|#000000|d|160
+dn|Apple|#ff2a2a|#ff2a2a|#0a0000|d|165
+dn|Justice|#e8e8ff|#e8e8ff|#05050f|d|150
+dn|Task Force|#4a8aff|#ff3a3a|#02040f|d|160
+dn|Wammys House|#c0c0d0|#c0c0d0|#05050a|s|160
+dn|Yotsuba|#ffd24a|#ffd24a|#0a0a05|d|160
+dn|Warehouse|#8a8a9a|#8a8a9a|#050505|g|170
+dn|Notebook Rules|#f0f0f0|#f0f0f0|#000000|d|160
+dn|Shinigami Eyes|#ff1a3a|#ff1a3a|#000000|d|135
+cp|Night City|#00ffff|#00ffff|#110022|d|110
+cp|V|#ffff00|#ffff00|#001111|d|147
+cp|Johnny Silverhand|#ffaa00|#ffaa00|#110000|d|184
+cp|Judy Alvarez|#ff44aa|#ff44aa|#001122|d|121
+cp|Panam Palmer|#ffcc00|#ffcc00|#112200|d|158
+cp|Jackie Welles|#ffdd00|#ffdd00|#221100|d|195
+cp|Rogue|#ff66ff|#ff66ff|#110011|d|132
+cp|River Ward|#88ddff|#88ddff|#001122|d|169
+cp|Kerry Eurodyne|#ff00cc|#ff00cc|#0a0010|d|206
+cp|Alt Cunningham|#00ffff|#00ffff|#000011|d|143
+cp|Arasaka|#ff3333|#ff3333|#110000|d|180
+cp|Militech|#ccff00|#ccff00|#111100|d|117
+cp|Kang Tao|#33ffaa|#33ffaa|#001111|d|154
+cp|Biotechnica|#66ff66|#66ff66|#001100|d|191
+cp|Trauma Team|#ffffff|#ffffff|#110000|d|128
+cp|NCPD|#44aaff|#44aaff|#000011|d|165
+cp|Maelstrom|#ff5500|#ff5500|#110000|d|202
+cp|Tyger Claws|#55ffcc|#55ffcc|#001111|d|139
+cp|Valentinos|#ffcc00|#ffcc00|#110000|d|176
+cp|Voodoo Boys|#cc44ff|#cc44ff|#110011|d|113
+cp|Wraiths|#ffbb33|#ffbb33|#111100|d|150
+cp|Aldecaldos|#ffdd33|#ffdd33|#112200|d|187
+cp|Afterlife|#44ffff|#44ffff|#110011|d|124
+cp|Konpeki Plaza|#ffffff|#ffffff|#001111|d|161
+cp|Pacifica|#ffcc44|#ffcc44|#220011|d|198
+cp|Badlands|#ffee55|#ffee55|#221100|d|135
+cp|Dogtown|#ff8844|#ff8844|#110000|d|172
+cp|Heywood|#ffcc66|#ffcc66|#001122|d|209
+cp|Braindance|#ff00ff|#ff00ff|#110022|d|146
+cp|Cyberpsycho|#ff00ff|#ff00ff|#110000|d|183
+er|David Martinez|#ffff00|#ffff00|#001111|d|110
+er|Lucy|#ff00cc|#ff00cc|#110022|d|147
+er|Maine|#ffcc00|#ffcc00|#221100|d|184
+er|Rebecca|#ff4488|#ff4488|#001122|d|121
+er|Pilar|#ffcc33|#ffcc33|#112200|d|158
+er|Kiwi|#ffbb00|#ffbb00|#110011|d|195
+er|Dorio|#ff9933|#ff9933|#110000|d|132
+er|Falco|#ddff00|#ddff00|#111100|d|169
+er|Adam Smasher|#ff2222|#ff2222|#110000|d|206
+er|Faraday|#66ddff|#66ddff|#001111|d|143
+er|Gloria|#ff88ff|#ff88ff|#110022|d|180
+er|Cyberpsychosis|#00ff88|#00ff88|#110000|d|117
+er|Moon|#99ccff|#99ccff|#000011|d|154
+er|Arasaka Tower|#ff4444|#ff4444|#110000|d|191
+er|Sandevistan|#ffff33|#ffff33|#001122|d|128
+er|Mantis Blades|#ff6666|#ff6666|#110000|d|165
+er|Gorilla Arms|#ffbb22|#ffbb22|#221100|d|202
+er|Kiwis Bar|#44ffdd|#44ffdd|#110022|d|139
+er|Heywood Streets|#ffcc55|#ffcc55|#001111|d|176
+er|Grand Imperial|#ffffdd|#ffffdd|#110011|d|113
+er|Afterlife Bar|#ff00aa|#ff00aa|#001122|d|150
+er|Dream Chip|#ff44ff|#ff44ff|#110022|d|187
+er|Lucys Dream|#ffccff|#ffccff|#000011|d|124
+er|Night Ride|#ff55aa|#ff55aa|#001122|d|161
+er|Rooftop Wish|#ffdd55|#ffdd55|#110022|d|198
+er|Netrunner|#44ff88|#44ff88|#001100|d|135
+er|Corpo Rat|#88bbff|#88bbff|#001122|d|172
+er|Street Kid|#ffaa44|#ffaa44|#221100|d|209
+er|Nomad|#eeff55|#eeff55|#112200|d|146
+er|Edgerunner|#00ffff|#00ffff|#110011|d|183
+ol|Ainz Ooal Gown|#dd88ff|#dd88ff|#110000|d|110
+ol|Albedo|#ffddee|#ffddee|#110011|d|147
+ol|Shalltear|#ff6688|#ff6688|#110000|d|184
+ol|Demiurge|#ffaa33|#ffaa33|#111100|d|121
+ol|Cocytus|#88eeff|#88eeff|#001122|d|158
+ol|Aura|#ccff66|#ccff66|#001100|d|195
+ol|Mare|#88ffdd|#88ffdd|#001111|d|132
+ol|Sebas|#ccddee|#ccddee|#111111|d|169
+ol|Narberal|#ee66ff|#ee66ff|#110011|d|206
+ol|Entoma|#ffbb44|#ffbb44|#111100|d|143
+ol|Victim|#99ff44|#99ff44|#001100|d|180
+ol|Gargantua|#ccaa88|#ccaa88|#111111|d|117
+ol|Pandoras Actor|#ffdd44|#ffdd44|#111100|d|154
+ol|Nazarick|#aa44cc|#aa44cc|#110000|d|191
+ol|Great Tomb|#9966ee|#9966ee|#110011|d|128
+ol|Sorcerer Kingdom|#99aaff|#99aaff|#001122|d|165
+ol|Momon|#88aacc|#88aacc|#110000|d|202
+ol|Nabe|#cc88ee|#cc88ee|#110011|d|139
+ol|Evileye|#ff5588|#ff5588|#110000|d|176
+ol|Climb|#ffdd66|#ffdd66|#111100|d|113
+ol|Brain Unglaus|#77bbff|#77bbff|#001122|d|150
+ol|Zesshi|#ff99dd|#ff99dd|#111111|d|187
+ol|Gazef Stronoff|#eebb55|#eebb55|#111100|d|124
+ol|Jircniv|#ff6688|#ff6688|#110000|d|161
+ol|Renner|#ff99bb|#ff99bb|#110011|d|198
+ol|Fallen Elder|#77ee88|#77ee88|#001100|d|135
+ol|Guild Ainz Ooal Gown|#ffcc55|#ffcc55|#111100|d|172
+ol|Floor Guardians|#cc99ff|#cc99ff|#110011|d|209
+ol|Supreme Beings|#ffffff|#ffffff|#111111|d|146
+ol|World Item|#ffee66|#ffee66|#110000|d|183
+zm|Akira Tendo|#ffdd00|#ffdd00|#110022|d|110
+zm|Shizuka (Z100)|#ffbb44|#ffbb44|#001122|d|147
+zm|Kenichiro|#ffdd44|#ffdd44|#111100|d|184
+zm|Beatrice Zom|#ffccff|#ffccff|#110011|d|121
+zm|Ryu Ino|#ffaa33|#ffaa33|#110000|d|158
+zm|Zom Sunrise|#ffff00|#ffff00|#110022|d|195
+zm|Bucket List|#ffff33|#ffff33|#001122|d|132
+zm|Office Escape|#ffee44|#ffee44|#111111|d|169
+zm|Zombie Pool|#ccff33|#ccff33|#001100|d|206
+zm|Zombie Shark|#33ffee|#33ffee|#001122|d|143
+zm|Zombie Tsunami|#66ffee|#66ffee|#001111|d|180
+zm|Zombie Dog|#ffbb55|#ffbb55|#111100|d|117
+zm|Carnival|#ffdd22|#ffdd22|#110022|d|154
+zm|Fireworks Night|#ffee33|#ffee33|#000011|d|191
+zm|Lonely Hero|#ffcc66|#ffcc66|#001122|d|128
+zm|Free Life|#ddff33|#ddff33|#112200|d|165
+zm|No Overtime|#ffff55|#ffff55|#110022|d|202
+zm|Tokyo Outbreak|#ffaa22|#ffaa22|#110000|d|139
+zm|Vacation Day|#ffffaa|#ffffaa|#001122|d|176
+zm|Road Trip|#ffdd33|#ffdd33|#221100|d|113
+zm|Hot Spring|#ffccff|#ffccff|#110022|d|150
+zm|Beach Bucket|#ffee66|#ffee66|#001111|d|187
+zm|Sleep In|#ffbbff|#ffbbff|#110022|d|124
+zm|Zombie Dance|#ffff44|#ffff44|#110011|d|161
+zm|Rage Free|#ffff33|#ffff33|#110000|d|198
+zm|Amusement Dead|#ffee33|#ffee33|#110022|d|135
+zm|Rooftop Party|#ffdd44|#ffdd44|#001122|d|172
+zm|Last Day|#ffdd66|#ffdd66|#110000|d|209
+zm|Zom Heart|#ffaa88|#ffaa88|#110011|d|146
+zm|Hundred Wishes|#ffff88|#ffff88|#001122|d|183
+sl|Rimuru|#88eeff|#88eeff|#001122|d|110
+sl|Veldora|#cc99ff|#cc99ff|#110022|d|147
+sl|Milim|#ffaaff|#ffaaff|#110022|d|184
+sl|Benimaru|#ff6666|#ff6666|#110000|d|121
+sl|Shuna|#ffbbee|#ffbbee|#110022|d|158
+sl|Shion|#ee88ff|#ee88ff|#110011|d|195
+sl|Souei|#66bbff|#66bbff|#001111|d|132
+sl|Hakurou|#ccddee|#ccddee|#111111|d|169
+sl|Ranga|#88bbff|#88bbff|#001122|d|206
+sl|Gobta|#aaff55|#aaff55|#001100|d|143
+sl|Diablo|#bb44ee|#bb44ee|#110011|d|180
+sl|Hinata|#99ddff|#99ddff|#001122|d|117
+sl|Gabiru|#77ccff|#77ccff|#001122|d|154
+sl|Ramiris|#ffbbee|#ffbbee|#110022|d|191
+sl|Guy Crimson|#ff5555|#ff5555|#110000|d|128
+sl|Leon|#ffdd66|#ffdd66|#111100|d|165
+sl|Clayman|#ee66ff|#ee66ff|#110011|d|202
+sl|Tempest|#77ffdd|#77ffdd|#001111|d|139
+sl|Jura Forest|#88ff66|#88ff66|#001100|d|176
+sl|Great Demon|#dd66ff|#dd66ff|#110011|d|113
+sl|Demon Lord|#ff4488|#ff4488|#110000|d|150
+sl|Storm Dragon|#88ccff|#88ccff|#001122|d|187
+sl|Raphael|#aaeeff|#aaeeff|#001122|d|124
+sl|Great Sage|#ddbbff|#ddbbff|#110022|d|161
+sl|Predator|#cc44cc|#cc44cc|#110011|d|198
+sl|Hell Flare|#ffaa44|#ffaa44|#110000|d|135
+sl|Slime Jelly|#77eeff|#77eeff|#001122|d|172
+sl|Blue Gel|#66ddff|#66ddff|#001111|d|209
+sl|Water Magic|#55bbff|#55bbff|#001122|d|146
+sl|Rimuru Smile|#ffbbff|#ffbbff|#110022|d|183
+sh|Naofumi|#88bbff|#88bbff|#001122|d|110
+sh|Raphtalia|#ffbb44|#ffbb44|#111100|d|147
+sh|Filo|#ffddff|#ffddff|#110022|d|184
+sh|Melty|#ff99dd|#ff99dd|#110011|d|121
+sh|Rishia|#ee99ff|#ee99ff|#110011|d|158
+sh|Itsuki|#77bbff|#77bbff|#001122|d|195
+sh|Ren|#66ddff|#66ddff|#001122|d|132
+sh|Motoyasu|#ff5566|#ff5566|#110000|d|169
+sh|Queen Mirelia|#ff6699|#ff6699|#110011|d|206
+sh|Malty|#ff5588|#ff5588|#110000|d|143
+sh|Shield Barrier|#88ccff|#88ccff|#001122|d|180
+sh|Curse Series|#ff3333|#ff3333|#110000|d|117
+sh|Rage Shield|#ff4400|#ff4400|#110000|d|154
+sh|Waves of Calamity|#ff6644|#ff6644|#110000|d|191
+sh|Cal Mira|#77ffbb|#77ffbb|#001122|d|128
+sh|Spirit Tortoise|#77cc66|#77cc66|#001100|d|165
+sh|Phoenix|#ffaa33|#ffaa33|#110000|d|202
+sh|Karma Dog|#ffbb66|#ffbb66|#111100|d|139
+sh|Slave Seal|#ee4488|#ee4488|#110011|d|176
+sh|Melromarc|#99bbff|#99bbff|#001122|d|113
+sh|Siltvelt|#ffcc55|#ffcc55|#111100|d|150
+sh|Faubrey|#88ccff|#88ccff|#001122|d|187
+sh|Zeltoble|#ff77ff|#ff77ff|#110011|d|124
+sh|Legendary Weapons|#88ddff|#88ddff|#001122|d|161
+sh|Heroic Era|#ffdd44|#ffdd44|#111100|d|198
+sh|Wing of Filo|#ffeeff|#ffeeff|#110022|d|135
+sh|Demi Human|#ffcc66|#ffcc66|#111100|d|172
+sh|Slavery Cart|#ccaa88|#ccaa88|#111111|d|209
+sh|Village Home|#ddcc55|#ddcc55|#112200|d|146
+sh|Peace Land|#aaeeff|#aaeeff|#001122|d|183
+ms|Mash Burnedead|#ffee44|#ffee44|#111100|d|110
+ms|Lance Crown|#88ddff|#88ddff|#001122|d|147
+ms|Dot Barrett|#99ccff|#99ccff|#001122|d|184
+ms|Finn Ames|#ffccdd|#ffccdd|#110022|d|121
+ms|Lemon Irvine|#ffbbff|#ffbbff|#110022|d|158
+ms|Abel Walker|#ff5566|#ff5566|#110000|d|195
+ms|Rayne Ames|#ee66ee|#ee66ee|#110011|d|132
+ms|Margarette|#ffaaee|#ffaaee|#110011|d|169
+ms|Doom Mash|#ffbb33|#ffbb33|#111100|d|206
+ms|Orter Madl|#ccddee|#ccddee|#111111|d|143
+ms|Innocent Zero|#cc44cc|#cc44cc|#110011|d|180
+ms|Easton|#77bbdd|#77bbdd|#001122|d|117
+ms|Magia Lupus|#77ccff|#77ccff|#001122|d|154
+ms|Selvis Eveil|#ff4444|#ff4444|#110000|d|191
+ms|Fuegoleon|#ff8844|#ff8844|#110000|d|128
+ms|Cream Puff|#ffeeff|#ffeeff|#110022|d|165
+ms|Muscle Magic|#ffee33|#ffee33|#111100|d|202
+ms|Cream Puffs|#ffddee|#ffddee|#110022|d|139
+ms|Mashle Training|#ddff44|#ddff44|#112200|d|176
+ms|Lightning Mash|#77ccff|#77ccff|#001122|d|113
+ms|Easton Academy|#88bbff|#88bbff|#001122|d|150
+ms|Gold Crest|#ffee44|#ffee44|#111100|d|187
+ms|Dormitory Orca|#77ffcc|#77ffcc|#001122|d|124
+ms|Dormitory Adler|#ee66ff|#ee66ff|#110011|d|161
+ms|Wahlberg|#ff6688|#ff6688|#110000|d|198
+ms|Witch Hunt|#dd4488|#dd4488|#110011|d|135
+ms|Spell Duel|#99ccff|#99ccff|#001122|d|172
+ms|Sky Spell|#88eeff|#88eeff|#001122|d|209
+ms|Final Boss Mash|#ffaa22|#ffaa22|#111100|d|146
+ms|Flexing Hour|#ffdd33|#ffdd33|#111100|d|183
+dd|Momo Ayase|#ffddff|#ffddff|#110022|d|110
+dd|Okarun|#88eeff|#88eeff|#001122|d|147
+dd|Turbo Granny|#ff5588|#ff5588|#110000|d|184
+dd|Aira Shiratori|#ee88ff|#ee88ff|#110011|d|121
+dd|Jiji|#ffcc55|#ffcc55|#111100|d|158
+dd|Seiko Ayase|#ffbbee|#ffbbee|#110022|d|195
+dd|Serpo|#66ffee|#66ffee|#001122|d|132
+dd|Evil Eye|#ff44ff|#ff44ff|#110011|d|169
+dd|Acrobatic Silky|#ff99ff|#ff99ff|#110011|d|206
+dd|Kito|#99bbff|#99bbff|#001122|d|143
+dd|Ben Kinoshita|#ffdd44|#ffdd44|#111100|d|180
+dd|Vamola|#ffaa88|#ffaa88|#110022|d|117
+dd|Dover Demon|#77bbff|#77bbff|#001122|d|154
+dd|Alien Ship|#44ffff|#44ffff|#001122|d|191
+dd|Spirit World|#cc99ff|#cc99ff|#110011|d|128
+dd|Psychic Power|#ffaaff|#ffaaff|#110022|d|165
+dd|Ultimate Okarun|#77ffcc|#77ffcc|#001122|d|202
+dd|Curse Doll|#ff5577|#ff5577|#110000|d|139
+dd|Tsuchinoko|#88ff66|#88ff66|#001100|d|176
+dd|Cursed House|#dd44aa|#dd44aa|#110011|d|113
+dd|Yokai Night|#dd99ff|#dd99ff|#110022|d|150
+dd|Flatwoods Monster|#66ffaa|#66ffaa|#001122|d|187
+dd|Shiratori Clan|#ee77ff|#ee77ff|#110011|d|124
+dd|Sacred Ground|#ffdd66|#ffdd66|#111100|d|161
+dd|Space Date|#88ccff|#88ccff|#001122|d|198
+dd|Tentacle Dance|#ff66ee|#ff66ee|#110011|d|135
+dd|Hip Check|#ffaa44|#ffaa44|#110000|d|172
+dd|Neon Spirit|#00ffff|#00ffff|#110022|d|209
+dd|Possession|#ff44aa|#ff44aa|#110000|d|146
+dd|Demon Noodle|#ffcc33|#ffcc33|#111100|d|183
+fn|Freddy Fazbear|#ddaa66|#ddaa66|#111100|d|110
+fn|Bonnie|#aa88ff|#aa88ff|#110022|d|147
+fn|Chica|#ffdd33|#ffdd33|#111100|d|184
+fn|Foxy|#ff6644|#ff6644|#110000|d|121
+fn|Golden Freddy|#ffee55|#ffee55|#111100|d|158
+fn|Puppet|#ee88ee|#ee88ee|#110011|d|195
+fn|Balloon Boy|#88ddff|#88ddff|#001122|d|132
+fn|Mangle|#ffbbdd|#ffbbdd|#110011|d|169
+fn|Toy Freddy|#ffcc88|#ffcc88|#111100|d|206
+fn|Toy Bonnie|#77ccff|#77ccff|#001122|d|143
+fn|Toy Chica|#ffee66|#ffee66|#111100|d|180
+fn|Springtrap|#ccaa55|#ccaa55|#111100|d|117
+fn|Phantom Freddy|#77cc77|#77cc77|#001100|d|154
+fn|Nightmare|#ff3333|#ff3333|#110000|d|191
+fn|Nightmare Fredbear|#ffbb33|#ffbb33|#111100|d|128
+fn|Jack-O-Bonnie|#ff9900|#ff9900|#111100|d|165
+fn|Plushtrap|#77ff77|#77ff77|#001100|d|202
+fn|Ballora|#ff77ff|#ff77ff|#110011|d|139
+fn|Circus Baby|#ff77aa|#ff77aa|#110000|d|176
+fn|Funtime Foxy|#ffaaee|#ffaaee|#110011|d|113
+fn|Ennard|#ff6688|#ff6688|#110011|d|150
+fn|Lefty|#bbaabb|#bbaabb|#111111|d|187
+fn|Glitchtrap|#44ff99|#44ff99|#001111|d|124
+fn|Vanny|#ff66ff|#ff66ff|#110011|d|161
+fn|Gregory|#88ddff|#88ddff|#001122|d|198
+fn|Freddy Fazbears Pizza|#ffbb44|#ffbb44|#111100|d|135
+fn|Security Office|#88bbbb|#88bbbb|#001111|d|172
+fn|Night Shift|#6688cc|#6688cc|#000011|d|209
+fn|Vent Crawl|#99bbbb|#99bbbb|#111111|d|146
+fn|Five Nights|#ff4444|#ff4444|#110000|d|183
+pal|Catppuccin Mocha|#cba6f7|#45475a|#11111b|d|140
+pal|Catppuccin Macchiato|#f5bde6|#494d64|#181926|s|163
+pal|Catppuccin Frappé|#ca9ee6|#51576d|#232634|d|186
+pal|Dracula|#bd93f9|#44475a|#191a21|d|209
+pal|Nord|#88c0d0|#4c566a|#2e3440|s|232
+pal|Gruvbox Dark|#fabd2f|#504945|#1d2021|d|255
+pal|Tokyo Night|#7aa2f7|#3b4261|#16161e|d|278
+pal|Tokyo Night Storm|#7dcfff|#414868|#1f2335|s|301
+pal|Rosé Pine|#ebbcba|#403d52|#191724|d|324
+pal|Rosé Pine Moon|#c4a7e7|#44415a|#232136|d|347
+pal|Solarized Dark|#b58900|#586e75|#002b36|d|10
+pal|Everforest|#a7c080|#475258|#232a2e|d|33
+pal|Kanagawa|#7e9cd8|#363646|#16161d|d|56
+pal|One Dark|#61afef|#3e4451|#21252b|d|79
+pal|Monokai Pro|#ffd866|#5b595c|#19181a|d|102
+pal|Ayu Mirage|#ffcc66|#33415e|#171b24|s|125
+pal|Material Ocean|#82aaff|#292d3e|#090b10|d|148
+pal|Palenight|#c792ea|#444267|#1b1e2b|d|171
+pal|Night Owl|#7fdbca|#1d3b53|#011627|d|194
+pal|Synthwave '84|#ff7edb|#541388|#1a1033|s|217
+pal|Cobalt²|#ffc600|#0d3a58|#122738|d|240
+pal|Horizon|#e95678|#2e303e|#1c1e26|d|263
+pal|Poimandres|#5de4c7|#303340|#1b1e28|d|286
+pal|GitHub Dark Dimmed|#539bf5|#373e47|#1c2128|d|309
+pal|Nightfox|#719cd6|#29394f|#131a24|d|332
+pal|Lofi Night Window|#ffb86c|#3b2a5a|#14101f|s|355
+pal|Jellyfish Reef|#5ef2ff|#0a5c7a|#00101c|d|18
+pal|Koi Garden|#ff7a59|#1f5c52|#0c1a1a|d|41
+pal|Lava Lamp ✦|#ff6bd6|#7d1d5b|#1a0612|d|64
+pal|Plasma Core|#b66bff|#3a0a6b|#0a0212|d|87
+pal|Kaleido Dream|#ff8ad8|#4a2a8a|#10061f|d|110
+pal|Flow State|#4dd2ff|#13396b|#050b16|d|133
+pal|Spirograph|#8f9bff|#2a2f66|#06070f|d|156
+xl|Alpine Dawn|#47b3ff|#2916f3|#040e16|d|0
+xl|Misty Forest|#47ffa3|#16cef3|#04160d|d|37
+xl|Desert Dunes|#ffa947|#c7f316|#160d04|d|74
+xl|Coral Reef|#ff6047|#f3c716|#160604|d|111
+xl|Canyon Sunset|#ff7e47|#f3eb16|#160904|d|148
+xl|Rainforest|#47ff57|#16f3bc|#041605|d|185
+xl|Glacier|#47e0ff|#163bf3|#041316|d|222
+xl|Savanna|#ffc847|#a2f316|#161004|d|259
+xl|Bamboo Grove|#66ff47|#16f385|#071604|d|296
+xl|Lavender Fields|#9447ff|#f316e0|#0b0416|d|333
+xl|Volcano Island|#ff6647|#f3ce16|#160704|d|10
+xl|Tundra|#4794ff|#4e16f3|#040b16|d|47
+xl|Autumn Woods|#ff9147|#e4f316|#160b04|d|84
+xl|Moonlit Lake|#4775ff|#7216f3|#040816|d|121
+xl|Cherry Hills|#ff4794|#f34e16|#16040b|d|158
+xl|Swamp|#94ff47|#16f34e|#0b1604|d|195
+xl|Salt Flats|#47ffff|#1660f3|#041616|d|232
+xl|Tropical Lagoon|#47fff0|#1672f3|#041614|d|269
+xl|Starry Prairie|#fff047|#72f316|#161404|d|306
+xl|Northern Pines|#47ffc2|#16a9f3|#041610|d|343
+xr|Synthwave ✦|#ff47ff|#f31660|#160416|d|0
+xr|Vaporwave ✦|#d147ff|#f31697|#110416|d|37
+xr|Outrun|#ff47a3|#f33b16|#16040d|d|74
+xr|Arcade|#9447ff|#f316e0|#0b0416|d|111
+xr|Miami Nights|#ff47c2|#f31616|#160410|d|148
+xr|Laser Grid|#47f0ff|#164ef3|#041416|d|185
+xr|Cassette|#ff8547|#f3f316|#160a04|d|222
+xr|Disco Ball|#e047ff|#f31685|#130416|d|259
+xr|Neon Diner|#ff4766|#f38516|#160407|d|296
+xr|VHS Glitch|#47c2ff|#1616f3|#041016|d|333
+xr|Pixel Dream|#6647ff|#ce16f3|#070416|d|10
+xr|Chrome 84|#4794ff|#4e16f3|#040b16|d|47
+xr|Tron Lines|#47e0ff|#163bf3|#041316|d|84
+xr|Hologram|#47ffe0|#1685f3|#041613|d|121
+xr|Glitch Pink|#ff47b2|#f32916|#16040e|d|158
+xr|Retro Future|#ffc247|#a9f316|#161004|d|195
+xr|Cyan Wave|#47f0ff|#164ef3|#041416|d|232
+xr|Magenta Rain|#ff47e0|#f3163b|#160413|d|269
+xr|Boombox|#ff7547|#f3e016|#160804|d|306
+xr|Y2K Candy|#ff47f0|#f3164e|#160414|d|343
+xg|Ruby|#ff4766|#f38516|#160407|d|0
+xg|Sapphire|#477eff|#6716f3|#040916|d|37
+xg|Emerald ✦|#47ff94|#16e0f3|#04160b|d|74
+xg|Amethyst|#b247ff|#f316bc|#0e0416|d|111
+xg|Topaz|#ffbc47|#b1f316|#160f04|d|148
+xg|Opal|#47f0ff|#164ef3|#041416|d|185
+xg|Jade|#47ffbc|#16b1f3|#04160f|d|222
+xg|Onyx|#c1c7cd|#666080|#0c0d0e|d|259
+xg|Obsidian|#c1c7cd|#666080|#0c0d0e|d|296
+xg|Rose Quartz|#ff4775|#f37216|#160408|d|333
+xg|Citrine|#ffda47|#8cf316|#161204|d|10
+xg|Aquamarine|#47ffff|#1660f3|#041616|d|47
+xg|Garnet|#ff4757|#f39716|#160405|d|84
+xg|Peridot|#a9ff47|#16f334|#0d1604|d|121
+xg|Turquoise|#47ffe7|#167df3|#041613|d|158
+xg|Moonstone|#c1c7cd|#666080|#0c0d0e|d|195
+xg|Tanzanite|#7547ff|#e016f3|#080416|d|232
+xg|Copper ✦|#ff8b47|#ebf316|#160a04|d|269
+xg|Silver ✦|#c1c7cd|#666080|#0c0d0e|d|306
+xg|Rose Gold|#ff6647|#f3ce16|#160704|d|343
+xs|Cotton Candy|#ff47d1|#f31629|#160411|d|0
+xs|Bubblegum|#ff47a3|#f33b16|#16040d|d|37
+xs|Mint Choc|#47ffc2|#16a9f3|#041610|d|74
+xs|Strawberry Milk|#ff476c|#f37d16|#160407|d|111
+xs|Lemon Drop|#fff047|#72f316|#161404|d|148
+xs|Blueberry Pie|#4757ff|#9716f3|#040516|d|185
+xs|Peach Soda|#ff7547|#f3e016|#160804|d|222
+xs|Grape Fizz|#c247ff|#f316a9|#100416|d|259
+xs|Cherry Cola|#ff4757|#f39716|#160405|d|296
+xs|Orange Sherbet|#ff9d47|#d5f316|#160c04|d|333
+xs|Matcha Latte|#85ff47|#16f360|#0a1604|d|10
+xs|Caramel|#ffaf47|#bff316|#160e04|d|47
+xs|Watermelon|#ff4775|#f37216|#160408|d|84
+xs|Lime Sorbet|#94ff47|#16f34e|#0b1604|d|121
+xs|Mango Lassi|#ffc847|#a2f316|#161004|d|158
+xs|Taffy|#ff47ff|#f31660|#160416|d|195
+xs|Cupcake|#ff47b2|#f32916|#16040e|d|232
+xs|Honeycomb|#ffd147|#97f316|#161104|d|269
+xs|Blue Raspberry|#47b3ff|#2916f3|#040e16|d|306
+xs|Cocoa|#ff9447|#e0f316|#160b04|d|343
+xm|Phoenix ✦|#ff7247|#f3dd16|#160804|d|0
+xm|Frost Giant|#47c2ff|#1616f3|#041016|d|37
+xm|Elven Glade|#47ff85|#16f3f3|#04160a|d|74
+xm|Dwarf Forge|#ff9147|#e4f316|#160b04|d|111
+xm|Dragon Hoard|#ffce47|#9bf316|#161104|d|148
+xm|Siren Deep|#47e7ff|#1643f3|#041316|d|185
+xm|Witch Brew|#66ff47|#16f385|#071604|d|222
+xm|Fairy Court|#ff47f0|#f3164e|#160414|d|259
+xm|Necropolis|#47ff66|#16f3ce|#041607|d|296
+xm|Valkyrie|#4794ff|#4e16f3|#040b16|d|333
+xm|Kraken|#47b3ff|#2916f3|#040e16|d|10
+xm|Griffin Sky|#ffb247|#bcf316|#160e04|d|47
+xm|Moon Temple|#4747ff|#a916f3|#040416|d|84
+xm|Sun Temple|#ffd447|#93f316|#161204|d|121
+xm|Thunder God|#4766ff|#8516f3|#040716|d|158
+xm|Shadow Realm|#a347ff|#f316ce|#0d0416|d|195
+xm|Crystal Cavern|#47f0ff|#164ef3|#041416|d|232
+xm|Enchanted Grove|#47ff47|#16f3a9|#041604|d|269
+xm|Ghost Ship|#47ffd1|#1697f3|#041611|d|306
+xm|Wyvern|#c8ff47|#1ef316|#101604|d|343
+xw|Sunrise ✦|#ff9d47|#d5f316|#160c04|d|0
+xw|Golden Hour|#ffc247|#a9f316|#161004|d|37
+xw|Blue Hour|#476cff|#7d16f3|#040716|d|74
+xw|Midnight ✦|#5747ff|#bc16f3|#050416|d|111
+xw|Thunderstorm|#4757ff|#9716f3|#040516|d|148
+xw|Blizzard|#47c8ff|#161ef3|#041016|d|185
+xw|Monsoon|#47d1ff|#1629f3|#041116|d|222
+xw|Heat Haze|#ff7e47|#f3eb16|#160904|d|259
+xw|Fog Bank|#c1c7cd|#666080|#0c0d0e|d|296
+xw|Rainbow Sky|#c1c7cd|#666080|#0c0d0e|d|333
+xw|Solar Eclipse|#ffaf47|#bff316|#160e04|d|10
+xw|Meteor Shower ✦|#8547ff|#f316f3|#0a0416|d|47
+xw|Spring Rain|#47ff66|#16f3ce|#041607|d|84
+xw|Summer Dusk|#ff6c47|#f3d516|#160704|d|121
+xw|Harvest Moon|#ffbc47|#b1f316|#160f04|d|158
+xw|Winter Solstice|#47a3ff|#3b16f3|#040d16|d|195
+xw|Dust Storm|#ffa347|#cef316|#160d04|d|232
+xw|Tornado Alley|#4794ff|#4e16f3|#040b16|d|269
+xw|Twilight ✦|#b247ff|#f316bc|#0e0416|d|306
+xw|Polar Night|#47ffff|#1660f3|#041616|d|343
+rp|Prism Beam|#47e0ff|#03d3fc|#080312|d|120
+rp|Rainbow Ribbons|#ffc247|#fca903|#120312|d|163
+rp|Spectrum|#ff8547|#fc5603|#0d0312|d|206
+rp|Oil Slick|#ff47c2|#fc03a9|#0a0312|d|249
+rp|Holo Foil|#ffff47|#fcfc03|#030f12|d|292
+rp|Unicorn|#47ffff|#03fcfc|#12030d|d|335
+rp|Candy Rainbow|#47e0ff|#03d3fc|#120308|d|18
+rp|Neon Spectrum|#a3ff47|#80fc03|#120312|d|61
+rp|Rave|#ff47a3|#fc0380|#0f0312|d|104
+rp|Kaleido|#47ffff|#03fcfc|#120803|d|147
+rp|Aurora Prism|#ff47c2|#fc03a9|#03120d|d|190
+rp|Glitch Rainbow|#47c2ff|#03a9fc|#120312|d|233
+rp|Lava Lamp|#ffd147|#fcbe03|#120503|d|276
+rp|Gradient Dream|#47ffa3|#03fc80|#12030a|d|319
+rp|Pop Art|#47a3ff|#0380fc|#120305|d|2
+rp|Rainbow Storm|#85ff47|#56fc03|#080312|d|45
+rp|Starburst|#47c2ff|#03a9fc|#120d03|d|88
+rp|Confetti Pop|#47ffe0|#03fcd3|#0d0312|d|131
+rp|Opal Fire|#ff47ff|#fc03fc|#120803|d|174
+rp|Technicolor|#4747ff|#0303fc|#120303|d|217
+pd|Peach Fuzz|#ffd9a3|#d9a459|#2c1a11|d|120
+pd|Lilac Haze|#ffa3e0|#d959ae|#1f112c|d|163
+pd|Baby Blue|#a3baff|#5979d9|#11212c|d|206
+pd|Mint Cream|#a3f0ff|#59c4d9|#112c23|d|249
+pd|Lemon Chiffon|#d1ffa3|#99d959|#2c2a11|d|292
+pd|Blush|#ffbaa3|#d97959|#2c1118|d|335
+pd|Lavender Mist|#ffa3ff|#d959d9|#1a112c|d|18
+pd|Seafoam|#a3ffd1|#59d999|#112c28|d|61
+pd|Apricot Sky|#a3e0ff|#59aed9|#2c1f11|d|104
+pd|Periwinkle|#a3e0ff|#59aed9|#11132c|d|147
+pd|Sorbet Sky|#a3f0ff|#59c4d9|#2c111f|d|190
+pd|Marshmallow|#fff0a3|#d9c459|#2c111f|d|233
+pd|Cloud Nine|#a3ffff|#59d9d9|#111f2c|d|276
+pd|Powder Pink|#ffa3b3|#d9596e|#2c111a|d|319
+pd|Sage Garden|#e0ffa3|#aed959|#162c11|d|2
+pd|Butter Cream|#f0ffa3|#c4d959|#2c2811|d|45
+pd|Orchid|#ffa3d1|#d95999|#2c1128|d|88
+pd|Sky Candy|#fff0a3|#d9c459|#11252c|d|131
+pd|Dreamy Dusk|#ffd1a3|#d99959|#23112c|d|174
+pd|Pastel Rainbow|#a3b2ff|#596ed9|#2c111a|d|217
+cs|Supernova|#ff52ff|#e000e0|#0d0402|d|120
+cs|Black Hole|#6f52ff|#2500e0|#08020d|d|163
+cs|Pulsar|#ff52c5|#e00096|#020b0d|d|206
+cs|Quasar|#52c5ff|#0096e0|#0d0a02|d|249
+cs|Red Giant|#ffe252|#e0bb00|#0d0202|d|292
+cs|Pink Nebula|#52c5ff|#0096e0|#0d020a|d|335
+cs|Ion Storm|#52ffe2|#00e0bb|#02080d|d|18
+cs|Galaxy Core|#ffd452|#e0a800|#06020d|d|61
+cs|Comet Trail|#ffc552|#e09600|#020a0d|d|104
+cs|Solar Wind|#52c5ff|#0096e0|#0d0a02|d|147
+cs|Dark Matter|#ff52ff|#e000e0|#0a020d|d|190
+cs|Stardust|#ffe252|#e0bb00|#04020d|d|233
+cs|Event Horizon|#c552ff|#9600e0|#02020d|d|276
+cs|Cosmic Dawn|#ffc552|#e09600|#06020d|d|319
+cs|Binary Stars|#ff52ff|#e000e0|#0d0a02|d|2
+cs|Meteor Belt|#ffc552|#e09600|#0d0602|d|45
+cs|Wormhole|#ff52c5|#e00096|#020d0d|d|88
+cs|Orbit|#52e2ff|#00bbe0|#0d0902|d|131
+cs|Zodiac|#52c5ff|#0096e0|#0a020d|d|174
+cs|Andromeda|#52ffff|#00e0e0|#02040d|d|217
+se|Early Spring|#ffff47|#f0f00f|#071505|d|120
+se|Cherry Season|#ff8547|#f05a0f|#15050a|d|163
+se|Spring Meadow|#ff47c2|#f00fa5|#0a1505|d|206
+se|Midsummer|#47e0ff|#0fcaf0|#151205|d|249
+se|Beach Day|#ffd147|#f0b80f|#051115|d|292
+se|Heatwave|#ffe047|#f0ca0f|#150705|d|335
+se|Firefly Night|#ffff47|#f0f00f|#050715|d|18
+se|Late Summer|#8547ff|#5a0ff0|#150a05|d|61
+se|Early Autumn|#85ff47|#5af00f|#150f05|d|104
+se|Pumpkin Patch|#ffd147|#f0b80f|#150b05|d|147
+se|Leaf Fall|#ff5747|#f0220f|#150905|d|190
+se|Harvest Gold|#ffff47|#f0f00f|#151105|d|233
+se|First Frost|#47ffff|#0ff0f0|#050f15|d|276
+se|Deep Winter|#47e0ff|#0fcaf0|#050a15|d|319
+se|Snow Day|#4794ff|#0f6df0|#050e15|d|2
+se|Fireside|#ffd147|#f0b80f|#150905|d|45
+se|Ice Palace|#47c2ff|#0fa5f0|#051215|d|88
+se|Thaw|#47c2ff|#0fa5f0|#051515|d|131
+se|Monsoon Season|#47ff66|#0ff035|#050f15|d|174
+se|Equinox|#47c2ff|#0fa5f0|#150f05|d|217
+ct|Tokyo|#47e0ff|#08bee2|#110308|d|120
+ct|Paris|#ffd147|#e2ac08|#030311|d|163
+ct|New York|#ff4766|#e2082d|#030611|d|206
+ct|London|#47c2ff|#089ae2|#030811|d|249
+ct|Seoul|#47e0ff|#08bee2|#0f0311|d|292
+ct|Dubai|#47d1ff|#08ace2|#110b03|d|335
+ct|Rio|#ff47a3|#e20875|#031106|d|18
+ct|Venice|#8547ff|#5108e2|#030e11|d|61
+ct|Cairo|#ffe047|#e2be08|#110b03|d|104
+ct|Sydney|#ff47c2|#e2089a|#030b11|d|147
+ct|Moscow|#ffd147|#e2ac08|#110306|d|190
+ct|Mumbai|#ffe047|#e2be08|#110903|d|233
+ct|Bangkok|#47ffa3|#08e275|#110e03|d|276
+ct|Istanbul|#ff47a3|#e20875|#030911|d|319
+ct|Rome|#c247ff|#9a08e2|#110803|d|2
+ct|Barcelona|#ff47c2|#e2089a|#110903|d|45
+ct|Hong Kong|#ffd147|#e2ac08|#110306|d|88
+ct|Las Vegas|#47e0ff|#08bee2|#11030a|d|131
+ct|Reykjavik|#ff6647|#e22d08|#03110d|d|174
+ct|Marrakech|#47ffe0|#08e2be|#110603|d|217`;
+let _AF=null;const AFX=()=>_AF||(_AF=AFT.split('\n').map(r=>{const[g,n,a,b1,b2,p,d]=r.split('|');return[n,a,b1,b2,p,+d,{},g]}));
+const TL=()=>{const L=[];THEMES.forEach(t=>L.push({g:'Aura Chat',t}));CT().forEach((t,i)=>L.push({g:'Imported',t,ci:i}));AFX().forEach(t=>L.push({g:AFL[t[7]]||'More',t}));return L.map((x,k)=>({...x,k}))};
+function tlHtml(q){q=(q||'').trim().toLowerCase();const cur=S.me?.th||{},gs=[];TL().filter(x=>!q||x.t[0].toLowerCase().includes(q)||x.g.toLowerCase().includes(q)).forEach(x=>{let g=gs.find(y=>y[0]===x.g);if(!g)gs.push(g=[x.g,[]]);g[1].push(x)});
+ return gs.map(([n,a],i)=>`<details class="tgp"${q||i<2?' open':''}><summary>${esc(n)}<small>${a.length}</small></summary><div class="tg">${a.map(x=>`<div class="tt${x.t[1]===cur.a&&x.t[2]===cur.b1?' cur':''}" data-a="tapply" data-v="${x.k}" title="${esc(x.t[0])}" style="${banner(toTh(x.t))};box-shadow:inset 0 -3px 0 ${x.t[1]}"><span>${esc(x.t[0])}</span>${x.ci!=null?`<b class="tx" data-a="tdel" data-v="${x.ci}" title="Remove">✕</b>`:''}</div>`).join('')}</div></details>`).join('')||'<div class="empty">No themes match.</div>'}
+/* ---------- Crop and zoom for banner and profile picture uploads ---------- */
+let CR=null;const AVMAX=380000,BNMAX=560000;
+function cropOpen(f,kind){if(!f||!/^image\//.test(f.type))return toast('Choose an image file.');const url=URL.createObjectURL(f),im=new Image();im.onload=()=>{const bn=kind==='bn',aw=Math.min(420,Math.floor(innerWidth*.94-44)),VW=bn?aw:Math.min(280,aw),VH=bn?Math.round(VW/3.5):VW;CR={f,url,im,kind,VW,VH,iw:im.naturalWidth,ih:im.naturalHeight,z:1};CR.s0=Math.max(VW/CR.iw,VH/CR.ih);CR.ox=(VW-CR.iw*CR.s0)/2;CR.oy=(VH-CR.ih*CR.s0)/2;crShow()};im.onerror=()=>{URL.revokeObjectURL(url);toast('Could not read that image.')};im.src=url}
+function crFit(){const c=CR,s=c.s0*c.z;c.ox=Math.min(0,Math.max(c.VW-c.iw*s,c.ox));c.oy=Math.min(0,Math.max(c.VH-c.ih*s,c.oy))}
+function crPaint(){const c=CR,i=$('#cri');if(!i)return;const s=c.s0*c.z;i.style.width=c.iw*s+'px';i.style.height=c.ih*s+'px';i.style.left=c.ox+'px';i.style.top=c.oy+'px';const o=$('#cro');if(o)o.textContent=`Crop: ${Math.round(c.VW/s)} x ${Math.round(c.VH/s)} px, taken from the original ${c.iw} x ${c.ih} px image. It is saved at that native size.`}
+function crZoom(z,ax,ay){const c=CR;z=Math.max(1,Math.min(6,z));ax=ax??c.VW/2;ay=ay??c.VH/2;const o=c.s0*c.z,px=(ax-c.ox)/o,py=(ay-c.oy)/o;c.z=z;const s=c.s0*z;c.ox=ax-px*s;c.oy=ay-py*s;crFit();const r=$('#crz');if(r)r.value=Math.round(z*100);crPaint()}
+function crShow(){const c=CR,bn=c.kind==='bn',r=bn?'0':{c:'50%',r:'30%',s:'8%'}[S.dr?.av?.sh||'c'],gif=c.f.type==='image/gif';
+ modal(`<h3>${bn?'Crop banner':'Crop profile picture'}</h3><p style="opacity:.7;margin:0 0 10px;font-size:13px">Drag the image to move it. Use the slider or mouse wheel to zoom. ${bn?'The frame has the same shape as your banner on your profile.':'The bright area is exactly what your avatar will show.'}</p><div class="crv" id="crv" style="width:${c.VW}px;height:${c.VH}px"><img id="cri" src="${c.url}" draggable="false" alt=""><div class="crm" style="border-radius:${r}"></div></div><label>Zoom</label><input type="range" id="crz" min="100" max="600" value="100" style="width:100%"><small id="cro" style="display:block;opacity:.6;margin-top:6px"></small><div class="cbt" style="margin-top:14px"><button class="btn" data-a="crok">Apply</button><button class="btn g" data-a="crreset">Reset</button><button class="btn g" data-a="crno">Cancel</button>${gif?'<button class="btn g" data-a="crorig" title="Skip cropping and keep the animation">Use original GIF</button>':''}</div>`);
+ const v=$('#crv');v.onpointerdown=e=>{c.dg={x:e.clientX,y:e.clientY,ox:c.ox,oy:c.oy};v.setPointerCapture(e.pointerId)};v.onpointermove=e=>{if(!c.dg)return;c.ox=c.dg.ox+e.clientX-c.dg.x;c.oy=c.dg.oy+e.clientY-c.dg.y;crFit();crPaint()};v.onpointerup=v.onpointercancel=()=>{c.dg=null};v.addEventListener('wheel',e=>{e.preventDefault();const b=v.getBoundingClientRect();crZoom(c.z*(e.deltaY<0?1.1:1/1.1),e.clientX-b.left,e.clientY-b.top)},{passive:false});$('#crz').oninput=e=>crZoom(e.target.value/100);crPaint()}
+function crOut(){const c=CR,s=c.s0*c.z,sw=c.VW/s,sh=c.VH/s,cap=c.kind==='bn'?2560:1536,k=Math.min(1,cap/Math.max(sw,sh)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(sw*k));cv.height=Math.max(1,Math.round(sh*k));const x=cv.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(c.im,-c.ox/s,-c.oy/s,sw,sh,0,0,cv.width,cv.height);return cv}
+function crEnc(cv,max){let u=cv.toDataURL('image/png');if(u.length<=max)return[u,'lossless PNG'];for(let q=.97;q>=.8;q-=.03){u=cv.toDataURL('image/jpeg',q);if(u.length<=max)return[u,'JPEG '+Math.round(q*100)+'% quality']}let w=cv.width,h=cv.height;while(w>240){w=Math.round(w*.85);h=Math.round(h*.85);const t=document.createElement('canvas');t.width=w;t.height=h;const g=t.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(cv,0,0,w,h);u=t.toDataURL('image/jpeg',.92);if(u.length<=max)return[u,'reduced to '+w+' x '+h+' to fit']}return[u,'']}
+function crDone(u,msg){const c=CR;if(c.kind==='bn')S.dr.bi=u;else S.dr.av.img=u;URL.revokeObjectURL(c.url);CR=null;sm();toast(msg)}
+const A={
+ am(v){AM=v;auth()},
+ async google(){const er=$('#aer');er.textContent='';try{const g=await B.google();let un;const u=await new Promise(r=>{un=B.sub('users',[g.uid],m=>{r(m[g.uid]);setTimeout(()=>un&&un())})});if(!u){const nu=newUser(g.name);if(g.photo)nu.av.img=g.photo;await B.patch('users',g.uid,nu)}}catch(x){const c=x.code||'';er.textContent=/popup-closed|cancelled-popup/.test(c)?'':/operation-not-allowed|configuration-not-found/.test(c)?'Google sign-in is not enabled in your Firebase project (Authentication, Sign-in method). Enable Google there.':/unauthorized-domain/.test(c)?'This address is not an authorized domain in Firebase (Authentication, Settings). Add it, or open the app from localhost or your hosted site.':/popup-blocked/.test(c)?'The sign-in popup was blocked. Allow popups for this page and try again.':/operation-not-supported|web-storage/.test(c)?'Google sign-in needs the app to be opened over http or https, not as a local file.':x.message}},
+ conn(){if(B.name==='Firebase')use(LB);else if(FB)use(FB);else toast('Firebase could not be loaded. Check your connection.')},
+ sec(v){S.sec=v;$('#app').classList.remove('chat');draw()},tab(v){S.tab=v;draw()},back(){$('#app').classList.remove('chat')},info(){$('#side').classList.toggle('open')},close(){$('#md').classList.remove('open');S.dr=null;S.me&&ux(S.me.th)},
+ card(id){const u=S.U[id];if(u)modal(card(u))},
+ dm(id){A.close();S.sec='home';open({kind:'dm',uid:id,id:dmId(id)})},
+ room(id){open({kind:'room',id})},grp(id){open({kind:'group',id})},
+ join(id){B.patch('rooms',id,{members:{$add:S.me.id}});open({kind:'room',id})},
+ leave(){const s=S.sel;B.patch('rooms',s.id,{members:{$del:S.me.id}});S.sel=null;cm();S.msgs=[];A.back();draw();drawMsgs()},
+ srv(id){S.sv=id;draw()},sback(){S.sv=null;draw()},schan(v){const[sid,c]=v.split('|');S.sv=sid;open({kind:'server',sid,chan:c,id:`srv_${sid}_${c}`})},
+ sjoin(id){B.patch('rooms',id,{members:{$add:S.me.id}});S.sv=id;draw()},
+ newsrv(){modal('<h3>Create a server</h3><form id="ns"><label>Server name</label><input class="in" id="sn" maxlength="30" required><div class="cbt" style="margin-top:16px"><button class="btn">Create</button><button type="button" class="btn g" data-a="close">Cancel</button></div></form>')},
+ addch(){const n=(prompt('Channel name')||'').toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-$/g,'').slice(0,24),sv=srvOf(S.sv);if(!n||!sv)return;const l=sv.chs||['general'];if(l.includes(n))return toast('That channel exists.');B.patch('rooms',sv.id,{chs:[...l,n]})},
+ delch(c){const sv=srvOf(S.sv);if(sv&&confirm('Delete #'+c+'?'))B.patch('rooms',sv.id,{chs:(sv.chs||[]).filter(x=>x!==c)})},
+ sleave(){const sv=srvOf(S.sv);if(!sv)return;if(sv.owner===S.me.id){if(!confirm('Delete this server for everyone?'))return;B.del('rooms',sv.id)}else B.patch('rooms',sv.id,{members:{$del:S.me.id}});S.sv=null;S.sel=null;cm();S.msgs=[];A.back();draw();drawMsgs()},
+ rpl(id){const m=S.msgs.find(x=>x.id===id);if(!m)return;S.rp={id,n:(S.U[m.u]||{}).name||m.n,x:(m.x||'Image').slice(0,80)};S.ed=null;rb();$('#tx').focus()},
+ edt(id){const m=S.msgs.find(x=>x.id===id);if(!m)return;S.ed=id;S.rp=null;$('#tx').value=m.x;rb();$('#tx').focus()},
+ canc(){S.ed=S.rp=S.im=null;$('#tx').value='';rb()},
+ dmsg(id){if(confirm('Delete this message?'))B.delMsg(S.sel.id,id)},
+ pin(id){const m=S.msgs.find(x=>x.id===id);m&&B.patchMsg(S.sel.id,id,{pin:!m.pin})},
+ pins(){const p=S.msgs.filter(m=>m.pin);modal('<h3>Pinned messages</h3>'+(p.map(m=>`<div class="card" style="padding:10px;margin-bottom:8px"><b>${esc((S.U[m.u]||{}).name||m.n)}</b> <small>${tm(m.t)}</small><div class="x">${fmt(m.x||'')}</div></div>`).join('')||'<div class="empty">Nothing pinned here yet.</div>')+'<div class="cbt"><button class="btn g" data-a="close">Close</button></div>')},
+ rmore(id){S.rt=id;pk('react','e')},
+ ptab(t){P.tab=t;P.q='';P.vw='home';pk('ins',t)},pcat(c){P.cat=c;P.q='';pk(P.mode,'e')},ptone(t){P.tone=t;pk(P.mode,'e')},
+ pe(c){const r=[c,...RC().filter(x=>x!==c)].slice(0,32);localStorage.aura_chat_recent=JSON.stringify(r);if(P.mode==='react'){A.close();A.react(S.rt+'|'+c)}else{const t=$('#tx');t.setRangeText(c,t.selectionStart,t.selectionEnd,'end');t.focus()}},
+ gif(){if(S.sel){P.q='';P.vw='home';pk('ins','g')}},gup(){const i=document.createElement('input');i.type='file';i.accept='image/gif';i.multiple=true;i.onchange=()=>[...i.files].forEach(addMyGif);i.click()},gmy(id){const g=MY().find(x=>x.id===id);if(!g)return;A.close();sendM({u:S.me.id,n:S.me.name,x:'',t:Date.now(),img:g.t})},gdel(id){try{localStorage.aura_chat_mygif=JSON.stringify(MY().filter(x=>x.id!==id))}catch(e){}P.items=favItems();gdraw()},gsave(){const k=$('#gk').value.trim();if(!k)return;PF.keys[P.pv]=k;PF.pv=P.pv;sp();pk('ins','g')},gkey(){PF.keys[P.pv]='';sp();pk('ins','g')},
+ gview(v){P.vw=v;P.q='';pk('ins',P.tab)},gtag(t){P.q=t;pk('ins',P.tab)},gmore(){gnext()},
+ gsend(u,el){if(!/^https:\/\//.test(u))return;const r=[{t:el?.dataset?.t||u,f:u},...RG().filter(x=>x.f!==u)].slice(0,40);localStorage.aura_chat_rgif=JSON.stringify(r);A.close();sendM({u:S.me.id,n:S.me.name,x:'',t:Date.now(),gif:u})},
+ gfav(u,el){const on=togFav(el.dataset.t||u,u);el.classList.toggle('on',on);if(P.vw==='fav'&&!P.q){P.items=favItems();gdraw()}},
+ mfav(id){const m=S.msgs.find(x=>x.id===id);if(m&&/^data:image\/gif/.test(m.img||'')){if(saveMy(m.img))toast('Saved to your GIF favorites.');return}if(m&&m.gif)toast(togFav(m.gif,m.gif)?'Saved to your GIF favorites.':'Removed from favorites.')},
+ gurl(){const u=($('#gl').value||'').trim();if(!/^https:\/\/\S+$/.test(u))return toast('Paste a direct https link to a GIF.');A.gsend(u)},
+ react(v){const[id,e]=v.split('|'),m=S.msgs.find(x=>x.id===id);if(!m)return;const a=(m.re&&m.re[e])||[],n=a.includes(S.me.id)?a.filter(x=>x!==S.me.id):[...a,S.me.id];B.patchMsg(S.sel.id,id,{re:{[e]:n}})},
+ emo(){if(S.sel){P.q='';pk('ins','e')}},attach(){$('#ig').click()},
+ prefs(){const c=(k,t)=>`<label class="ck" style="text-transform:none;opacity:1;font-size:14px"><input type="checkbox" data-p="${k}"${PF[k]?' checked':''}> ${t}</label>`;modal(`<h3>App settings</h3>${c('snd','Message sounds')}${c('nt','Desktop notifications when the tab is hidden')}${c('cmp','Compact message layout')}${c('h24','24-hour clock')}<label>Text size</label><input type="range" min="12" max="18" data-p="fs" value="${PF.fs}" style="width:100%"><h3 style="margin-top:18px">Themes</h3><div class="cbt"><button class="btn g sm" data-a="imp">Import from Aura Files / Studio</button><button class="btn g sm" data-a="clrimp">Clear imported themes</button></div><div class="cbt" style="margin-top:16px"><button class="btn" data-a="close">Done</button></div>`)},
+ qs(){if(!S.me)return;modal('<h3>Quick switcher</h3><input class="in" id="qi" placeholder="Jump to a friend, room, group or channel" autocomplete="off"><div id="qr" class="sc" style="margin-top:8px;max-height:50vh"></div>');qf('');$('#qi').focus()},
+ imp(v){S.impT=v==='t';modal('<h3>Import themes</h3><p style="opacity:.7;margin:0 0 8px">Paste Customization Studio codes (AURA1:...) or Aura Files theme JSON, or choose files (aura-themes.json, .txt). Fonts, corner radius, glow, text color and panel opacity come along.</p><textarea class="in" id="ic" rows="5" placeholder="AURA1:..."></textarea><div class="cbt" style="margin-top:12px"><button class="btn" data-a="doimp">Import</button><button class="btn g" data-a="impf">Choose files</button><button class="btn g" data-a="close">Cancel</button></div>')},
+ doimp(){const t=parseImport($('#ic').value),n=addThemes(t);A.close();toast(t.length?(n?`Imported ${n} theme${n>1?'s':''}. Find them under Imported in the Themes menu.`:'Those themes are already imported.'):'No valid themes found.');if(S.impT){S.impT=0;A.themes()}},impf(){$('#tf').click()},
+ clrimp(){localStorage.aura_chat_themes='[]';toast('Imported themes cleared.');if($('#tl')){const q=$('#tq');$('#tl').innerHTML=tlHtml(q?q.value:'')}},
+ async add(s){const[n,t]=String(s).trim().split('#');if(!n||!t)return toast('Use the format name#1234');const u=await B.find(n.trim(),t.trim());if(!u)return toast('No user found with that name and tag.');A.req(u.id)},
+ req(id){const m=S.me.id;if(id===m)return toast('That is your own account.');if((S.me.friends||[]).includes(id))return toast('You are already friends.');if((S.me.incoming||[]).includes(id))return A.acc(id);if((S.me.outgoing||[]).includes(id))return toast('Request already sent.');B.patch('requests',pid(m,id),{from:m,to:id,members:[m,id],status:'pending',t:Date.now()});toast('Friend request sent.');A.close()},
+ acc(id){B.patch('requests',pid(S.me.id,id),{status:'accepted'});A.close()},
+ dec(id){B.del('requests',pid(S.me.id,id))},
+ can(id){B.del('requests',pid(S.me.id,id));A.close()},
+ rem(id){B.del('requests',pid(S.me.id,id));A.close()},
+ newroom(){modal('<h3>New chat room</h3><form id="nr"><label>Room name</label><input class="in" id="rn" maxlength="30" required><label>Topic</label><input class="in" id="rt" maxlength="60"><div class="cbt" style="margin-top:16px"><button class="btn">Create room</button><button type="button" class="btn g" data-a="close">Cancel</button></div></form>')},
+ newgroup(){const f=S.me.friends||[];modal(`<h3>New group chat</h3><form id="ng"><label>Group name</label><input class="in" id="gn" maxlength="30" required><label>Add friends</label>${f.map(i=>`<label class="ck" style="text-transform:none;opacity:1;font-size:14px"><input type="checkbox" value="${i}"> ${esc(S.U[i]?.name||'Friend')}</label>`).join('')||'<div class="empty">Add some friends first.</div>'}<div class="cbt" style="margin-top:16px"><button class="btn">Create group</button><button type="button" class="btn g" data-a="close">Cancel</button></div></form>`)},
+ set(){A.close();const m=S.me;S.dr=JSON.parse(JSON.stringify({name:m.name,bio:m.bio||'',activity:m.activity||'',status:m.status||'online',bi:m.bi||'',av:{c1:'#ff1a1a',c2:'#2a0000',sh:'c',txt:'',img:'',...m.av},th:{a:'#ff1a1a',b1:'#7a0000',b2:'#000000',p:'n',d:135,...m.th}}));sm()},
+ preset(i){S.dr.th=toTh(ALLT()[i]);sm()},
+ upl(){const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=()=>cropOpen(i.files[0],'av');i.click()},noimg(){S.dr.av.img='';pv()},
+ bnup(){const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=()=>cropOpen(i.files[0],'bn');i.click()},bnno(){S.dr.bi='';pv()},
+ crno(){if(CR){URL.revokeObjectURL(CR.url);CR=null}sm()},crreset(){const c=CR;c.z=1;c.ox=(c.VW-c.iw*c.s0)/2;c.oy=(c.VH-c.ih*c.s0)/2;$('#crz').value=100;crPaint()},
+ crok(){const c=CR,cv=crOut(),[u,how]=crEnc(cv,c.kind==='bn'?BNMAX:AVMAX);crDone(u,`Saved ${cv.width} x ${cv.height} px${how?' ('+how+')':''}. Press Save to keep it.`)},
+ crorig(){const c=CR,max=c.kind==='bn'?BNMAX:AVMAX,r=new FileReader();r.onload=()=>{if(r.result.length>max)return toast('That GIF is too big to store (limit about '+Math.round(max/1000)+' KB).');crDone(r.result,'Original GIF used. Press Save to keep it.')};r.readAsDataURL(c.f)},
+ themes(){A.close();const n=AFX().length+THEMES.length+CT().length;modal(`<h3>Themes</h3><div class="act" style="margin-bottom:8px">Pick a theme to restyle the app and your profile banner. ${n} available, including the Aura Files collection.</div><div class="cbt" style="margin:0 0 8px"><button class="btn g sm" data-a="imp" data-v="t">Import from Aura Files / Studio</button><button class="btn g sm" data-a="clrimp">Clear imported</button></div><input class="in" id="tq" placeholder="Search themes" autocomplete="off"><div id="tl" style="max-height:52vh;overflow:auto;margin-top:8px">${tlHtml('')}</div><div class="cbt" style="margin-top:12px"><button class="btn g sm" data-a="treset">Reset to default</button><button class="btn" data-a="close">Done</button></div>`)},
+ tapply(k,el){const x=TL()[+k];if(!x||!S.me)return;const th=toTh(x.t);S.me.th=th;ux(th);B.patch('users',S.me.id,{th});document.querySelectorAll('#tl .tt.cur').forEach(e=>e.classList.remove('cur'));el&&el.classList.add('cur');toast(x.t[0]+' applied.')},
+ treset(){const th=toTh(THEMES[0]);S.me.th=th;ux(th);B.patch('users',S.me.id,{th});const q=$('#tq');$('#tl').innerHTML=tlHtml(q?q.value:'');toast('Default theme restored.')},
+ tdel(i){const l=CT();l.splice(+i,1);localStorage.aura_chat_themes=JSON.stringify(l);const q=$('#tq');$('#tl').innerHTML=tlHtml(q?q.value:'')},
+
+ save(){const d=S.dr;B.patch('users',S.me.id,{name:d.name.trim()||S.me.name,bio:d.bio,activity:d.activity,status:d.status,av:d.av,th:d.th,bi:d.bi||''});A.close();toast('Profile saved.')},
+ async out(){A.close();await B.patch('users',S.me.id,{seen:0});B.out()}};
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t&&A[t.dataset.a])A[t.dataset.a](t.dataset.v,t)});
+$('#md').addEventListener('click',e=>{if(e.target.id==='md')A.close()});
+document.addEventListener('input',e=>{const f=e.target.dataset?.f;if(f&&S.dr){setP(S.dr,f,e.target.type==='range'?+e.target.value:e.target.value);pv()}});
+$('#uf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)cropOpen(f,'av')};
+$('#tf').onchange=async e=>{const fs=[...e.target.files];e.target.value='';if(!fs.length)return;let all=[];for(const f of fs)all=all.concat(parseImport(await f.text()));const n=addThemes(all);A.close();toast(all.length?(n?`Imported ${n} theme${n>1?'s':''}.`:'Those themes are already imported.'):'No valid themes found in those files.');if(S.dr)sm();if(S.impT){S.impT=0;A.themes()}};
+$('#ig').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(f.type==='image/gif')return attachGif(f);const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,800/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);const d=c.toDataURL('image/jpeg',.7);if(d.length>700000)return toast('Image is too large.');S.im=d;rb()};i.src=r.result};r.readAsDataURL(f)};
+document.addEventListener('submit',async e=>{const id=e.target.id;if(!id)return;e.preventDefault();
+ if(id==='af'){A.add($('#fi').value);$('#fi').value=''}
+ else if(id==='nr'){const rid='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);B.patch('rooms',rid,{type:'room',name:$('#rn').value.trim(),topic:$('#rt').value.trim(),public:true,members:[S.me.id],owner:S.me.id,last:Date.now()});A.close();S.sec='rooms';open({kind:'room',id:rid})}
+ else if(id==='ng'){const ids=[...document.querySelectorAll('#ng input[type=checkbox]:checked')].map(c=>c.value),rid='g'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);B.patch('rooms',rid,{type:'group',name:$('#gn').value.trim(),members:[S.me.id,...ids],owner:S.me.id,last:Date.now()});A.close();S.sec='groups';open({kind:'group',id:rid})}
+ else if(id==='ns'){const rid='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);B.patch('rooms',rid,{type:'server',name:$('#sn').value.trim(),chs:['general','announcements','off-topic'],public:true,owner:S.me.id,members:[S.me.id],c:S.me.th?.a||'#f00',last:Date.now()});A.close();S.sec='servers';S.sv=rid;draw();A.schan(rid+'|general')}
+ else if(id==='js'){const c=$('#ji').value.trim(),r=S.pub.find(x=>x.id===c&&x.type==='server');if(!r)return toast('No server found with that invite code.');A.sjoin(c)}
+ else if(id==='mi'){let x=$('#tx').value.trim();const s=S.sel;if(!s||!(x||S.im))return;
+  if(S.ed){if(x)B.patchMsg(s.id,S.ed,{x,ed:Date.now()});S.ed=null;$('#tx').value='';rb();return}
+  if(/^\/shrug/.test(x))x=(x.slice(6).trim()+' ¯\\_(ツ)_/¯').trim();else if(/^\/tableflip/.test(x))x=(x.slice(10).trim()+' (╯°□°)╯︵ ┻━┻').trim();else if(/^\/me /.test(x))x='*'+x.slice(4)+'*';
+  $('#tx').value='';const m={u:S.me.id,n:S.me.name,x,t:Date.now()};if(GIFRE.test(x)){m.gif=x;m.x=''}if(S.rp)m.rp=S.rp;if(S.im)m.img=S.im;S.rp=S.im=null;rb();
+  if(s.kind==='dm')await B.patch('rooms',s.id,{type:'dm',members:[S.me.id,s.uid],last:m.t});else if(s.kind==='server')await B.patch('rooms',s.sid,{last:m.t,lastc:{[s.chan]:m.t}});else await B.patch('rooms',s.id,{last:m.t});B.msg(s.id,m);rd(s.id)}
+ else if(id==='af2'){const er=$('#aer');er.textContent='';try{const em=$('#ae').value.trim(),pw=$('#ap').value;let uid;if(AM==='up'){uid=await B.up(em,pw);await B.patch('users',uid,newUser($('#an').value.trim()))}else uid=await B.in(em,pw);if(B===LB){sessionStorage.aura_me=uid;LB.cb(uid)}}catch(x){const c=x.code||'';er.textContent=/operation-not-allowed|configuration-not-found/.test(c)?'Email sign-in is not enabled in your Firebase project (Authentication, Sign-in method). Enable it, or use local demo mode.':x.message}}});
+$('#tx').addEventListener('paste',e=>{const f=[...(e.clipboardData?.files||[])].find(x=>x.type==='image/gif');if(f){e.preventDefault();attachGif(f)}});
+$('#tx').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#mi').requestSubmit()}};
+function qf(q){q=q.toLowerCase();const o=[];(S.me.friends||[]).forEach(i=>o.push(['dm',i,(S.U[i]||{}).name||'Friend','Friend']));S.pub.filter(r=>r.type!=='server').forEach(r=>o.push([(r.members||[]).includes(S.me.id)?'room':'join',r.id,'# '+r.name,'Room']));S.rooms.filter(r=>r.type==='group').forEach(r=>o.push(['grp',r.id,r.name,'Group']));S.rooms.filter(r=>r.type==='server').forEach(r=>(r.chs||['general']).forEach(c=>o.push(['schan',r.id+'|'+c,'# '+c,r.name])));
+ $('#qr').innerHTML=o.filter(x=>x[2].toLowerCase().includes(q)).slice(0,30).map(x=>`<div class="row" data-a="${x[0]}" data-v="${esc(x[1])}"><div class="gr"><b>${esc(x[2])}</b><small>${esc(x[3])}</small></div></div>`).join('')||'<div class="empty">No matches.</div>'}
+document.addEventListener('input',e=>{const t=e.target;if(t.id==='qi')qf(t.value);else if(t.id==='qs'){S.q=t.value;drawMsgs()}else if(t.id==='pq'){P.q=t.value;pg()}else if(t.id==='tq'){$('#tl').innerHTML=tlHtml(t.value)}else if(t.id==='gq'){clearTimeout(P.gt);P.gt=setTimeout(()=>gsearch(t.value),450)}else if(t.id==='tx'&&S.sel&&S.me&&Date.now()-(S.tt||0)>3000){S.tt=Date.now();B.patch('users',S.me.id,{typing:{r:S.sel.id,t:S.tt}})}else if(t.dataset?.p){const k=t.dataset.p;PF[k]=t.type==='checkbox'?+t.checked:+t.value;localStorage.aura_chat_pref=JSON.stringify(PF);prefs();if(k==='nt'&&PF.nt&&window.Notification)Notification.requestPermission()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){A.close()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();A.qs()}else if(e.key==='ArrowUp'&&e.target.id==='tx'&&!e.target.value&&S.msgs){const m=[...S.msgs].reverse().find(x=>x.u===S.me.id);m&&A.edt(m.id)}});
+document.addEventListener('change',e=>{const t=e.target;if(t.id==='gpv'){P.pv=t.value;P.ty='all';P.q='';P.vw='trend';sp();pk('ins','g')}else if(t.id==='gty'){P.ty=t.value;gstart()}});
+const FBP=initFB().then(b=>FB=b).catch(()=>null);
+Promise.race([FBP,new Promise(r=>setTimeout(r,6000))]).then(()=>use(FB||LB));
+</script></body></html>
