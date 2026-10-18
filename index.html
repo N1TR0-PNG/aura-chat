@@ -1776,9 +1776,11 @@ function thPrev(th){const e=th.e?th.e:th.pk&&AE.pk[th.pk]?packEng(AE.pk[th.pk]):
 const thSv=()=>JL('aura_chat_saved',[]),thFo=()=>JL('aura_chat_tfolders',[]),thRc=()=>JL('aura_chat_rect',[]),thJ=(k,v)=>{try{localStorage[k]=JSON.stringify(v)}catch(e){toast('Browser storage is full.')}};
 const thCur=()=>S.me?.th||DEF_TH;
 const THB={Black:'#050505',Charcoal:'#1a1a1a',Gray:'#3a3a3a',Navy:'#071a3d',Blue:'#0b3a8f',Teal:'#064a4a',Green:'#0a3d1c',Purple:'#2a0a45',Crimson:'#3d0000',Brown:'#3a2210',Pink:'#5a1038'},THA=['#ff0000','#ff7a00','#ffc400','#00ff41','#00e5ff','#2a7bff','#a24bff','#ff4fb0','#ffffff'];
+/* Firestore merges maps deeply, so clear the old theme map first or stale keys (e.g. an old imported 'e') would override the new theme. */
+async function thWrite(n){try{await B.patch('users',S.me.id,{th:null})}catch(e){}try{await B.patch('users',S.me.id,{th:n})}catch(e){toast('Could not save your theme.')}}
 function thSet(th,rec){if(!S.me)return;try{localStorage.aura_chat_prevth=JSON.stringify(S.me.th||null)}catch(e){}
  if(!S.me.pf){S.me.pf=pfOf(S.me);B.patch('users',S.me.id,{pf:S.me.pf})}
- const n=thClean(th);S.me.th=n;thLive(n);B.patch('users',S.me.id,{th:n});if(rec)thJ('aura_chat_rect',[rec,...thRc().filter(x=>x!==rec)].slice(0,10));thDraw()}
+ const n=thClean(th);S.me.th=n;thLive(n);thWrite(n);if(rec)thJ('aura_chat_rect',[rec,...thRc().filter(x=>x!==rec)].slice(0,10));thDraw()}
 function thFilter(q){q=(q||'').trim().toLowerCase();const el=$('#thm');if(!el)return;el.querySelectorAll('.tile[data-n]').forEach(t=>{t.style.display=(!q||t.dataset.n.toLowerCase().includes(q))?'':'none'});el.querySelectorAll('details.grp[data-g]').forEach(g=>{if(g.dataset.g.startsWith('f:'))return;const any=[...g.querySelectorAll('.tile[data-n]')].some(t=>t.style.display!=='none');g.style.display=(!q||any)?'':'none';if(q&&any)g.open=true})}
 function thSame(a,b){return(a.pk&&a.pk===b.pk)||(!a.pk&&!b.pk&&a.n===b.n&&a.a===b.a&&JSON.stringify(a.e||0)===JSON.stringify(b.e||0))}
 function thDraw(){const el=$('#thm');if(!el||el.hidden||!S.me)return;const y=el.scrollTop,cur=thCur(),L=TL(),op=S.thOpen||(S.thOpen=new Set(['Signature']));
@@ -1820,7 +1822,7 @@ Object.assign(A,{
  thapply(k){const x=TL()[+k];if(!x)return;thSet(x.th,x.id);toast(x.th.n+' applied.')},
  thimp(i){const t=CT()[+i];if(!t)return;thSet(t);toast(t.n+' applied.')},
  thrand(){const L=TL();if(!L.length)return;let x,n=0;do{x=L[Math.random()*L.length|0]}while(n++<20&&x.th.pk===thCur().pk);thSet(x.th,x.id);toast(x.th.n+' applied.')},
- thundo(){let p=null;try{p=JSON.parse(localStorage.aura_chat_prevth)}catch(e){}if(!p)return toast('Nothing to undo.');const cur=S.me.th||null,n=thClean(p);S.me.th=n;thLive(n);B.patch('users',S.me.id,{th:n});try{localStorage.aura_chat_prevth=JSON.stringify(cur)}catch(e){}thDraw()},
+ thundo(){let p=null;try{p=JSON.parse(localStorage.aura_chat_prevth)}catch(e){}if(!p)return toast('Nothing to undo.');const cur=S.me.th||null,n=thClean(p);S.me.th=n;thLive(n);thWrite(n);try{localStorage.aura_chat_prevth=JSON.stringify(cur)}catch(e){}thDraw()},
  threset(){thSet(DEF_TH);toast('Default theme restored.')},
  thsolid(k){const c=THB[k];if(!c)return;const e=thEng(thCur());thSet({n:k+' background',a:thCur().a,e:{...e,themeName:k+' background',bgx:{...e.bgx,mode:'solid',c1:c},fx:{...AE.meta.DEFFX,type:'none',speed:50}}})},
  thacc(c){if(!hex6c(c))return;const t=thCur(),e=thEng(t);thSet({n:t.n,a:c,e:{...e,accent:c}})},
@@ -1973,8 +1975,12 @@ Object.assign(A,{
  pfadd(){if((S.pd.fl||[]).length>=5)return;S.pd.fl=[...(S.pd.fl||[]),{t:'',i:''}];prDraw()},
  fadd(){A.pfadd()},fdel(i){S.pd.fl.splice(+i,1);prDraw()},fsort(i){const f=S.pd.fl[+i];f.i=f.i.split('\n').map(x=>x.trim()).filter(Boolean).sort((a,b)=>a.localeCompare(b)).join('\n');prDraw()},
  async psave(){const d=S.pd,own=S.wal.owned,dec={};SLOTS.forEach(k=>{dec[k]=d.decor[k]&&own.includes(d.decor[k])?d.decor[k]:''});
-  const upd={name:d.name.trim()||S.me.name,bio:d.bio,activity:d.activity,pron:(d.pron||'').slice(0,20),status:d.status,av:d.av,pf:d.pf,bn:d.bn||'',decor:dec,fl:(d.fl||[]).slice(0,5).map(f=>({t:String(f.t||'').slice(0,30),i:String(f.i||'').slice(0,800)}))};
-  await B.patch('wallets',S.me.id,{eq:dec});await B.patch('users',S.me.id,upd);S.wal.eq=dec;S.me={...S.me,...upd};S.U[S.me.id]=S.me;S.pd.decor=dec;S.pd0=JSON.stringify(S.pd);toast('Profile saved.');prDraw();try{draw();drawMsgs()}catch(e){}},
+  const norm=o=>{const r={};SLOTS.forEach(k=>r[k]=(o&&o[k])||'');return JSON.stringify(r)};
+  const upd={name:d.name.trim()||S.me.name,bio:d.bio,activity:d.activity,pron:(d.pron||'').slice(0,20),status:d.status,av:d.av,pf:d.pf,bn:d.bn||'',fl:(d.fl||[]).slice(0,5).map(f=>({t:String(f.t||'').slice(0,30),i:String(f.i||'').slice(0,800)}))};
+  /* Only touch the wallet / decor when the equipped items really changed: a user with no wallet document yet must not trigger a wallet create, and the rules only accept decor that matches wallets.eq. */
+  const eqChanged=norm(dec)!==norm(S.wal.eq),decChanged=norm(dec)!==norm(S.me.decor);
+  try{if(eqChanged)await B.patch('wallets',S.me.id,{eq:dec});if(decChanged)upd.decor=dec;await B.patch('users',S.me.id,upd)}catch(e){return toast('Could not save your profile. Check your connection and permissions.')}
+  S.wal.eq=dec;S.me={...S.me,...upd,decor:decChanged?dec:S.me.decor};S.U[S.me.id]=S.me;S.pd.decor=dec;S.pd0=JSON.stringify(S.pd);toast('Profile saved.');prDraw();try{draw();drawMsgs()}catch(e){}},
  pbkx(){const d=S.pd,j={app:'aura-chat-backup',v:2,profile:{bio:d.bio,activity:d.activity,av:d.av,pf:d.pf,bn:d.bn||'',fl:d.fl},theme:S.me.th||null,settings:SET,nicknames:NK},a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(j)],{type:'application/json'}));a.download='aura-customization-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Backup downloaded. No messages or login details are included.')},
  bki(){$('#kf').click()}
 });
