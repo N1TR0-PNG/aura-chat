@@ -686,7 +686,7 @@ body.rszing,body.rszing *{user-select:none!important;cursor:col-resize!important
 .zsc.dz .scp.bun .bnp{margin-top:-112px}
 .zsc.dz .scp.bun .bav .av{background:#26262b!important}
 #app{transition:opacity .25s}html.hold #app{opacity:0}#aeng{opacity:0;transition:opacity .3s}html.aeok #aeng{opacity:1}
-#boot{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);font-weight:700}#boot i{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:bootsp .8s linear infinite}#boot .rt{opacity:0;pointer-events:none;animation:bootrt 0s 8s forwards}#boot .rt small{display:block;opacity:.7;font-weight:500;margin-bottom:10px;text-align:center}@keyframes bootsp{to{transform:rotate(360deg)}}@keyframes bootrt{to{opacity:1;pointer-events:auto}}body:has(#app:not([hidden])) #boot,body:has(#auth.open) #boot{display:none}
+#boot{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);font-weight:700}#boot i{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:bootsp .8s linear infinite}#boot .rt{opacity:0;pointer-events:none;animation:bootrt 0s 8s forwards}#boot .rt small{display:block;opacity:.7;font-weight:500;margin-bottom:10px;text-align:center}@keyframes bootsp{to{transform:rotate(360deg)}}@keyframes bootrt{to{opacity:1;pointer-events:auto}}body:has(#app:not([hidden])) #boot,body:has(#auth.open) #boot,#boot.gone{display:none}
 </style>
 </head><body>
 <div id="boot"><i></i><span>Loading Aura Chat…</span><div class="rt"><small>Taking longer than usual. Check your connection.</small><button class="btn" onclick="location.reload()">Retry</button></div></div>
@@ -2118,7 +2118,7 @@ function enter(uid){
  /* Only create a fresh profile once the server has actually answered that none exists. A slow connection must never reset an existing account. */
  const mkU=n=>{if(S.uid!==uid||S.me)return;if(got)B.patch('users',uid,newUser('User'));else if(n<40)setTimeout(()=>mkU(n+1),1500)};setTimeout(()=>mkU(0),3500)}
 function stop(){{const p=document.getElementById('adp');if(p)p.hidden=true}[S.sm,S.sq,S.sr,S.sp,S.ss,S.sps,S.sch,S.stp,S.sapp,S.sdv,S.scg,S.srv2,S.scl,uw,cm,cg].forEach(f=>f&&f());clearInterval(S.hb);Object.assign(S,{ld:0,me:null,R:[],rooms:[],pub:[],srv:[],pubS:[],chs:[],cur:null,admin:false,th:null,dvOn:0,sel:null,msgs:[],sec:'home'});wk='';seeded=0}
-function boot(){fx();$('#auth').classList.remove('open');$('#app').hidden=false;$('#app').classList.remove('chat');
+function boot(){try{fx()}catch(e){console.warn('fx failed',e)}$('#auth').classList.remove('open');$('#app').hidden=false;bootGone();$('#app').classList.remove('chat');
  S.sr=B.sub('my-rooms',S.me.id,r=>{const f0=!S.ld;S.ld=1;S.rooms=r;r.forEach(x=>ntf(x,f0));watch();draw()});
  S.sp=B.sub('pub-rooms',0,r=>{S.pub=r;if(!seeded){seeded=1;[['lounge','Lounge','Hang out and chat about anything'],['music','Music','Share what you are listening to'],['help','Help desk','Questions about Aura Chat']].forEach(([id,name,topic])=>{if(!r.find(x=>x.id===id))B.patch('rooms',id,{type:'room',name,topic,public:true,owner:'',members:[]})})}draw()});
  bootX();beat();S.hb=setInterval(()=>{beat();draw()},25000);draw();setTimeout(()=>{if(S.me&&!S.me.intro&&!localStorage['aura_intro_'+S.me.id]&&!$('#md').classList.contains('open'))introShow(0)},900)}
@@ -3405,6 +3405,12 @@ Object.assign(A,{
  bki(){$('#kf').click()}
 });
 
+/* Loading screen fix: hide #boot from JS (older browsers lack :has()), whenever the app or the sign-in screen appears, and add a watchdog so it can never spin forever. */
+function bootGone(){const b=document.getElementById('boot');if(b)b.classList.add('gone')}
+(function(){const chk=()=>{if(!document.getElementById('app').hidden||document.getElementById('auth').classList.contains('open'))bootGone()};
+ new MutationObserver(chk).observe(document.getElementById('app'),{attributes:true,attributeFilter:['hidden']});
+ new MutationObserver(chk).observe(document.getElementById('auth'),{attributes:true,attributeFilter:['class']});chk();
+ setTimeout(()=>{if(document.getElementById('app').hidden&&!document.getElementById('auth').classList.contains('open')){try{toast('Could not load your account in time. Please sign in again.')}catch(e){}document.getElementById('auth').classList.add('open');bootGone()}},15000)})();
 Promise.race([FBP,new Promise(r=>setTimeout(r,10000))]).then(()=>use(FB||LB));
 
 document.addEventListener('keydown',e=>{if(!S.shOn||e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target,typing=t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName),pd=$('#pdm');
