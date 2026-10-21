@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>(function(){/* If the browser blocks localStorage/sessionStorage (sandboxed preview, some webviews, strict privacy modes) the app used to crash at launch and sit on the background. Fall back to in-memory storage instead. */['localStorage','sessionStorage'].forEach(function(n){var ok=1;try{var t=window[n];t.setItem('__t','1');t.removeItem('__t')}catch(e){ok=0}if(ok)return;var m={},api={getItem:function(k){return k in m?m[k]:null},setItem:function(k,v){m[k]=String(v)},removeItem:function(k){delete m[k]},clear:function(){m={}},key:function(i){return Object.keys(m)[i]||null}};var px=new Proxy({},{get:function(_,k){if(k==='length')return Object.keys(m).length;if(k in api)return api[k];return k in m?m[k]:undefined},set:function(_,k,v){m[k]=String(v);return true},deleteProperty:function(_,k){delete m[k];return true},has:function(_,k){return k in m},ownKeys:function(){return Object.keys(m)},getOwnPropertyDescriptor:function(_,k){return k in m?{value:m[k],enumerable:true,configurable:true,writable:true}:undefined}});try{Object.defineProperty(window,n,{value:px,configurable:true})}catch(e){}});
 /* Never fail silently: if startup crashes, say so on screen. */
 window.addEventListener('error',function(e){var b=document.getElementById('boot');if(b&&!document.getElementById('app').hidden===false&&!document.getElementById('auth').classList.contains('open')){var sp=b.querySelector('span');if(sp)sp.textContent='Could not start: '+(e.message||'unknown error')}})})();</script>
@@ -283,37 +283,70 @@ html{background:var(--bgc,#000)!important}body{background:transparent!important}
 /* ===== avatar decorations ===== */
 .av{overflow:visible}
 .dco{position:absolute;left:-10%;top:-10%;width:120%;height:120%;pointer-events:none;overflow:visible;z-index:2}
+/* ----- avatar decoration player: one canvas per avatar, painted from a pre-baked loop ----- */
+.dco.dcw{--h:60;left:calc(50% - var(--h)*1%);top:calc(50% - var(--h)*1%);width:calc(var(--h)*2%);height:calc(var(--h)*2%)}
+.dcv,.dcsvg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.dcsvg{overflow:visible}
 .av .dot{z-index:3}
 .ca{overflow:visible!important}
-/* ===== nameplates ===== */
-.row.npl{position:relative;overflow:hidden;isolation:isolate}
-.row.npl::before{content:"";position:absolute;inset:0;background:var(--np);opacity:.75;z-index:-2}
-.row.npl::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.1) 70%);z-index:-1}
+/* ===== nameplates v2: framed like avatar frames, layered + animated (transform/opacity only) ===== */
+.npl{--nr:12px;--nc:#9ad8ff;--nc2:#c09aff;--nc3:#ffd27a;--ang:0deg;--nd:0s;position:relative;isolation:isolate;border:2px solid transparent!important;border-radius:var(--nr)!important;background:linear-gradient(#0c0c12,#0c0c12) padding-box,conic-gradient(from var(--ang),var(--nc),var(--nc2),var(--nc3),var(--nc2),var(--nc)) border-box!important;box-shadow:0 0 12px -5px var(--nc);transition:box-shadow .25s}
+.row.npl{padding:6px 8px}
 .row.npl .gr b,.row.npl .gr small{color:#fff;text-shadow:0 1px 3px #000}
-.npl-flow::before{background-size:300% 100%!important;animation:npflow 7s linear infinite}
+.npl:hover,.npl.on{box-shadow:0 0 18px -2px var(--nc)}
+.npl:is(.npspin,:hover,.on){animation:npspin 7s linear infinite}
+.npt3:is(.npspin,:hover,.on),.npt4:is(.npspin,:hover,.on){animation:npspin 7s linear infinite,npglow 3s ease-in-out infinite}
+.npt4:is(.npspin,:hover,.on){animation-duration:4s,2.4s}
+@keyframes npspin{to{--ang:360deg}}
+@keyframes npglow{50%{box-shadow:0 0 22px 0 var(--nc)}}
+np-f{position:absolute;inset:0;z-index:-1;display:block;border-radius:calc(var(--nr) - 2px);overflow:hidden;pointer-events:none;contain:paint}
+np-f>*{position:absolute;display:block;font-style:normal}
+np-f::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(90deg,transparent,var(--nc),transparent) 50% 0/84% 1px no-repeat;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -12px 16px -14px var(--nc)}
+.npt4 np-f::after{animation:npedge 2.4s ease-in-out var(--nd) infinite}
+@keyframes npedge{50%{opacity:.4}}
+np-a{inset:0;background:var(--np);background-color:#0c0c12;opacity:.92}
+np-v{inset:0;background:linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.08) 72%)}
+np-p{left:0;top:0;width:calc(100% + 200px);height:calc(100% + 100px);opacity:.8;background:radial-gradient(circle at 12px 10px,var(--nc) 0 1.2px,transparent 2.6px) 0 0/40px 20px,radial-gradient(circle at 30px 14px,#fff 0 .9px,transparent 2px) 0 0/50px 25px,radial-gradient(circle at 20px 25px,var(--nc2) 0 1.4px,transparent 3px) 0 0/100px 50px}
+.npt1 np-p{display:none}.npt4 np-p{opacity:1}
+.npm-rise np-p{animation:nppr 5s linear var(--nd) infinite}
+.npm-fall np-p{animation:nppf 6s linear var(--nd) infinite}
+.npm-drift np-p{animation:nppd 12s linear var(--nd) infinite}
+.npm-twk np-p{animation:npptw 2.2s ease-in-out var(--nd) infinite alternate}
+@keyframes nppr{to{transform:translate3d(0,-100px,0)}}
+@keyframes nppf{from{transform:translate3d(0,-100px,0)}}
+@keyframes nppd{to{transform:translate3d(-200px,0,0)}}
+@keyframes npptw{from{opacity:.2}}
+np-s{top:-10%;bottom:-10%;left:0;width:38%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.3) 50%,transparent);transform:translate3d(-130%,0,0) skewX(-20deg);animation:npsw 5.2s ease-in-out var(--nd) infinite}
+.npt4 np-s{animation-duration:3.6s}
+.npl-glint np-s{background:linear-gradient(100deg,transparent,rgba(255,244,200,.5) 50%,transparent)}
+.npl-scan np-s{left:0;right:0;width:auto;top:0;bottom:auto;height:34%;background:linear-gradient(180deg,transparent,rgba(140,255,255,.28),transparent);transform:translate3d(0,-110%,0);animation:npsc 2.8s linear var(--nd) infinite}
+@keyframes npsw{0%,52%{transform:translate3d(-130%,0,0) skewX(-20deg)}100%{transform:translate3d(400%,0,0) skewX(-20deg)}}
+@keyframes npsc{to{transform:translate3d(0,330%,0)}}
+np-g{right:10px;top:4px;font-size:13px;line-height:1;color:var(--nc);text-shadow:0 0 6px var(--nc);opacity:.9}
+np-g::before{content:var(--ng)}
+.npt2 np-g,.npt3 np-g,.npt4 np-g{animation:npgp 2.6s ease-in-out var(--nd) infinite}
+np-g.b{right:30px;top:auto;bottom:4px;font-size:8px;opacity:.6;transform:rotate(180deg);animation:none}
+@keyframes npgp{50%{opacity:1;transform:scale(1.3) rotate(10deg)}}
+/* legacy plate-art motion, now scoped to the clipped art layer */
+.npl-flow np-a{background-size:300% 100%!important;animation:npflow 7s linear infinite}
+.npl-rain np-a{animation:nprain 1.4s linear infinite}
+.npl-breathe np-a{animation:npbreathe 3.2s ease-in-out infinite}
+.npl-hue np-a{animation:nphue 8s ease-in-out infinite}
+.npl-zoom np-a{animation:npzoom 14s ease-in-out infinite alternate}
+.npl-rise np-a{animation:nprise 5s linear infinite}
+.npl-drift np-a{animation:npdrift 18s linear infinite}
+.npl-flicker np-a{animation:npflick 2.6s steps(1) infinite}
 @keyframes npflow{to{background-position:300% 0}}
-.npl-shine::after{background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.35) 50%,transparent 65%),linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.05));background-size:250% 100%,100% 100%;animation:npshine 3.5s linear infinite}
-@keyframes npshine{from{background-position:150% 0,0 0}to{background-position:-100% 0,0 0}}
-.npl-rain::before{animation:nprain 1.4s linear infinite}
 @keyframes nprain{to{background-position:0 28px}}
-/* ===== nameplate upgrades: new animations ===== */
 @keyframes npbreathe{0%,100%{filter:brightness(.95) saturate(1)}50%{filter:brightness(1.3) saturate(1.25)}}
 @keyframes nphue{0%,100%{filter:hue-rotate(-25deg)}50%{filter:hue-rotate(25deg) brightness(1.12)}}
 @keyframes npzoom{from{transform:scale(1.02) translateX(0)}to{transform:scale(1.2) translateX(-5%)}}
-@keyframes npglint{0%{background-position:0% 0,0 0}50%,100%{background-position:100% 0,0 0}}
-@keyframes npscan{from{background-position:0 0,0 0}to{background-position:0 100%,0 0}}
-.npl-breathe::before{animation:npbreathe 3.2s ease-in-out infinite}
-.npl-hue::before{animation:nphue 8s ease-in-out infinite}
-.npl-zoom::before{animation:npzoom 14s ease-in-out infinite alternate}
-.npl-glint::after{background:linear-gradient(105deg,transparent 42%,rgba(255,244,200,.55) 50%,transparent 58%),linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.08));background-size:260% 100%,100% 100%;animation:npglint 4.5s ease-in-out infinite}
-.npl-scan::after{background:linear-gradient(180deg,transparent 42%,rgba(140,255,255,.28) 50%,transparent 58%),linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.08));background-size:100% 400%,100% 100%;animation:npscan 3s linear infinite}
-.mnp.npl-glint::before,.mnp.npl-scan::before{animation:npbreathe 3.2s ease-in-out infinite}
 @keyframes nprise{to{background-position:0 -40px}}
 @keyframes npdrift{to{background-position:120px 0}}
 @keyframes npflick{0%,100%{filter:brightness(1)}6%{filter:brightness(1.3)}11%{filter:brightness(.88)}24%{filter:brightness(1.18)}38%{filter:brightness(.94)}57%{filter:brightness(1.32)}71%{filter:brightness(.9)}86%{filter:brightness(1.12)}}
-.npl-rise::before{animation:nprise 5s linear infinite}
-.npl-drift::before{animation:npdrift 18s linear infinite}
-.npl-flicker::before{animation:npflick 2.6s steps(1) infinite}
+/* off-screen nameplates (and anything inside them) are paused; reduced motion kills it entirely */
+.npz,.npz *,.npz np-f::after{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.npl,.npl *,.npl np-f::after{animation:none!important}}
 /* ===== display name styles ===== */
 .nst{font-weight:700}
 .nst-gold_foil{font-family:Cinzel,serif;background:linear-gradient(180deg,#fff1a8,#e0a912 50%,#8a5a00);-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;filter:drop-shadow(0 1px 1px #0008)}
@@ -437,10 +470,8 @@ html{background:var(--bgc,#000)!important}body{background:transparent!important}
 .zmini.frm::before{content:var(--fc);position:absolute;top:0;left:3px;color:var(--fg);font-size:15px;z-index:3}
 .zmini.frm::after{content:var(--fc);position:absolute;bottom:0;right:3px;color:var(--fg);font-size:15px;z-index:3;transform:rotate(180deg)}
 .zmini .pfx{position:absolute;inset:0;width:100%;height:100%}
-.mnp{width:210px;height:46px;border-radius:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:0 10px;background:#15151b}
-.mnp::before{content:"";position:absolute;inset:0;background:var(--np)}
-.mnp>*{position:relative}.mnp i{width:26px;height:26px;border-radius:50%;background:#2c2c38;display:block}.mnp u{height:7px;width:90px;background:#fff9;border-radius:4px;display:block;text-decoration:none}
-.mnp.npl-flow::before{background-size:300% 100%;animation:npflow 7s linear infinite}.mnp.npl-shine::before{filter:brightness(1.05)}.mnp.npl-rain::before{animation:nprain 1.4s linear infinite}
+.mnp{width:210px;height:46px;display:flex;align-items:center;gap:10px;padding:0 10px;--nr:12px}
+.mnp>i{width:26px;height:26px;border-radius:50%;background:#2c2c38;display:block;position:relative;z-index:1}.mnp>u{height:7px;width:90px;background:#fff9;border-radius:4px;display:block;text-decoration:none;position:relative;z-index:1}
 .nsp{font-size:26px;color:#fff;font-weight:700;padding:0 8px;text-align:center}
 .bcol{display:flex;gap:6px;align-items:center;transform:scale(.8)}
 .colcard{border-radius:14px;overflow:hidden;cursor:pointer;height:170px;position:relative;border:1px solid #fff1;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:#fff}
@@ -517,7 +548,7 @@ html{background:var(--bgc,#000)!important}body{background:transparent!important}
 .thhv iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none;background:#000}
 #thm .tgl{display:flex;gap:8px;align-items:center;font-size:12px;opacity:.7;margin:8px 0}
 .aeload{position:fixed;right:14px;bottom:14px;z-index:90;background:#000b;color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px}
-.cn{display:inline-block;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b8,#e0a912);margin-right:5px;vertical-align:-1px;box-shadow:0 0 0 1px #8a5a00}
+.cn{display:inline-block;width:16px;height:16px;background:var(--orb-sm) center/contain no-repeat;margin-right:5px;vertical-align:-3px}html[data-orb=px] .cn{background-image:var(--orb-px);image-rendering:pixelated}.zbig .cn{width:32px;height:32px;margin-right:8px;vertical-align:middle}.cn.big{width:32px;height:32px;margin:0 6px 0 0;vertical-align:middle}
 .pcard .ca{border-color:var(--cbg1)!important}
 
 
@@ -717,8 +748,6 @@ body.rszing,body.rszing *{user-select:none!important;cursor:col-resize!important
 .car{position:relative}
 .car .tbub{position:absolute;left:86px;bottom:22px;margin:0;width:max-content;max-width:calc(100% - 100px);z-index:3}
 /* decorations must not be clipped inside member, friend and DM rows */
-.row.npl{overflow:visible}
-.row.npl::before,.row.npl::after{border-radius:inherit}
 .row .av{overflow:visible}
 #rail .me{overflow:visible}
 #list .sc,.sc{padding-top:4px}
@@ -978,6 +1007,9 @@ dreadbear|Dreadbear|7|#2a1a30|#ff2a2a|#b06bff|bear+tophat+spikes|flame
 mendo|Mendo|7|#d8d0c8|#ff2a4a|#ffffff|mask|diamond
 mimic|The Mimic|7|#1a1a22|#ffffff|#ff2a4a|wires+mask|diamond`.split('\n').map(l=>{const[id,n,gm,b,a,g,t,k]=l.split('|');return{id,n,gm:+gm,b,a,g,t,k}});
 const FNG={1:['Staatliches','FNAF 1'],2:['Chewy','FNAF 2'],3:['Special Elite','FNAF 3'],4:['Creepster','FNAF 4'],5:['Audiowide','Sister Location'],6:['Bangers','Pizzeria Simulator & Ultimate Custom Night'],7:['Orbitron','Security Breach, Help Wanted & Ruin']};
+/* ===== Orb currency art (Aura Orbs): one smooth SVG and one 16x16 pixel PNG, picked by the Orb style setting ===== */
+const ORB_SM='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><radialGradient id="b" cx="50%" cy="32%" r="72%"><stop offset="0" stop-color="#2a42dc"/><stop offset=".5" stop-color="#0a1aa6"/><stop offset=".8" stop-color="#030a66"/><stop offset="1" stop-color="#020648"/></radialGradient><linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c3dcff"/><stop offset=".5" stop-color="#6283f8"/><stop offset="1" stop-color="#2f4bdc"/></linearGradient><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9a6fb"/><stop offset=".45" stop-color="#e2e0ff"/><stop offset="1" stop-color="#7a82f2"/></linearGradient></defs><path d="M30.9 16L30.8 17L30.4 18.3L29.9 19.8L29.1 21.3L28.1 22.8L27 24.3L25.7 25.7L24.3 27L22.8 28.1L21.3 29.1L19.8 29.9L18.3 30.4L17 30.8L16 30.9L15 30.8L13.7 30.4L12.2 29.9L10.7 29.1L9.2 28.1L7.7 27L6.3 25.7L5 24.3L3.9 22.8L2.9 21.3L2.1 19.8L1.6 18.3L1.2 17L1.1 16L1.2 15L1.6 13.7L2.1 12.2L2.9 10.7L3.9 9.2L5 7.7L6.3 6.3L7.7 5L9.2 3.9L10.7 2.9L12.2 2.1L13.7 1.6L15 1.2L16 1.1L17 1.2L18.3 1.6L19.8 2.1L21.3 2.9L22.8 3.9L24.3 5L25.7 6.3L27 7.7L28.1 9.2L29.1 10.7L29.9 12.2L30.4 13.7L30.8 15Z" fill="url(#b)"/><path d="M29.4 16L29.3 16.9L29 18.1L28.5 19.4L27.8 20.8L26.9 22.1L25.9 23.5L24.7 24.7L23.5 25.9L22.1 26.9L20.8 27.8L19.4 28.5L18.1 29L16.9 29.3L16 29.4L15.1 29.3L13.9 29L12.6 28.5L11.2 27.8L9.9 26.9L8.5 25.9L7.3 24.7L6.1 23.5L5.1 22.1L4.2 20.8L3.5 19.4L3 18.1L2.7 16.9L2.6 16L2.7 15.1L3 13.9L3.5 12.6L4.2 11.2L5.1 9.9L6.1 8.5L7.3 7.3L8.5 6.1L9.9 5.1L11.2 4.2L12.6 3.5L13.9 3L15.1 2.7L16 2.6L16.9 2.7L18.1 3L19.4 3.5L20.8 4.2L22.1 5.1L23.5 6.1L24.7 7.3L25.9 8.5L26.9 9.9L27.8 11.2L28.5 12.6L29 13.9L29.3 15.1Z" fill="none" stroke="#2f4be0" stroke-opacity=".28" stroke-width=".8"/><path d="M9 26.2C12.5 28.6 19.5 28.6 23 26.2 20 27.2 12 27.2 9 26.2Z" fill="#3b57ec" opacity=".8"/><path d="M30.9 16L30.8 17L30.4 18.3L29.9 19.8L29.1 21.3L28.1 22.8L27 24.3L25.7 25.7L24.3 27L22.8 28.1L21.3 29.1L19.8 29.9L18.3 30.4L17 30.8L16 30.9L15 30.8L13.7 30.4L12.2 29.9L10.7 29.1L9.2 28.1L7.7 27L6.3 25.7L5 24.3L3.9 22.8L2.9 21.3L2.1 19.8L1.6 18.3L1.2 17L1.1 16L1.2 15L1.6 13.7L2.1 12.2L2.9 10.7L3.9 9.2L5 7.7L6.3 6.3L7.7 5L9.2 3.9L10.7 2.9L12.2 2.1L13.7 1.6L15 1.2L16 1.1L17 1.2L18.3 1.6L19.8 2.1L21.3 2.9L22.8 3.9L24.3 5L25.7 6.3L27 7.7L28.1 9.2L29.1 10.7L29.9 12.2L30.4 13.7L30.8 15Z" fill="none" stroke="url(#r)" stroke-width=".95" stroke-linejoin="round"/><path d="M5 12.6C6.8 9 10 6.2 13.6 4.5" fill="none" stroke="#d6e9ff" stroke-linecap="round"/><path d="M24.6 7.6C27 9.6 28.5 12.2 29 14.6M28.6 18.4C27.6 21.4 25.6 23.8 22.8 25.6" fill="none" stroke="#8aaeff" stroke-width=".9" stroke-linecap="round"/><path d="M6.2 20.2C7.8 23.2 10.4 25.4 13 26.6" fill="none" stroke="#5a7cf8" stroke-width=".9" stroke-linecap="round"/><rect x="1.8" y="15.6" width="28.4" height="1" fill="#00000c"/><path d="M16 8.9L17.9 14.6 21.2 15.2V17.1L17.9 17.7 16 23.4 14.1 17.7 10.8 17.1V15.2L14.1 14.6Z" fill="url(#s)"/><rect x="10.8" y="15.2" width="10.4" height="1.9" fill="#efeeff" opacity=".8"/><ellipse cx="16" cy="16.1" rx="1.5" ry=".9" fill="#fff"/></svg>'),ORB_PX='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABP0lEQVR4nJWSMUjDQBSG/ysFB4uji0gLHboVB6cKgtbg6iJKwSUENyniJpVmrEMJ1lVcC3XJKt0dxIJCFsEuJWQQnMSCdHgOZ665e2nFH25473//x7vkBGYoiIj6j9P6dE+ItLlsWhAADo6GWt/zZd8EaUUQEZlBU85JUYNk/hMGgJvrodpGAWaFm04eTSc/F6K+wUf4xgYrG0XpudwDpCeCiGhn657ZT/1drV63+Mz2/iYyyV8FAB23qsIrq/LEwI5b5YvIuyxpp9edUDgiCkek1OtO2FytMaYsAOSWzzWoXW/j9uqM9cw54PcdeD7RxfElM2OIXW8zr1Q5xMAvCPYSk3p4+ZxnTzcAgFpjTHee/WcAAMpWCwO/IDRAErKwuJYa/P561sIMEEMAwNymbLUAQAunApKg1+Bd1WYw1g/66JntZPVfhAAAAABJRU5ErkJggg==';
+document.documentElement.style.setProperty('--orb-sm','url("'+ORB_SM+'")');document.documentElement.style.setProperty('--orb-px','url("'+ORB_PX+'")');
 /* ===== Avatar decoration library: procedural SVG (viewBox -60 -60 120 120, avatar radius 50) ===== */
 const DCO=(()=>{
 const T=Math.PI*2,r2=n=>Math.round(n*100)/100;
@@ -1066,7 +1098,7 @@ add('bat_swarm',()=>`${ring('#2a1146',2.5,{op:.8})}${(()=>{let h='';for(let i=0;
 /* RETRO ARCADE */
 add('pixel_hearts',()=>`${ring('#ff3b6b',2,{dash:'4 4',op:.85,spin:30})}${orbit('heart',8,{r:55,s:5.6,c:['#ff3b6b','#ff8aa8'],rot:0,jit:.1})}`);
 add('pixel_crown',()=>`<g shape-rendering="crispEdges"><path d="M-22-50V-70H-14V-62H-6V-74H6V-62H14V-70H22V-50Z" fill="#ffd400" stroke="#8a5a00" stroke-width="2"/><rect x="-18" y="-58" width="6" height="5" fill="#ff3b3b"/><rect x="-3" y="-58" width="6" height="5" fill="#3bd1ff"/><rect x="12" y="-58" width="6" height="5" fill="#3bff7a"/></g>`);
-add('coin_collector',()=>`${(()=>{let h='';for(let i=0;i<9;i++){const a=T*i/9,[x,y]=pol(55,a);h+=`<ellipse cx="${r2(x)}" cy="${r2(y)}" rx="5.4" ry="5.8" fill="#ffd400" stroke="#a86b00" stroke-width="1.2"><animate attributeName="rx" values="5.4;1;5.4" dur="1.6s" begin="${i*.18}s" repeatCount="indefinite"/></ellipse>`}return h})()}`);
+add('coin_collector',()=>`<g>${(()=>{const px=document.documentElement.dataset.orb==='px',u=px?ORB_PX:ORB_SM;let h='';for(let i=0;i<9;i++){const a=T*i/9,[x,y]=pol(55,a);h+=`<image href="${u}" x="${r2(x-6.5)}" y="${r2(y-6.5)}" width="13" height="13"${px?' style="image-rendering:pixelated"':''}><animate attributeName="opacity" values="1;.5;1" dur="1.6s" begin="${i*.18}s" repeatCount="indefinite"/></image>`}return h})()}</g>`);
 add('glitch_ring',()=>`${ring('#ff2bd6',3,{op:.8,r:51.5})}${ring('#2bffea',3,{op:.8,r:50,dash:'28 9 6 14'})}<g>${(()=>{let h='';for(let i=0;i<9;i++){const a=T*i/9+rnd(),[x,y]=pol(54,a);h+=`<rect x="${r2(x-6)}" y="${r2(y-1.5)}" width="${6+rnd()*9}" height="2.4" fill="${i%2?'#2bffea':'#ff2bd6'}">${tw(.7+rnd(),rnd(),0,1)}</rect>`}return h})()}</g>`);
 add('pixel_stars',()=>`<g shape-rendering="crispEdges">${(()=>{let h='';for(let i=0;i<14;i++){const a=T*i/14+rnd()*.3,[x,y]=pol(54+rnd()*6,a),s=2+rnd()*2.4;h+=`<g transform="translate(${r2(x)} ${r2(y)})" fill="${['#fff','#ffe27a','#7df9ff'][i%3]}"><rect x="${-s/2}" y="${-s*1.5}" width="${s}" height="${s*3}"/><rect x="${-s*1.5}" y="${-s/2}" width="${s*3}" height="${s}"/>${tw(1+rnd()*2,rnd()*2,.15,1)}</g>`}return h})()}</g>`);
 
@@ -1819,8 +1851,269 @@ add('vt_halo',()=>{let ry='',en='',cd='',fl='',sm='',em='';
 
 const ids=Object.keys(defs);
 const cache={};
-function svg(id){if(!defs[id])return'';if(cache[id])return cache[id];N(id);let body=defs[id]();const am=AMB[id];if(am==='bob')body=`<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -2.5;0 0" dur="3.6s" repeatCount="indefinite"/>${body}</g>`;else if(am==='breathe')body=`<g><animateTransform attributeName="transform" type="scale" values="1;1.025;1" dur="4s" repeatCount="indefinite"/>${body}</g>`;return cache[id]=`<svg class="dco" viewBox="-60 -60 120 120" overflow="visible" aria-hidden="true">${body}</svg>`}
-return{svg,ids,has:id=>!!defs[id],GP,SYC}
+function body(id){if(!defs[id])return'';if(cache[id])return cache[id];N(id);let b=defs[id]();const am=AMB[id];if(am==='bob')b=`<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -2.5;0 0" dur="3.6s" repeatCount="indefinite"/>${b}</g>`;else if(am==='breathe')b=`<g><animateTransform attributeName="transform" type="scale" values="1;1.025;1" dur="4s" repeatCount="indefinite"/>${b}</g>`;return cache[id]=b}
+/* The avatar only gets a tiny placeholder; DCV (below) bakes the art into a looping spritesheet and plays it. */
+const svg=(id,z=40)=>defs[id]?`<span class="dco dcw" data-dc="${id}" data-t="${z>=56?'l':'s'}" aria-hidden="true"><canvas class="dcv" width="1" height="1"></canvas></span>`:'';
+/* The original live, animated SVG: only used as a fallback if baking fails. */
+const markup=id=>`<svg class="dcsvg" viewBox="-60 -60 120 120" overflow="visible" aria-hidden="true">${body(id)}</svg>`;
+return{svg,body,markup,ids,has:id=>!!defs[id],GP,SYC}
+})();
+
+/* ===== Avatar decoration player =====
+   A decoration is vector art with dozens of animated nodes. Keeping every node alive on every
+   avatar is what made the page heavy. Instead each decoration is baked ONCE into a looping
+   "film strip" (LOOP seconds at FPS frames, kept as one GPU bitmap). Every avatar is a single
+   <canvas>, and ONE shared timer paints the current frame into all of them. Two avatars with
+   the same decoration share the same bitmap. Baked strips are also saved in IndexedDB (in the
+   background), so a repeat visit skips the baking. If baking ever fails, the avatar falls
+   back to the old live SVG, so nothing disappears. */
+const DCV=(()=>{
+ /* ---------- settings ---------- */
+ const LOOP=6,FPS=10,N=LOOP*FPS,COLS=10,ROWS=N/COLS;   // 6 s loop, 10 fps, 60 frames laid out 10 x 6
+ const PPU={s:.75,l:1.5};            // pixels per SVG unit: small avatars / large avatars
+ const MAXH=132;                      // widest half-window a strip may grow to (SVG units)
+ const KEEP=96;                       // strips kept in memory before the oldest unused one is dropped
+ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const SVGNS='http://www.w3.org/2000/svg';
+
+ /* ---------- state ---------- */
+ const sheets=new Map();             // "id|tier" -> {bmp,h,S}   (insertion order = least recently used first)
+ const waiting=new Map();            // "id|tier" -> Set of elements waiting for that strip
+ const tracked=new Set();            // every decoration element currently on the page
+ const visible=new Set();            // the ones currently on screen
+ const playing=new Set();            // the ones that are on screen AND have a strip
+ const queue=[];                     // keys still to bake
+ let busy=false;
+
+ const keyOf=el=>el.dataset.dc+'|'+el.dataset.t;
+ const yieldUI=()=>new Promise(r=>setTimeout(r,0));          // let scrolling and typing run between two bakes
+ const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=(h*33^s.charCodeAt(i))>>>0;return h.toString(36)};
+ const canvas=(w,h)=>typeof OffscreenCanvas!=='undefined'?new OffscreenCanvas(w,h):Object.assign(document.createElement('canvas'),{width:w,height:h});
+ const toPNG=c=>c.convertToBlob?c.convertToBlob({type:'image/png'}):new Promise(ok=>c.toBlob(ok,'image/png'));
+
+ /* ---------- IndexedDB cache (optional, every call is allowed to fail) ---------- */
+ const idb=(()=>{let p;
+  const open=()=>p||(p=new Promise((ok,no)=>{try{const r=indexedDB.open('aura-dcv',1);r.onupgradeneeded=()=>r.result.createObjectStore('s');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}catch(e){no(e)}}));
+  return{
+   get:k=>open().then(db=>new Promise(ok=>{const q=db.transaction('s').objectStore('s').get(k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>ok(null)})).catch(()=>null),
+   set:(k,v)=>open().then(db=>{db.transaction('s','readwrite').objectStore('s').put(v,k)}).catch(()=>{})
+  }})();
+
+ /* saving to IndexedDB needs a PNG encode, so it runs one at a time in the background and
+    is skipped when it falls behind (the strip is simply baked again next visit) */
+ let saving=0;
+ async function persist(ik,cv,h){
+  if(saving>=6)return;
+  saving++;
+  try{idb.set(ik,{blob:await toPNG(cv),h})}catch(e){}
+  saving--;
+ }
+
+ /* ---------- 1. measure: how far does this decoration reach past the avatar? ---------- */
+ function measure(id){
+  const host=document.createElement('div');
+  host.style.cssText='position:fixed;left:-9999px;top:0;width:240px;height:240px;pointer-events:none';
+  host.innerHTML=`<svg viewBox="-60 -60 120 120" width="240" height="240" overflow="visible">${DCO.body(id)}</svg>`;
+  document.body.appendChild(host);
+  const svg=host.firstChild,o=svg.getBoundingClientRect(),cx=o.left+120,cy=o.top+120;
+  let reach=0;
+  for(const c of svg.children){
+   if(c.tagName==='defs')continue;
+   const r=c.getBoundingClientRect();
+   if(!r.width&&!r.height)continue;
+   reach=Math.max(reach,(cx-r.left)/2,(r.right-cx)/2,(cy-r.top)/2,(r.bottom-cy)/2);
+  }
+  host.remove();
+  return Math.min(MAXH,Math.max(60,Math.ceil((reach+8)/4)*4));   // half-window in SVG units, multiple of 4
+ }
+
+ /* glow or art touching the edge of a frame means the window was too small */
+ function touchesEdge(px,W,S){
+  let sum=0;
+  for(let k=0;k<N;k++){
+   const x0=(k%COLS)*S,y0=Math.floor(k/COLS)*S;
+   for(let i=0;i<S;i++){
+    sum+=px[(y0*W+x0+i)*4+3]+px[((y0+S-1)*W+x0+i)*4+3]+px[((y0+i)*W+x0)*4+3]+px[((y0+i)*W+x0+S-1)*4+3];
+   }
+  }
+  return sum>800;
+ }
+
+ /* ---------- 2. bake: draw every frame into one image, then rasterise it once ---------- */
+ async function bake(id,tier,H=measure(id)){
+  const S=Math.round(2*H*PPU[tier]);                              // S = frame size in pixels
+  const tpl=document.createElement('template');
+  tpl.innerHTML=`<svg>${DCO.body(id)}</svg>`;
+  const root=tpl.content.firstChild;
+
+  /* Make every animation loop exactly once (or a whole number of times) per LOOP, so the
+     last frame flows straight into the first. */
+  const clips=[...root.querySelectorAll('animate,animateTransform,animateMotion,set')].map(el=>{
+   const d=parseFloat(el.getAttribute('dur')),b=parseFloat(el.getAttribute('begin'))||0;
+   return{el,b,hasDur:d>0,dq:LOOP/Math.max(1,Math.round(LOOP/(d>0?d:LOOP)))};
+  });
+
+  const ser=new XMLSerializer();
+  let tiles='';
+  for(let k=0;k<N;k++){
+   const t=k/FPS;
+   for(const c of clips){                                         // negative `begin` = "already this far into the loop"
+    const x=c.b-t;
+    c.el.setAttribute('begin',(x-c.dq*Math.ceil(x/c.dq)).toFixed(3)+'s');
+    if(c.hasDur)c.el.setAttribute('dur',c.dq+'s');
+   }
+   const frame=[...root.childNodes].map(n=>ser.serializeToString(n)).join('')
+    .replace(/(\s)id="([^"]*)"/g,`$1id="$2_${k}"`)                // every frame needs its own gradient / clip ids
+    .replace(/url\(#([^)]*)\)/g,`url(#$1_${k})`)
+    .replace(/href="#([^"]*)"/g,`href="#$1_${k}"`);
+   tiles+=`<svg x="${(k%COLS)*S}" y="${Math.floor(k/COLS)*S}" width="${S}" height="${S}" viewBox="${-H} ${-H} ${2*H} ${2*H}">${frame}</svg>`;
+  }
+
+  const W=COLS*S,Ht=ROWS*S;
+  const sheet=`<svg xmlns="${SVGNS}" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${Ht}" viewBox="0 0 ${W} ${Ht}">${tiles}</svg>`;
+  const src=URL.createObjectURL(new Blob([sheet],{type:'image/svg+xml'}));
+  try{
+   const img=new Image();
+   await new Promise((ok,no)=>{img.onload=ok;img.onerror=()=>no(new Error('sheet'));img.src=src});
+   const cv=canvas(W,Ht);
+   const x=cv.getContext('2d',{willReadFrequently:true});
+   x.drawImage(img,0,0,W,Ht);
+   if(H<MAXH&&touchesEdge(x.getImageData(0,0,W,Ht).data,W,S))return bake(id,tier,Math.min(MAXH,H+16));
+   return{cv,h:H};
+  }finally{URL.revokeObjectURL(src)}
+ }
+
+ /* ---------- 3. load: memory -> IndexedDB -> bake ---------- */
+ async function load(id,tier){
+  const key=id+'|'+tier,ik=[hash(DCO.body(id)),N,COLS,FPS,PPU[tier],key].join('|');
+  let rec=await idb.get(ik),bmp,h;
+  if(rec&&rec.blob){
+   try{bmp=await createImageBitmap(rec.blob);h=rec.h}catch(e){bmp=null}
+  }
+  if(!bmp){
+   const b=await bake(id,tier);
+   bmp=await createImageBitmap(b.cv);h=b.h;
+   persist(ik,b.cv,h);
+  }
+  const s={bmp,h,S:Math.round(bmp.width/COLS)};
+  sheets.set(key,s);
+  trim();
+  return s;
+ }
+
+ function trim(){
+  if(sheets.size<=KEEP)return;
+  const live=new Set([...visible].map(keyOf));
+  for(const [k,s] of sheets){
+   if(sheets.size<=KEEP)break;
+   if(live.has(k))continue;
+   sheets.delete(k);s.bmp.close();
+   for(const el of tracked)if(keyOf(el)===k){playing.delete(el);el._s=null;el.classList.remove('rdy')}
+  }
+ }
+
+ /* ---------- 4. play: one shared timer paints the current frame into every avatar ---------- */
+ const frameNow=()=>Math.floor(((performance.now()/1000)%LOOP)*FPS)%N;   // shared clock: every avatar stays in step
+ function paint(el,f){
+  const s=el._s,cv=el.firstElementChild;
+  if(!s||!cv)return;
+  const x=el._x||(el._x=cv.getContext('2d'));
+  x.clearRect(0,0,s.S,s.S);
+  x.drawImage(s.bmp,(f%COLS)*s.S,Math.floor(f/COLS)*s.S,s.S,s.S,0,0,s.S,s.S);
+ }
+ let raf=0,last=-1;
+ const DIO='IntersectionObserver'in window?new IntersectionObserver(es=>es.forEach(e=>{e.target._off=!e.isIntersecting;if(!e.target.isConnected)DIO.unobserve(e.target)}),{rootMargin:'60px'}):null;
+ function tick(){
+  raf=0;
+  if(!playing.size)return;
+  const f=frameNow();
+  if(f!==last){last=f;for(const el of playing)if(!el._off)paint(el,f)}
+  raf=requestAnimationFrame(tick);
+ }
+
+ function use(el,s,key,play){
+  sheets.delete(key);sheets.set(key,s);                           // mark as recently used
+  if(DIO&&!el._io){el._io=1;DIO.observe(el)}
+  const cv=el.firstElementChild;
+  if(el._s!==s){cv.width=cv.height=s.S;el._s=s;el._x=null}
+  el.style.setProperty('--h',s.h);
+  el.classList.add('rdy');
+  paint(el,play&&!REDUCED?frameNow():0);
+  if(play&&!REDUCED){playing.add(el);if(!raf)raf=requestAnimationFrame(tick)}
+  else playing.delete(el);
+ }
+
+ function fallback(el,id){                                        // last resort: the original live SVG
+  el.innerHTML=DCO.markup(id);
+  el.classList.add('rdy','fb');
+ }
+
+ function want(key,el){
+  if(!waiting.has(key))waiting.set(key,new Set());
+  waiting.get(key).add(el);
+  if(!queue.includes(key))queue.push(key);
+  pump();
+ }
+
+ async function pump(){
+  if(busy)return;
+  busy=true;
+  try{
+   while(queue.length){
+    const key=queue.pop();                                        // newest request first = what the person is looking at
+    const set=waiting.get(key);
+    if(!set)continue;
+    for(const el of set)if(!visible.has(el)||!el.isConnected)set.delete(el);
+    if(!set.size){waiting.delete(key);continue}
+    const [id,tier]=key.split('|');
+    let s=null;
+    try{s=sheets.get(key)||await load(id,tier)}catch(e){}
+    waiting.delete(key);
+    for(const el of set){
+     if(!el.isConnected||el.classList.contains('rdy'))continue;
+     if(s)use(el,s,key,visible.has(el));else fallback(el,id);
+    }
+    await yieldUI();
+   }
+  }finally{busy=false}
+ }
+
+ function show(el){
+  const key=keyOf(el),s=sheets.get(key);
+  if(s)use(el,s,key,true);else want(key,el);
+ }
+
+ /* ---------- 5. watch the page: new avatars get picked up, off-screen ones stop playing ---------- */
+ const io=new IntersectionObserver(list=>{
+  for(const e of list){
+   const el=e.target;
+   if(e.isIntersecting){visible.add(el);if(!el.classList.contains('fb')&&!playing.has(el))show(el)}
+   else{visible.delete(el);playing.delete(el)}
+  }
+ },{rootMargin:'160px'});
+
+ function track(el){
+  if(tracked.has(el))return;
+  tracked.add(el);
+  io.observe(el);
+  const s=sheets.get(keyOf(el));
+  if(s)use(el,s,keyOf(el),true);                                  // already baked: no flicker on re-render
+ }
+ function untrack(el){
+  if(!tracked.delete(el))return;
+  io.unobserve(el);visible.delete(el);playing.delete(el);
+ }
+ const each=(node,fn)=>{if(node.nodeType!==1)return;if(node.matches('.dcw'))fn(node);node.querySelectorAll('.dcw').forEach(fn)};
+
+ new MutationObserver(list=>{
+  for(const m of list){
+   m.removedNodes.forEach(n=>each(n,untrack));
+   m.addedNodes.forEach(n=>each(n,track));
+  }
+ }).observe(document.documentElement,{childList:true,subtree:true});
+ each(document.documentElement,track);
+
+ return{tracked:()=>tracked.size,visible:()=>visible.size,playing:()=>playing.size,sheets,constants:{LOOP,FPS,N,COLS,ROWS},load};
 })();
 
 /* ===== Cosmetics: collections, items, renderers (avatar decorations, profile effects, nameplates, frames, name styles) ===== */
@@ -1828,7 +2121,7 @@ const COLS=[
  ['cauldron','Cauldron Chaos','Brew trouble with glittering witch dust, bubbling potions and pointy hats.','linear-gradient(120deg,#0f1a3a,#2a0f55 55%,#0b3a2a)',1],
  ['allears','AllEars','Six breeds of ears, each with its own trimmings: a belled collar, a bushy tail, honey and bees, a fur ruff and jungle gold.','linear-gradient(120deg,#ffe3ef,#d8e8ff 60%,#fff1d6)',1],
  ['witching','Witching Hour','Moonlit nights, watchful eyes and a murder of crows.','linear-gradient(120deg,#05070d,#16222f 60%,#2b3a4a)',1],
- ['arcade','Retro Arcade','Insert coin. Pixel hearts, coins, crowns and glitchy neon.','linear-gradient(120deg,#1a0838,#3a0a6a 60%,#0a2a6a)',0],
+ ['arcade','Retro Arcade','Insert orb. Pixel hearts, orbs, crowns and glitchy neon.','linear-gradient(120deg,#1a0838,#3a0a6a 60%,#0a2a6a)',0],
  ['blossom','Blossom','Sakura wreaths, daisy chains, roses and butterflies.','linear-gradient(120deg,#ffd3e4,#ffb7d1 60%,#ffe3f0)',0],
  ['frost','Frostbite','Ice crowns, snowflakes, holly and twinkling lights.','linear-gradient(120deg,#0a1f3a,#1d4f8a 60%,#8fd8ff)',0],
  ['inferno','Inferno','Flames, horns, lava and crackling lightning.','linear-gradient(120deg,#2a0600,#8a1800 55%,#ff7a00)',0],
@@ -1883,7 +2176,7 @@ const COL=Object.fromEntries([...COLS,...FRAN.map(f=>[f.id,f.n,f.d,f.bg,0])].map
 const DECO_META={witch_dust:['Witch Dust',650,'cauldron'],witch_hat:['Witch Hat',800,'cauldron'],cauldron_brew:['Bubbling Cauldron',700,'cauldron'],broom_trail:['Broom Trail',650,'cauldron'],familiar:['The Familiar',700,'cauldron'],
  ears_cat:['Cat Ears',900,'allears'],ears_fox:['Fox Ears',900,'allears'],ears_bunny:['Bunny Ears',900,'allears'],ears_bear:['Bear Ears',900,'allears'],ears_wolf:['Wolf Ears',900,'allears'],ears_leopard:['Leopard Ears',950,'allears'],
  dark_moon:['Dark Moon',900,'witching'],dark_moon_crows:['Dark Moon Crows',900,'witching'],always_watching:['Always Watching',650,'witching'],moonlit_thorns:['Moonlit Thorns',750,'witching'],bat_swarm:['Bat Swarm',700,'witching'],
- pixel_hearts:['Pixel Hearts',600,'arcade'],pixel_crown:['8-Bit Crown',700,'arcade'],coin_collector:['Coin Collector',650,'arcade'],glitch_ring:['Glitch Ring',700,'arcade'],pixel_stars:['Pixel Stars',600,'arcade'],
+ pixel_hearts:['Pixel Hearts',600,'arcade'],pixel_crown:['8-Bit Crown',700,'arcade'],coin_collector:['Orb Collector',650,'arcade'],glitch_ring:['Glitch Ring',700,'arcade'],pixel_stars:['Pixel Stars',600,'arcade'],
  sakura_wreath:['Sakura Wreath',850,'blossom'],cherry_branch:['Cherry Branch',900,'blossom'],daisy_chain:['Daisy Chain',700,'blossom'],rose_garden:['Rose Garden',800,'blossom'],butterflies:['Butterflies',750,'blossom'],
  frost_ring:['Frostbite',850,'frost'],snowflakes:['Snowflakes',650,'frost'],holly_wreath:['Holly Wreath',750,'frost'],fairy_lights:['Fairy Lights',700,'frost'],ice_crown:['Ice Crown',900,'frost'],
  flame_ring:['Dragon Flames',900,'inferno'],ember_halo:['Ember Halo',700,'inferno'],devil_horns:['Devil Horns',750,'inferno'],lava_ring:['Lava Flow',800,'inferno'],lightning_ring:['Storm Surge',750,'inferno'],
@@ -2204,9 +2497,37 @@ const decRaw=u=>{const d=u?.decor||{};return{deco:IT[d.deco]?.k==='deco'?d.deco:
 /* the user's chosen Symbiote colour (u.syc) swaps their Symbiote pieces for the matching colourway */
 const decOf=u=>{const r=decRaw(u),c=u?.syc;if(c)for(const k in r){const v=r[k]&&IT[r[k]+'@'+c];if(v)r[k]=v.id}return r};
 const nstCls=u=>{const d=decOf(u).nst;return d?' nst nst-'+IT[d].key:''};
-const nplAttr=u=>{const d=decOf(u).npl;if(!d)return{c:'',s:''};const it=IT[d];return{c:' npl'+(it.an?' npl-'+it.an:''),s:` style="--np:${it.bg.replace(/"/g,'')}"`}};
+/* ===== nameplates v2: derive palette / glyph / motion / rarity tier from each plate, cached ===== */
+const NPX='<np-f><np-a></np-a><np-v></np-v><np-p></np-p><np-s></np-s><np-g></np-g><np-g class="b"></np-g></np-f>';
+const NPM=new Map(),NPG={cauldron:['✦','rise'],allears:['♥','drift'],witching:['☾','twk'],arcade:['■','fall'],blossom:['✿','fall'],frost:['❄','fall'],inferno:['✦','rise'],cosmic:['✦','twk'],neon:['◢','rise'],royal:['❦','twk'],sweet:['♥','rise'],nature:['❧','drift']},NPAM={rain:'fall',rise:'rise',drift:'drift',flicker:'rise'};
+function npPick(bg){
+ const re=/#([0-9a-f]{6})\b|#([0-9a-f]{3})\b|rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([.\d]+))?/gi,all=[];let m;
+ while((m=re.exec(bg))){let r,g,b;
+  if(m[1]){r=parseInt(m[1].slice(0,2),16);g=parseInt(m[1].slice(2,4),16);b=parseInt(m[1].slice(4),16)}
+  else if(m[2]){const h=m[2];r=parseInt(h[0]+h[0],16);g=parseInt(h[1]+h[1],16);b=parseInt(h[2]+h[2],16)}
+  else{if(m[6]!==undefined&&+m[6]<.4)continue;r=+m[3];g=+m[4];b=+m[5]}
+  r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;let h=0,s=0;
+  if(d){s=d/(1-Math.abs(2*l-1));h=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4;h*=60}
+  all.push({h,s,l,sc:s*(1-Math.abs(2*l-1))+(l>.08&&l<.96&&s>.2?1:0)})}
+ all.sort((a,b)=>b.sc-a.sc);const out=[];
+ for(const c of all){if(out.every(o=>{const d=Math.abs(o.h-c.h);return Math.min(d,360-d)>38}))out.push(c);if(out.length===3)break}
+ if(!out.length)out.push({h:205,s:.8,l:.6});
+ while(out.length<3){const b=out[out.length-1];out.push({h:(b.h+55)%360,s:b.s,l:b.l})}
+ return out.map(c=>`hsl(${Math.round(c.h)},${Math.round(Math.max(c.s,.6)*100)}%,${Math.round(Math.min(.72,Math.max(.58,c.l))*100)}%)`)}
+function nplMeta(it){let m=NPM.get(it.id);if(m)return m;
+ const cs=npPick(it.bg||''),g0=NPG[it.c]||[],fr=g0[0]?null:ITEMS.find(i=>i.k==='frm'&&i.c===it.c&&i.cr);
+ let h=7;for(const ch of it.id)h=(h*31+ch.charCodeAt(0))|0;
+ m={a:cs[0],b:cs[1],c:cs[2],g:String(g0[0]||fr?.cr||'✦').replace(/['"\\]/g,''),m:NPAM[it.an]||g0[1]||['rise','fall','drift','twk'][(h>>>3)%4],t:it.pr>=900?4:it.pr>=800?3:it.pr>=700?2:1,d:-((h>>>0)%47)/10};
+ NPM.set(it.id,m);return m}
+const nplCls=(it,sp)=>{const m=nplMeta(it);return` npl npl-${it.an||'none'} npm-${m.m} npt${m.t}${sp?' npspin':''}`};
+const nplSt=it=>{const m=nplMeta(it);return`--np:${String(it.bg).replace(/"/g,'')};--nc:${m.a};--nc2:${m.b};--nc3:${m.c};--ng:'${m.g}';--nd:${m.d}s`};
+const nplAttr=u=>{const d=decOf(u).npl;if(!d)return{c:'',s:'',x:''};const it=IT[d];return{c:nplCls(it),s:` style="${nplSt(it)}"`,x:NPX}};
+/* pause nameplate animations that are scrolled out of view */
+{const io='IntersectionObserver'in window?new IntersectionObserver(es=>es.forEach(e=>{const t=e.target;t.classList.toggle('npz',!e.isIntersecting);if(!t.isConnected)io.unobserve(t)}),{rootMargin:'80px'}):null;let q=0;
+ const scan=()=>{q=0;document.querySelectorAll('.npl:not([data-npo])').forEach(el=>{el.dataset.npo=1;io&&io.observe(el)})};
+ if(io)new MutationObserver(()=>{q||(q=requestAnimationFrame(scan))}).observe(document.body,{childList:true,subtree:true})}
 const frmStyle=id=>{const it=IT[id];return it?`--fb:${it.bd};--fg:${it.gl};--fc:'${it.cr||''}'`:''};
-function av(u,z=40,dot=1){const a=u?.av||{},dcI=decOf(u).deco,dc=dcI?IT[dcI].key:'',r={c:'50%',r:'30%',s:'8%'}[a.sh||'c'],mo=a.mo||'',cl=['av',mo&&'avm-'+mo,a.sp&&'avs-'+a.sp,a.ds&&'avd-'+a.ds,a.gl&&'avg-'+a.gl].filter(Boolean).join(' '),bg=a.img?`url(${a.img}) center/cover`:`linear-gradient(135deg,${a.c1||'#f00'},${a.c2||'#400'})`,face=a.img?'':esc((a.txt||u?.name||'?').slice(0,2)),inner=(mo==='spin')?`<b class="avf" style="background:${bg}">${face}</b>`:face;return `<span class="${cl}" style="width:${z}px;height:${z}px;border-radius:${r};font-size:${z*.4}px;${mo==='spin'?'':`background:${bg};`}${a.gl?`--g:${esc(a.gc||a.c1||'#fff')};`:''}">${inner}${dc?DCO.svg(dc):''}${dot?`<i class="dot ${st(u)}"></i>`:''}</span>`}
+function av(u,z=40,dot=1){const a=u?.av||{},dcI=decOf(u).deco,dc=dcI?IT[dcI].key:'',r={c:'50%',r:'30%',s:'8%'}[a.sh||'c'],mo=a.mo||'',cl=['av',mo&&'avm-'+mo,a.sp&&'avs-'+a.sp,a.ds&&'avd-'+a.ds,a.gl&&'avg-'+a.gl].filter(Boolean).join(' '),bg=a.img?`url(${a.img}) center/cover`:`linear-gradient(135deg,${a.c1||'#f00'},${a.c2||'#400'})`,face=a.img?'':esc((a.txt||u?.name||'?').slice(0,2)),inner=(mo==='spin')?`<b class="avf" style="background:${bg}">${face}</b>`:face;return `<span class="${cl}" style="width:${z}px;height:${z}px;border-radius:${r};font-size:${z*.4}px;${mo==='spin'?'':`background:${bg};`}${a.gl?`--g:${esc(a.gc||a.c1||'#fff')};`:''}">${inner}${dc?DCO.svg(dc,z):''}${dot?`<i class="dot ${st(u)}"></i>`:''}</span>`}
 const pfxCv=id=>id&&IT[id]?`<canvas class="pfx" data-pfx="${IT[id].key}"></canvas>`:'';
 
 /* ---- profile effect engine (one rAF loop, canvases found by class) ---- */
@@ -2234,8 +2555,9 @@ function pfxShape(x,sh,p,s,col,sp){
  if(sh==='snow'){x.lineWidth=1;x.beginPath();for(let i=0;i<3;i++){const a=i*1.047;x.moveTo(Math.cos(a)*s/2,Math.sin(a)*s/2);x.lineTo(-Math.cos(a)*s/2,-Math.sin(a)*s/2)}x.stroke();return}
  if(sh==='ghost'){x.beginPath();x.moveTo(-s/2,s/2);x.lineTo(-s/2,0);x.arc(0,0,s/2,Math.PI,0);x.lineTo(s/2,s/2);x.lineTo(s/4,s/3);x.lineTo(0,s/2);x.lineTo(-s/4,s/3);x.closePath();x.fill();x.fillStyle='#1a1a2a';x.fillRect(-s/4,-s/8,s/8,s/6);x.fillRect(s/8,-s/8,s/8,s/6);return}
  if(DCO.GP[sh]){x.scale(s/2,s/2);x.fill(pth(sh))}}
+const PFIO='IntersectionObserver'in window?new IntersectionObserver(es=>es.forEach(e=>{e.target._off=!e.isIntersecting;if(!e.target.isConnected)PFIO.unobserve(e.target)}),{rootMargin:'60px'}):null;
 function pfxTick(ts){
- document.querySelectorAll('canvas.pfx').forEach(cv=>{try{let st=PFX.get(cv);const key=cv.dataset.pfx;
+ document.querySelectorAll('canvas.pfx').forEach(cv=>{try{if(PFIO&&!cv._io){cv._io=1;PFIO.observe(cv)}if(cv._off)return;let st=PFX.get(cv);const key=cv.dataset.pfx;
   const it=IT['pe_'+key];if(!it||!it.sp){return}
   if(!st||st.key!==key||Math.abs((cv.clientWidth||0)-st.w)>8||Math.abs((cv.clientHeight||0)-st.h)>8){if(!cv.clientWidth)return;st=pfxInit(cv,it.sp);st.key=key;PFX.set(cv,st);st.once=!cv.closest('#pdm,#prf,.zmini,.pgi,.prvwrap,.bnp,.scp');if(st.once){const n=performance.now(),o=PFXT.get(key);st.t0=o&&n-o<15000?o:n;PFXT.set(key,st.t0)}}
   let fade=1;if(st.once){const age=(performance.now()-st.t0)/1000;if(age>=PFX_LIFE){if(!st.done){st.done=1;cv.getContext('2d').clearRect(0,0,cv.width,cv.height)}return}fade=age>PFX_LIFE-PFX_FADE?(PFX_LIFE-age)/PFX_FADE:1}
@@ -2262,8 +2584,8 @@ requestAnimationFrame(pfxTick);
 /* ---------- Discord-style extras ---------- */
 const JL=(k,d)=>{try{return JSON.parse(localStorage[k])||d}catch(e){return d}};
 const NK=JL('aura_nick',{}),dn=u=>NK[u?.id]||u?.name;
-const SET={sound:1,desk:0,h24:0,cmp:0,fs:14,fsn:14,fst:11,fsb:14,mem:1,lay:'classic',sep:'line',w1:270,w2:270,uz:100,atr:0,avm:1,...JL('aura_set',{})},svS=()=>{localStorage.aura_set=JSON.stringify(SET);fx();draw();drawMsgs()};
-const fx=()=>{document.documentElement.style.setProperty('--uz',Math.max(.5,Math.min(2,(+SET.uz||100)/100)));document.documentElement.classList.toggle('cmp',!!SET.cmp);['bubbles','minimal'].forEach(l=>document.documentElement.classList.toggle('lay-'+l,SET.lay===l));['dots','bold','none'].forEach(l=>document.documentElement.classList.toggle('sep-'+l,SET.sep===l));document.documentElement.style.setProperty('--w1',SET.w1+'px');document.documentElement.style.setProperty('--w2',SET.w2+'px');document.documentElement.style.setProperty('--fs',SET.fs+'px');['fsn','fst','fsb'].forEach(k=>document.documentElement.style.setProperty('--'+k,SET[k]+'px'));$('#app').classList.toggle('nomem',!SET.mem);document.documentElement.classList.toggle('noavm',!SET.avm)};
+const SET={sound:1,desk:0,h24:0,cmp:0,fs:14,fsn:14,fst:11,fsb:14,mem:1,lay:'classic',sep:'line',w1:270,w2:270,uz:100,atr:0,avm:1,orb:'sm',...JL('aura_set',{})},svS=()=>{localStorage.aura_set=JSON.stringify(SET);fx();draw();drawMsgs()};
+const fx=()=>{document.documentElement.style.setProperty('--uz',Math.max(.5,Math.min(2,(+SET.uz||100)/100)));document.documentElement.classList.toggle('cmp',!!SET.cmp);['bubbles','minimal'].forEach(l=>document.documentElement.classList.toggle('lay-'+l,SET.lay===l));['dots','bold','none'].forEach(l=>document.documentElement.classList.toggle('sep-'+l,SET.sep===l));document.documentElement.style.setProperty('--w1',SET.w1+'px');document.documentElement.style.setProperty('--w2',SET.w2+'px');document.documentElement.style.setProperty('--fs',SET.fs+'px');['fsn','fst','fsb'].forEach(k=>document.documentElement.style.setProperty('--'+k,SET[k]+'px'));$('#app').classList.toggle('nomem',!SET.mem);document.documentElement.classList.toggle('noavm',!SET.avm);document.documentElement.dataset.orb=SET.orb==='px'?'px':'sm'};
 let RDm=JL('aura_read',{}),MR=null,lty=0;const pl={};
 const rdS=id=>{RDm[id]=Date.now();localStorage.aura_read=JSON.stringify(RDm)},unr=r=>!!r&&r.last>(RDm[r.id]||0)&&r.lb!==S.me?.id&&S.sel?.id!==r.id;
 const ping=()=>{try{const c=new(window.AudioContext||webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.connect(g);g.connect(c.destination);o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1320,t+.09);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.start();o.stop(t+.3);setTimeout(()=>c.close(),500)}catch(e){}};
@@ -2365,15 +2687,15 @@ const AX={
  mt(){SET.mem=SET.mem?0:1;svS()},
  snd(){SET.sound=SET.sound?0:1;svS()},mepop(){const o=$('#mpop');if(o){o.remove();return}const m=S.me,g=m.id==='guest',bio=m.bio||'',up=$('#ubar .up'),uz=Math.max(.5,Math.min(2,(+SET.uz||100)/100)),r=up?up.getBoundingClientRect():{left:8,top:innerHeight-60},nm=nstCls(m).trim(),pf=pfOf(m),ci=(a,i,l,v,x)=>`<div class="ci" data-a="${a}"${v?` data-v="${v}"`:''}><span>${i}</span>${l}${x?`<b>›</b>`:''}</div>`,sts=[['online','on','Online'],['idle','idle','Idle'],['dnd','dnd','Do not disturb'],['invisible','off','Invisible']];
 const el=document.createElement('div');el.id='mpop';el.className='mpop';el.style.cssText=`zoom:${uz};left:${Math.max(6,r.left)/uz}px;bottom:${(innerHeight-r.top+8)/uz}px;--a:${pf.a}`;
-el.innerHTML=`<div class="mpt"><div class="mpa">${av(m,72)}</div>${m.activity?`<div class="tbub">${esc(m.activity)}</div>`:''}</div><div class="mps"><h3 class="${nm}">${esc(dn(m))}${bdH(m)}</h3><div class="sl2">${g?'Guest':esc(m.name)+'#'+esc(m.tag)}${m.pron?' &bull; '+esc(m.pron):''}</div>${bio?`<p>${esc(bio.length>110?bio.slice(0,110)+'…':bio)}</p>${bio.length>110?`<a class="vfb" data-a="vfb" data-v="${m.id}">View Full Bio</a>`:''}`:''}${folH(m)}</div><div class="cm">${g?'':ci('set',IK.pencil,'Edit Profile')}${g?'':ci('mpbub',IK.chat,'Thought bubble','',1)}<div class="mpx" id="mpbx" hidden><input class="in" id="mpi" maxlength="128" placeholder="What are you thinking?" value="${esc(m.activity||'')}"><div class="mpr"><small id="mpn">${(m.activity||'').length}/128</small><button class="btn sm" data-a="mpbs">Save</button></div></div>${ci('mpst',`<i class="dot ${st(m)}"></i>`,LBL[st(m)],'',1)}<div class="mpx" id="mpsx" hidden>${sts.map(([k,c,t])=>`<div class="ci" data-a="ss" data-v="${k}"><span><i class="sd ${c}"></i></span>${t}</div>`).join('')}</div>${g?'':`<div class="ci" data-a="shop"><span>${IK.tag}</span><em id="mpcv">Aura Coins</em><b>›</b></div>`}${S.admin?ci('adm',IK.shield,'Admin panel'):''}</div><div class="cm">${ci('out',IK.user,'Switch Accounts','',1)}${ci('cid',IK.copy,'Copy User ID',m.id)}</div>`;
+el.innerHTML=`<div class="mpt"><div class="mpa">${av(m,72)}</div>${m.activity?`<div class="tbub">${esc(m.activity)}</div>`:''}</div><div class="mps"><h3 class="${nm}">${esc(dn(m))}${bdH(m)}</h3><div class="sl2">${g?'Guest':esc(m.name)+'#'+esc(m.tag)}${m.pron?' &bull; '+esc(m.pron):''}</div>${bio?`<p>${esc(bio.length>110?bio.slice(0,110)+'…':bio)}</p>${bio.length>110?`<a class="vfb" data-a="vfb" data-v="${m.id}">View Full Bio</a>`:''}`:''}${folH(m)}</div><div class="cm">${g?'':ci('set',IK.pencil,'Edit Profile')}${g?'':ci('mpbub',IK.chat,'Thought bubble','',1)}<div class="mpx" id="mpbx" hidden><input class="in" id="mpi" maxlength="128" placeholder="What are you thinking?" value="${esc(m.activity||'')}"><div class="mpr"><small id="mpn">${(m.activity||'').length}/128</small><button class="btn sm" data-a="mpbs">Save</button></div></div>${ci('mpst',`<i class="dot ${st(m)}"></i>`,LBL[st(m)],'',1)}<div class="mpx" id="mpsx" hidden>${sts.map(([k,c,t])=>`<div class="ci" data-a="ss" data-v="${k}"><span><i class="sd ${c}"></i></span>${t}</div>`).join('')}</div>${g?'':`<div class="ci" data-a="shop"><span>${IK.tag}</span><em id="mpcv">Aura Orbs</em><b>›</b></div>`}${S.admin?ci('adm',IK.shield,'Admin panel'):''}</div><div class="cm">${ci('out',IK.user,'Switch Accounts','',1)}${ci('cid',IK.copy,'Copy User ID',m.id)}</div>`;
 document.body.appendChild(el);
-if(!g)B.get('wallets',m.id).then(w=>{const c=$('#mpcv');if(c&&w)c.textContent=(w.coins||0)+' Aura Coins'}).catch(()=>{})},
+if(!g)B.get('wallets',m.id).then(w=>{const c=$('#mpcv');if(c&&w)c.textContent=(w.coins||0)+' Aura Orbs'}).catch(()=>{})},
 mpst(){$('#mpsx')?.toggleAttribute('hidden')},
 mpbub(){const x=$('#mpbx');if(!x)return;x.toggleAttribute('hidden');if(!x.hidden)$('#mpi')?.focus()},
 mpbs(){const v=($('#mpi')?.value||'').trim().slice(0,128);B.patch('users',S.me.id,{activity:v});$('#mpop')?.remove();toast(v?'Thought bubble updated.':'Thought bubble cleared.')},
 stm(){modal(`<h3>Set status</h3>${[['online','<i class="sd on"></i>Online'],['idle','<i class="sd idle"></i>Idle'],['dnd','<i class="sd dnd"></i>Do not disturb'],['invisible','<i class="sd off"></i>Invisible']].map(([k,t])=>`<div class="row" data-a="ss" data-v="${k}">${t}</div>`).join('')}<label>Custom status</label><input class="in" id="cs" maxlength="128" placeholder="What are you up to?" value="${esc(S.me.activity||'')}"><div class="cbt"><button class="btn" data-a="scs">Save status</button>${S.me.id==='guest'?'':'<button class="btn g" data-a="set">Full profile</button>'}</div>`)},
  ss(v){B.patch('users',S.me.id,{status:v});A.close()},scs(){B.patch('users',S.me.id,{activity:$('#cs').value.trim().slice(0,128)});A.close()},
- cfg(){const t=(k,l)=>`<label class="tg"><input type="checkbox" data-s="${k}"${SET[k]?' checked':''}> ${l}</label>`;modal(`<h3>App settings</h3>${t('sound','Play a sound for new messages')}${t('desk','Desktop notifications')}${t('h24','24-hour clock')}${t('cmp','Compact message layout')}${t('mem','Show member list')}${t('avm','Animate profile pictures, decorations and effects')}${t('atr','Auto-translate messages (needs a recent Chrome)')}<div class="cbt" style="margin:12px 0 0"><button class="btn g sm" data-a="intro" data-v="0">Show the intro again</button></div><label>Layout style</label><select class="in" data-sel="lay">${['classic','bubbles','minimal'].map(v=>`<option value="${v}"${SET.lay===v?' selected':''}>${v[0].toUpperCase()+v.slice(1)}</option>`).join('')}</select><label>Chat separators</label><select class="in" data-sel="sep">${[['line','Lines'],['dots','Dotted'],['bold','Bold'],['none','Minimal']].map(([v,l])=>`<option value="${v}"${SET.sep===v?' selected':''}>${l}</option>`).join('')}</select><label>App scale (<b id="uzv">${SET.uz||100}</b>%)</label><input type="range" min="50" max="200" step="5" data-s="uz" value="${SET.uz||100}" style="width:100%" title="Double-click to reset"><label>Left panel width</label><input type="range" min="160" max="640" data-s="w1" value="${SET.w1}" style="width:100%"><label>Member panel width</label><input type="range" min="160" max="640" data-s="w2" value="${SET.w2}" style="width:100%"><label>Message text size</label><input type="range" min="12" max="20" data-s="fs" value="${SET.fs}" style="width:100%"><label>Username size</label><input type="range" min="11" max="22" data-s="fsn" value="${SET.fsn}" style="width:100%"><label>Timestamp size</label><input type="range" min="9" max="16" data-s="fst" value="${SET.fst}" style="width:100%"><label>Profile bio size</label><input type="range" min="11" max="20" data-s="fsb" value="${SET.fsb}" style="width:100%"><h3 style="margin-top:18px">Themes</h3><div class="cbt"><button class="btn g sm" data-a="themes">Browse themes</button><button class="btn g sm" data-a="imp" data-v="t">Import themes</button></div><h3 style="margin-top:18px">Admin access</h3>${S.admin?'<small>Admin tools are unlocked. Open the Admin button in the left bar.</small>':'<div class="cbt"><input class="in" id="adc" type="password" placeholder="Admin code" style="flex:1"><button class="btn sm" data-a="unlock">Unlock</button></div>'}<h3 style="margin-top:18px">Shortcuts and formatting</h3><div class="kb">Ctrl+K quick switcher<br>Enter send, Shift+Enter new line<br>Up arrow in an empty box edits your last message<br>Esc cancels reply or edit<br>@ mentions, : emoji, /shrug /tableflip /unflip /me /spoiler<br>Paste or drop an image to attach it<br>**bold** *italic* __underline__ ~~strike~~ ||spoiler|| \`code\` &gt; quote</div><div class="cbt"><button class="btn" data-a="close">Done</button></div>`)},
+ cfg(){const t=(k,l)=>`<label class="tg"><input type="checkbox" data-s="${k}"${SET[k]?' checked':''}> ${l}</label>`;modal(`<h3>App settings</h3>${t('sound','Play a sound for new messages')}${t('desk','Desktop notifications')}${t('h24','24-hour clock')}${t('cmp','Compact message layout')}${t('mem','Show member list')}${t('avm','Animate profile pictures, decorations and effects')}${t('atr','Auto-translate messages (needs a recent Chrome)')}<div class="cbt" style="margin:12px 0 0"><button class="btn g sm" data-a="intro" data-v="0">Show the intro again</button></div><label>Layout style</label><select class="in" data-sel="lay">${['classic','bubbles','minimal'].map(v=>`<option value="${v}"${SET.lay===v?' selected':''}>${v[0].toUpperCase()+v.slice(1)}</option>`).join('')}</select><label>Chat separators</label><select class="in" data-sel="sep">${[['line','Lines'],['dots','Dotted'],['bold','Bold'],['none','Minimal']].map(([v,l])=>`<option value="${v}"${SET.sep===v?' selected':''}>${l}</option>`).join('')}</select><label>Orb style</label><select class="in" data-sel="orb">${[['sm','Smooth'],['px','Pixelated']].map(([v,l])=>`<option value="${v}"${(SET.orb||'sm')===v?' selected':''}>${l}</option>`).join('')}</select><div style="margin:8px 0 0;display:flex;align-items:center"><span class="cn big"></span><small style="opacity:.6">Shown wherever Aura Orbs appear.</small></div><label>App scale (<b id="uzv">${SET.uz||100}</b>%)</label><input type="range" min="50" max="200" step="5" data-s="uz" value="${SET.uz||100}" style="width:100%" title="Double-click to reset"><label>Left panel width</label><input type="range" min="160" max="640" data-s="w1" value="${SET.w1}" style="width:100%"><label>Member panel width</label><input type="range" min="160" max="640" data-s="w2" value="${SET.w2}" style="width:100%"><label>Message text size</label><input type="range" min="12" max="20" data-s="fs" value="${SET.fs}" style="width:100%"><label>Username size</label><input type="range" min="11" max="22" data-s="fsn" value="${SET.fsn}" style="width:100%"><label>Timestamp size</label><input type="range" min="9" max="16" data-s="fst" value="${SET.fst}" style="width:100%"><label>Profile bio size</label><input type="range" min="11" max="20" data-s="fsb" value="${SET.fsb}" style="width:100%"><h3 style="margin-top:18px">Themes</h3><div class="cbt"><button class="btn g sm" data-a="themes">Browse themes</button><button class="btn g sm" data-a="imp" data-v="t">Import themes</button></div><h3 style="margin-top:18px">Admin access</h3>${S.admin?'<small>Admin tools are unlocked. Open the Admin button in the left bar.</small>':'<div class="cbt"><input class="in" id="adc" type="password" placeholder="Admin code" style="flex:1"><button class="btn sm" data-a="unlock">Unlock</button></div>'}<h3 style="margin-top:18px">Shortcuts and formatting</h3><div class="kb">Ctrl+K quick switcher<br>Enter send, Shift+Enter new line<br>Up arrow in an empty box edits your last message<br>Esc cancels reply or edit<br>@ mentions, : emoji, /shrug /tableflip /unflip /me /spoiler<br>Paste or drop an image to attach it<br>**bold** *italic* __underline__ ~~strike~~ ||spoiler|| \`code\` &gt; quote</div><div class="cbt"><button class="btn" data-a="close">Done</button></div>`)},
  acp(v){acp(+v)}};
 
 /* ---------- Firebase backend ---------- */
@@ -2465,7 +2787,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)beat()});
 function watch(){const s=new Set([S.me.id,...(S.me.friends||[]),...(S.me.incoming||[]),...(S.me.outgoing||[])]);S.rooms.forEach(r=>(r.members||[]).forEach(m=>s.add(m)));S.srv.forEach(r=>(r.members||[]).forEach(m=>s.add(m)));S.msgs.forEach(m=>s.add(m.u));const a=[...s].slice(0,150),k=a.join();if(k===wk)return;wk=k;uw();uw=B.sub('users',a,m=>{Object.assign(S.U,m);draw();drawMsgs()})}
 function open(sel){if(S.sel)S.dft[S.sel.id]=$('#tx').value;S.sel=sel;S.th=null;S.msgs=[];S.snap=1;S.rep=S.ed=null;S.img='';S.rdAt=RDm[sel.id]||0;S.botT=Date.now();S.botD=new Set();rdS(sel.id);cm();cm=B.sub('msgs',sel.id,m=>{S.msgs=m;watch();drawMsgs();botRun();if(typeof appRun==='function')appRun()},tkO(sel));$('#app').classList.add('chat');$('#tx').value=S.dft[sel.id]||'';rbar();draw();drawMsgs();$('#tx').focus()}
 const dmId=u=>'dm_'+[S.me.id,u].sort().join('_');
-const urow=(i,k,r)=>{const u=S.U[i]||{name:'Loading',tag:''};return `<div class="row${S.sel?.uid===i?' on':''}${unr(r)?' un':''}${nplAttr(u).c}" data-a="${k==='f'?'dm':'card'}" data-v="${i}"${nplAttr(u).s}>${av(u,36)}<div class="gr"><b class="${nstCls(u).trim()}">${esc(dn(u))}</b><small>${esc(r?.lx||u.activity||LBL[st(u)])}</small></div>${unr(r)?'<i class="ub">•</i>':''}${k==='in'?`<button class="btn sm" data-a="acc" data-v="${i}">Accept</button><button class="btn g sm" data-a="dec" data-v="${i}">Decline</button>`:k==='out'?`<button class="btn g sm" data-a="can" data-v="${i}">Cancel</button>`:''}</div>`};
+const urow=(i,k,r)=>{const u=S.U[i]||{name:'Loading',tag:''};return `<div class="row${S.sel?.uid===i?' on':''}${unr(r)?' un':''}${nplAttr(u).c}" data-a="${k==='f'?'dm':'card'}" data-v="${i}"${nplAttr(u).s}>${nplAttr(u).x}${av(u,36)}<div class="gr"><b class="${nstCls(u).trim()}">${esc(dn(u))}</b><small>${esc(r?.lx||u.activity||LBL[st(u)])}</small></div>${unr(r)?'<i class="ub">•</i>':''}${k==='in'?`<button class="btn sm" data-a="acc" data-v="${i}">Accept</button><button class="btn g sm" data-a="dec" data-v="${i}">Decline</button>`:k==='out'?`<button class="btn g sm" data-a="can" data-v="${i}">Cancel</button>`:''}</div>`};
 const rrow=(r,j)=>`<div class="row${S.sel?.id===r.id?' on':''}${unr(r)?' un':''}" data-a="${j?'room':'join'}" data-v="${r.id}">${ric(r,'#')}<div class="gr"><b>${esc(r.name)}</b><small>${esc(r.topic||(r.members||[]).length+' members')}</small></div>${unr(r)?'<i class="ub">•</i>':''}${j?'':'<button class="btn sm">Join</button>'}</div>`;
 const credit='<div class="credit">Made by Aaron<small>blah blah blah blah blah blah blah blah.</small></div>';
 function draw(){if(!S.me)return;vpSync();const un=S.rooms.filter(unr).length+(S.me.incoming||[]).length;document.title=(un?`(${un}) `:'')+'Aura Chat';rail();list();side();$('#mh').innerHTML=mh()}
@@ -2480,7 +2802,7 @@ function list(){const m=S.me,old=$('#fi'),ov=old&&old.value,of=old&&document.act
   h=`<div class="lh"><b>Group chats</b><button class="btn sm" data-a="newgroup">New group</button></div><div class="sc">${gs.map(r=>`<div class="row${S.sel?.id===r.id?' on':''}${unr(r)?' un':''}" data-a="grp" data-v="${r.id}">${ric(r,esc((r.name||'G')[0].toUpperCase()))}<div class="gr"><b>${esc(r.name)}</b><small>${(r.members||[]).length} members</small></div>${unr(r)?'<i class="ub">•</i>':''}</div>`).join('')||'<div class="empty">No group chats yet. Create one with your friends.</div>'}</div>`}
  else if(S.sec==='server')h=srvList();
  const sy=$('#list .sc')?.scrollTop||0;if(S.sec!=='server'){const mk=(on,a,v,t,i,c)=>`<button class="nv${on?' on':''}" data-a="${a}"${v?` data-v="${v}"`:''}>${i}<span>${t}</span>${c?`<span class="nb">${c}</span>`:''}</button>`,kk=f=>S.rooms.filter(f).filter(unr).length,nn=(m.incoming||[]).length;h=`<button class="qf" data-a="qs">Find or start a conversation</button><div class="dnav">${mk(S.sec==='home'&&S.fv,'friends','','Friends',IK.home,nn+kk(r=>r.type==='dm'))}${mk(S.sec==='rooms','sec','rooms','Rooms',IK.hash,kk(r=>r.type==='room'))}${mk(S.sec==='groups','sec','groups','Groups',IK.users,kk(r=>r.type==='group'))}${mk(0,'themes','','Themes',IK.palette)}${mk(0,'shop','','Shop',IK.tag)}</div>`+h}$('#list').innerHTML=h+credit;$('#ubar').innerHTML=upanel();const sc=$('#list .sc');if(sc)sc.scrollTop=sy;const fi=$('#fi');if(fi){fi.value=ov||'';if(of)fi.focus()}}
-const mrow=u=>`<div class="row${nplAttr(u).c}" data-a="card" data-v="${u.id}"${nplAttr(u).s}>${av(u,34)}<div class="gr"><b class="${nstCls(u).trim()}" style="${rCol(SC(),u.id)?'color:'+rCol(SC(),u.id):''}">${esc(dn(u))}${rtag(u.id)}${rPills(SC(),u.id)}${bdH(u)}${u.mock?'<span class="mock-tag">Sample</span>':''}</b><small>${esc(u.activity||LBL[st(u)])}</small></div></div>`;
+const mrow=u=>`<div class="row${nplAttr(u).c}" data-a="card" data-v="${u.id}"${nplAttr(u).s}>${nplAttr(u).x}${av(u,34)}<div class="gr"><b class="${nstCls(u).trim()}" style="${rCol(SC(),u.id)?'color:'+rCol(SC(),u.id):''}">${esc(dn(u))}${rtag(u.id)}${rPills(SC(),u.id)}${bdH(u)}${u.mock?'<span class="mock-tag">Sample</span>':''}</b><small>${esc(u.activity||LBL[st(u)])}</small></div></div>`;
 function side(){const s=S.sel;let h;
  if(S.sec==='server'&&!(s&&s.sid)){h=memH(SRV())}else if(!s||s.kind==='dm'){const u=s?S.U[s.uid]:S.me;h=u?`<div class="sc">${card(u)}</div>`:''}
  else{const us=memU(CTX()),o=us.filter(on),f=us.filter(u=>!on(u));
@@ -2501,7 +2823,7 @@ function drawMsgs(){const el=$('#ml'),s=S.sel;if(!s){el.innerHTML='<div class="e
   const x=m.x||'',big=jumbo(x),img=m.im||(/^(https:\/\/|data:image\/)/.test(m.gif||m.img||'')?(m.gif||m.img):'')||(x.match(/https?:\/\/\S+\.(?:png|jpe?g|gif|webp)(?:\?\S*)?/i)||[])[0],full=new Date(m.t).toLocaleString(),
   rp=m.rp?`<div class="rp" data-a="jmp" data-v="${m.rp.id}">${av(S.U[m.rp.u]||{name:'User'},16,0)} <b>${esc(S.U[m.rp.u]?.name||'User')}</b> ${esc(m.rp.x)}</div>`:'',
   rx=Object.entries(m.rx||{}).filter(([,a])=>a.length).map(([e,a])=>`<button class="rx${a.includes(me.id)?' me':''}" data-a="rx" data-v="${m.id}|${e}" title="${esc(a.map(i=>S.U[i]?.name||'User').join(', '))}">${emHtml(e)} ${a.length}</button>`).join(''),
-  tb=`<div class="tb"><button data-a="pk" data-v="${m.id}" title="Add reaction">${IK.smile}</button><button data-a="rpl" data-v="${m.id}" title="Reply">${IK.reply}</button>${m.u===me.id&&!m.mock?`<button data-a="edt" data-v="${m.id}" title="Edit">${IK.pencil}</button>`:''}${m.x&&TRS()?`<button data-a="trn" data-v="${m.id}" title="Translate">${IK.globe}</button>`:''}${gifOf(m)?`<button data-a="mfav" data-v="${m.id}" title="Save GIF to favorites">${IK.star}</button>`:''}${m.x?`<button data-a="quo" data-v="${m.id}" title="Quote">&#10077;</button><button data-a="cpy" data-v="${m.id}" title="Copy text">${IK.copy}</button>`:''}<button data-a="pin" data-v="${m.id}" title="${m.pin?'Unpin':'Pin'}">${IK.pin}</button>${m.u===me.id||isOwn?`<button data-a="del" data-v="${m.id}" title="Delete">${IK.trash}</button>`:''}</div>`;
+  tb=`<div class="tb"><button data-a="pk" data-v="${m.id}" title="Add reaction">${IK.smile}</button><button data-a="rpl" data-v="${m.id}" title="Reply">${IK.reply}</button>${m.u===me.id&&!m.mock?`<button data-a="edt" data-v="${m.id}" title="Edit">${IK.pencil}</button>`:''}${m.x&&TRS()?`<button data-a="trn" data-v="${m.id}" title="Translate">${IK.globe}</button>`:''}${gifOf(m)?`<button data-a="mfav" data-v="${m.id}" title="Save GIF to favorites">${IK.star}</button>`:''}${m.x?`<button data-a="quo" data-v="${m.id}" title="Quote">&#10077;</button><button data-a="cpm" data-v="${m.id}" title="Copy text">${IK.copy}</button>`:''}<button data-a="pin" data-v="${m.id}" title="${m.pin?'Unpin':'Pin'}">${IK.pin}</button>${m.u===me.id||isOwn?`<button data-a="del" data-v="${m.id}" title="Delete">${IK.trash}</button>`:''}</div>`;
   h+=`<div class="m${c?' c':''}${m.u!==me.id&&MM.test(x)?' mn':''}" data-mid="${m.id}">${tb}${c?`<span class="ts" title="${full}">${new Date(m.t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:!SET.h24})}</span>`:`<span data-a="card" data-v="${aid}" style="cursor:pointer">${av(u,38,0)}</span>`}<div>${m.pin?'<div class="pn">'+IK.pin+' Pinned</div>':''}${m.ans?'<div class="pn">'+IK.ok+' Official answer</div>':''}${m.post?`<div class="pt">${esc(m.post.t)}</div>`:''}${rp}${c?'':`<div class="mt"><b class="${nstCls(u).trim()}" data-a="card" data-v="${aid}" style="color:${rCol(CTX(),aid)||pfOf(u).a}">${m.bot?''+IK.bot+' '+esc(m.n):m.mock?esc(m.n):esc(dn(u)||m.n)}</b>${m.mock?'<span class="mock-tag">Sample</span>':''}${m.bot?'':bdH(u)}<small title="${full}">${tm(m.t)}</small></div>`}${x?`<div class="x${big?' big':''}">${md(x)}${m.ed?` <span class="ed" title="${m.ed>1e9?'Edited '+new Date(m.ed).toLocaleString():'Edited'}">(edited)</span>`:''}</div>`:''}${m.poll?pollH(m):''}${m.comp&&typeof compH==='function'?compH(m):''}${m.file?fileH(m):''}${m.au&&okAu(m.au)?`<div class="vm"><audio controls preload="none" src="${m.au}"></audio><div class="tr">${m.tr?''+IK.doc+' '+esc(m.tr):'No transcript available'}</div></div>`:''}${TRN[m.id]?`<div class="tr">${IK.globe} ${esc(TRN[m.id])}</div>`:''}${m.st?stickerH(m.st):''}${img?`<img class="em" src="${esc(img)}" loading="lazy" referrerpolicy="no-referrer" data-a="img" alt="image">`:''}${rx?`<div class="rxs">${rx}<button class="rx" data-a="pk" data-v="${m.id}">+</button></div>`:''}</div></div>`});
  el.innerHTML=h||'<div class="empty">No messages yet. Say hello.</div>';if(near||S.snap)el.scrollTop=el.scrollHeight;S.snap=0;
  const lt=S.msgs.length?S.msgs[S.msgs.length-1].t:0;if(!document.hidden&&lt>(RDm[s.id]||0)){rdS(s.id);draw()}typ();cmp();if(SET.atr&&TRS())S.msgs.slice(-40).forEach(trans)}
@@ -3068,10 +3390,10 @@ Object.assign(A,{
  async aresign(){if(!confirm('Step down as admin? You will lose your admin access and level.'))return;await B.del('adminClaims',S.me.id);S.admin=false;S.alv=0;A.close();draw();toast('You are no longer an admin.')},
  async setmp(){const p=$('#amp').value.trim();if(p.length<8)return toast('Use at least 8 characters.');await B.patch('adminConfig','mod',{code:p});$('#amp').value='';toast('Moderator password updated.')},
  async shop(){S.wal={coins:0,owned:[],eq:{},...((await B.get('wallets',S.me.id).catch(()=>null))||{})};shopm()},
- async sbuy(id){const d=DEC[id],w=S.wal;if(!d||w.owned.includes(id)||w.coins<d[3])return toast('Not enough Aura Coins.');const n={coins:w.coins-d[3],owned:[...w.owned,id]};await B.patch('wallets',S.me.id,n);S.wal={...w,...n};toast('Bought '+d[2]+'.');shopm()},
+ async sbuy(id){const d=DEC[id],w=S.wal;if(!d||w.owned.includes(id)||w.coins<d[3])return toast('Not enough Aura Orbs.');const n={coins:w.coins-d[3],owned:[...w.owned,id]};await B.patch('wallets',S.me.id,n);S.wal={...w,...n};toast('Bought '+d[2]+'.');shopm()},
  async seq(v){const[id,on]=v.split('|'),d=DEC[id];if(!d||!S.wal.owned.includes(id))return;const eq={...S.wal.eq,[d[1]]:on==='1'?id:''};await B.patch('wallets',S.me.id,{eq});await B.patch('users',S.me.id,{decor:eq});S.wal.eq=eq;shopm()},
  async cfind(){const v=$('#cfu').value.trim(),i=v.lastIndexOf('#');if(i<1)return toast('Enter a name and tag like Sam#1234.');const u=await B.find(v.slice(0,i),v.slice(i+1));if(!u)return toast('No user found.');S.cu=u;S.cw={coins:0,owned:[],eq:{},...((await B.get('wallets',u.id).catch(()=>null))||{})};admm()},
- async csend(v){const u=S.cu,w=S.cw,n=Math.floor(+$('#cam').value);if(!u||!(n>0)||n>Math.min(100000,apl().coin)||!aperm('coins'))return toast('Enter an amount from 1 to '+Math.min(100000,apl().coin)+'.');const c=Math.min(1000000,Math.max(0,w.coins+(v==='-'?-n:n)));await B.patch('wallets',u.id,{coins:c,owned:w.owned||[],eq:w.eq||{}});S.cw={...w,coins:c};toast((v==='-'?'Took ':'Sent ')+n+' Aura Coins.');admm()},
+ async csend(v){const u=S.cu,w=S.cw,n=Math.floor(+$('#cam').value);if(!u||!(n>0)||n>Math.min(100000,apl().coin)||!aperm('coins'))return toast('Enter an amount from 1 to '+Math.min(100000,apl().coin)+'.');const c=Math.min(1000000,Math.max(0,w.coins+(v==='-'?-n:n)));await B.patch('wallets',u.id,{coins:c,owned:w.owned||[],eq:w.eq||{}});S.cw={...w,coins:c};toast((v==='-'?'Took ':'Sent ')+n+' Aura Orbs.');admm()},
  async alv(v){if(!aperm('admins'))return;const[i,d]=v.split('|'),x=(S.adl||[]).find(y=>y.id===i);if(!x)return;const n=(x.level||3)+ +d;if(n<1||n>=S.alv||(x.level||3)>=S.alv)return;await B.patch('adminClaims',i,{level:n});await loadAdm();admm()},
  async arem(i){if(!aperm('admins'))return;const x=(S.adl||[]).find(y=>y.id===i);if(!x||(x.level||3)>=S.alv)return;if(!confirm('Remove this admin? Their one-time code is already used, so it cannot be reused.'))return;await B.del('adminClaims',i);await loadAdm();admm()},
  async bfind(){const v=$('#bfu').value.trim(),i=v.lastIndexOf('#');if(i<1)return toast('Enter a name and tag like Sam#1234.');const u=await B.find(v.slice(0,i),v.slice(i+1));if(!u)return toast('No user found.');S.bu=u;admm()},
@@ -3082,15 +3404,15 @@ Object.assign(A,{
 document.addEventListener('input',e=>{const t=e.target,k=t.dataset?.cf;if(k&&S.chd)S.chd[k]=t.type==='checkbox'?t.checked:t.value});
 document.addEventListener('change',e=>{const t=e.target,k=t.dataset?.cf;if(k&&S.chd&&t.type==='checkbox')S.chd[k]=t.checked});
 function shopm(){const w=S.wal,prev=d=>d[1]==='frame'?av({...S.me,decor:{frame:d[0]}},38,0):d[1]==='fx'?`<span class="bn ${d[5]}" style="display:inline-block;width:64px;height:30px;border-radius:6px;flex:none;${bnS(S.me)}"></span>`:`<b class="${d[5]}" style="--a:${(S.me.th||{}).a||'#f00'}">${esc(S.me.name)}</b>`,
- mk=d=>{const[id,sl,nm,pr]=d,own=w.owned.includes(id),on=w.eq[sl]===id;return`<div class="row" style="cursor:default"><span style="min-width:70px;display:inline-flex;justify-content:center">${prev(d)}</span><div class="gr"><b>${nm}</b><small>${own?(on?'Equipped':'Owned'):pr+' Aura Coins'}</small></div>${own?`<button class="btn ${on?'g':''} sm" data-a="seq" data-v="${id}|${on?0:1}">${on?'Unequip':'Equip'}</button>`:`<button class="btn sm" data-a="sbuy" data-v="${id}"${w.coins<pr?' disabled style="opacity:.5"':''}>Buy</button>`}</div>`};
- modal(`<h3>Profile shop</h3><div class="gl">Your balance: <b>${w.coins} Aura Coins</b></div><small style="opacity:.6">Aura Coins are given out by admins.</small>${[['frame','Avatar frames'],['fx','Banner effects'],['nm','Name styles']].map(([k,l])=>`<div class="gl">${l}</div>${DECOR.filter(d=>d[1]===k).map(mk).join('')}`).join('')}<div class="cbt" style="margin-top:14px"><button class="btn g" data-a="close">Close</button></div>`)}
-function coinTab(){const u=S.cu,w=S.cw;return`<small style="opacity:.6">Only admins with the Send Aura Coins ability can send them. Your limit is ${apl().coin} per send.</small><label>Find a user</label><div class="cbt"><input class="in" id="cfu" placeholder="Name#1234" style="flex:1"><button class="btn sm" data-a="cfind">Find</button></div>${u?`<div class="row" style="cursor:default">${av(u,34,0)}<div class="gr"><b>${esc(u.name)}</b><small>#${esc(u.tag)} &middot; ${w.coins} coins</small></div></div><label>Amount</label><input class="in" id="cam" type="number" min="1" max="100000" value="100"><div class="cbt"><button class="btn" data-a="csend" data-v="+">Send coins</button><button class="btn g" data-a="csend" data-v="-">Take coins</button></div>`:''}`}
+ mk=d=>{const[id,sl,nm,pr]=d,own=w.owned.includes(id),on=w.eq[sl]===id;return`<div class="row" style="cursor:default"><span style="min-width:70px;display:inline-flex;justify-content:center">${prev(d)}</span><div class="gr"><b>${nm}</b><small>${own?(on?'Equipped':'Owned'):pr+' Aura Orbs'}</small></div>${own?`<button class="btn ${on?'g':''} sm" data-a="seq" data-v="${id}|${on?0:1}">${on?'Unequip':'Equip'}</button>`:`<button class="btn sm" data-a="sbuy" data-v="${id}"${w.coins<pr?' disabled style="opacity:.5"':''}>Buy</button>`}</div>`};
+ modal(`<h3>Profile shop</h3><div class="gl">Your balance: <b>${w.coins} Aura Orbs</b></div><small style="opacity:.6">Aura Orbs are given out by admins.</small>${[['frame','Avatar frames'],['fx','Banner effects'],['nm','Name styles']].map(([k,l])=>`<div class="gl">${l}</div>${DECOR.filter(d=>d[1]===k).map(mk).join('')}`).join('')}<div class="cbt" style="margin-top:14px"><button class="btn g" data-a="close">Close</button></div>`)}
+function coinTab(){const u=S.cu,w=S.cw;return`<small style="opacity:.6">Only admins with the Send Aura Orbs ability can send them. Your limit is ${apl().coin} per send.</small><label>Find a user</label><div class="cbt"><input class="in" id="cfu" placeholder="Name#1234" style="flex:1"><button class="btn sm" data-a="cfind">Find</button></div>${u?`<div class="row" style="cursor:default">${av(u,34,0)}<div class="gr"><b>${esc(u.name)}</b><small>#${esc(u.tag)} &middot; ${w.coins} coins</small></div></div><label>Amount</label><input class="in" id="cam" type="number" min="1" max="100000" value="100"><div class="cbt"><button class="btn" data-a="csend" data-v="+">Send orbs</button><button class="btn g" data-a="csend" data-v="-">Take orbs</button></div>`:''}`}
 const LVN={1:'Helper',2:'Moderator',3:'Admin',4:'Senior Admin',5:'Owner'};
 async function loadAdm(){await loadRC();await loadDeals();try{const[a,c,bn]=await Promise.all([B.list('adminClaims'),aperm('acodes')?B.list('adminCodes'):[],aperm('aban')?B.list('adminBans'):[]]);S.abn=bn;S.adl=a.sort((x,y)=>(y.level||3)-(x.level||3));S.acl=c.sort((x,y)=>(y.t||0)-(x.t||0)).slice(0,30);await Promise.all([...S.adl.map(x=>x.id),...S.acl.map(x=>x.usedBy).filter(Boolean),...bn.map(x=>x.id)].map(async i=>{if(!S.U[i]){const u=await B.get('users',i).catch(()=>null);if(u)S.U[i]=u}}))}catch(e){S.adl=[];S.acl=[]}}
 /* ===== admin levels: level 5 decides what levels 1-4 are, can do and are limited to; shop deals are set by admins ===== */
 const AGR=[
  {id:'users',t:'Users and badges',d:'Recognize people on their profiles.',p:[['badges','Give and remove badges'],['usrtools','Reset themes and clear profiles']]},
- {id:'eco',t:'Economy',d:'Aura Coins and shop pricing.',p:[['coins','Send Aura Coins'],['ctake','Take Aura Coins'],['deals','Set shop discounts and timers'],['gifts','Grant and take shop items']]},
+ {id:'eco',t:'Economy',d:'Aura Orbs and shop pricing.',p:[['coins','Send Aura Orbs'],['ctake','Take Aura Orbs'],['deals','Set shop discounts and timers'],['gifts','Grant and take shop items']]},
  {id:'com',t:'Communities',d:'Servers and official support.',p:[['servers','Mark servers official'],['help','Create the Help Desk']]},
  {id:'dev',t:'Developers',d:'Apps and announcements.',p:[['apps','Approve and reject apps'],['tiers','Change app tiers'],['log','Post to the changelog']]},
  {id:'staff',t:'Admin management',d:'Only ever applies to admins below your own level.',p:[['acodes','Create and revoke one-time codes'],['arank','Change rank and access'],['akick','Remove admins'],['aban','Ban and unban from admin access'],['audit','View the activity log']]},
@@ -3127,7 +3449,7 @@ const adOk=s=>s[3]===undefined?true:s[3]==='l5'?(S.alv||0)>=5:Array.isArray(s[3]
 const adn=i=>esc(S.U[i]?.name||i),adEl=()=>{let e=$('#adp');if(!e){document.body.insertAdjacentHTML('beforeend','<div id="adp" hidden></div>');e=$('#adp')}return e};
 function adAsk(msg,fn){S.acf=fn;modal(`<h3>Please confirm</h3><p style="margin:0 0 4px">${msg}</p><div class="cbt"><button class="btn g" data-a="close">Cancel</button><button class="btn" data-a="acy">Confirm</button></div>`)}
 function adGroups(pre,perms,mine,L,lm){const dis=mine.length?'':' disabled';return AGR.map(g=>{const ks=g.p.map(x=>x[0]),on=ks.filter(k=>perms.includes(k)).length;
- const lim=g.id==='eco'?`<div class="alim"><div><label>Coins per action</label><input class="in" type="number" min="0" max="${lm.coin}" id="${pre}_lc" value="${L.coin}"${dis}></div><div><label>Max discount %</label><input class="in" type="number" min="0" max="${lm.deal}" id="${pre}_ld" value="${L.deal}"${dis}></div><div><label>Longest timer (days, 0 = none)</label><input class="in" type="number" min="0" max="${lm.days||365}" id="${pre}_ly" value="${L.days}"${dis}></div></div>`:'';
+ const lim=g.id==='eco'?`<div class="alim"><div><label>Orbs per action</label><input class="in" type="number" min="0" max="${lm.coin}" id="${pre}_lc" value="${L.coin}"${dis}></div><div><label>Max discount %</label><input class="in" type="number" min="0" max="${lm.deal}" id="${pre}_ld" value="${L.deal}"${dis}></div><div><label>Longest timer (days, 0 = none)</label><input class="in" type="number" min="0" max="${lm.days||365}" id="${pre}_ly" value="${L.days}"${dis}></div></div>`:'';
  return`<div class="agc"><div class="agh"><div><b>${g.t}</b><small>${g.d}</small></div><span class="agn">${on}/${ks.length}</span>${mine.length?`<button class="btn g sm" data-a="agall" data-v="${pre}|${g.id}|1">All</button><button class="btn g sm" data-a="agall" data-v="${pre}|${g.id}|0">None</button>`:''}</div>${g.p.map(([k,l])=>{const ok=mine.includes(k);return`<label class="agt${ok||!mine.length?'':' off'}"><span>${l}${mine.length&&!ok?'<small>You do not have this ability</small>':''}</span><input type="checkbox" class="sw" id="${pre}_${k}"${perms.includes(k)?' checked':''}${ok?'':' disabled'}></label>`}).join('')}${lim}</div>`}).join('')}
 function adCount(){document.querySelectorAll('#adp .agc').forEach(g=>{const n=g.querySelector('.agn');if(n){const a=[...g.querySelectorAll('.agt .sw')];n.textContent=a.filter(c=>c.checked).length+'/'+a.length}})}
 function adSync(){const fp=$('#ae_fp'),r=document.querySelector('[name=ae_lv]:checked');if(!fp||!r)return;const own=adOwn(),pc=rcOf(+r.value),f=fp.checked;ALLP().forEach(k=>{const c=$('#ae_'+k);if(!c)return;if(f)c.checked=pc.p.includes(k);c.disabled=f||!own.includes(k)});Object.entries({lc:'coin',ld:'deal',ly:'days'}).forEach(([a,b])=>{const c=$('#ae_'+a);if(!c)return;if(f)c.value=pc.l[b];c.disabled=f});adCount()}
@@ -3136,9 +3458,9 @@ function adEdit(x){const me=S.alv,lv=x.level||3,self=x.id===S.me.id,can=aperm('a
 const adSrv=()=>{const q=(S.asq||'').toLowerCase();return(S.pubS||[]).filter(s=>!q||(s.name||'').toLowerCase().includes(q)).map(s=>`<div class="row" style="cursor:default"><div class="gr"><b>${s.official?'<i class="ofc">'+IK.check+'</i> ':''}${esc(s.name)}</b><small>${(s.members||[]).length} members</small></div><button class="btn ${s.official?'g':''} sm" data-a="sofc" data-v="${s.id}">${s.official?'Remove official':'Make official'}</button></div>`).join('')||'<div class="empty">No servers found.</div>'};
 const gh=t=>`<div class="gl" style="padding-left:0">${t}</div>`,fnd=(id,a,ph)=>`<div class="cbt" style="margin:0 0 12px"><input class="in" id="${id}" placeholder="${ph}" style="flex:1" autocomplete="off"><button class="btn sm" data-a="${a}">Find</button></div>`;
 const ADV={
-home(){const me=S.alv,mine=adOwn(),l=apl();return`<p class="sub">You are level ${me}. Your access comes from groups of abilities, not a single title.</p><div class="adk"><div class="adt2"><b>${(S.adl||[]).length}</b><small>Admins</small></div><div class="adt2"><b>${(S.revApps||[]).length}</b><small>Apps awaiting review</small></div><div class="adt2"><b>${Object.keys(DL).filter(id=>IT[id]&&dp(IT[id])).length}</b><small>Active shop deals</small></div>${aperm('aban')?`<div class="adt2"><b>${(S.abn||[]).length}</b><small>Banned from admin</small></div>`:''}</div>${gh('Your access')}${AGR.map(g=>`<div class="agc"><div class="agh"><div><b>${g.t}</b></div></div>${g.p.map(([k,t])=>`<span class="ach${mine.includes(k)?'':' x'}">${t}</span>`).join('')}</div>`).join('')}<small style="opacity:.6">Limits: ${l.coin} coins per action, up to ${l.deal}% off, ${l.days?'timers up to '+l.days+' days':'no timer limit'}.</small>`},
+home(){const me=S.alv,mine=adOwn(),l=apl();return`<p class="sub">You are level ${me}. Your access comes from groups of abilities, not a single title.</p><div class="adk"><div class="adt2"><b>${(S.adl||[]).length}</b><small>Admins</small></div><div class="adt2"><b>${(S.revApps||[]).length}</b><small>Apps awaiting review</small></div><div class="adt2"><b>${Object.keys(DL).filter(id=>IT[id]&&dp(IT[id])).length}</b><small>Active shop deals</small></div>${aperm('aban')?`<div class="adt2"><b>${(S.abn||[]).length}</b><small>Banned from admin</small></div>`:''}</div>${gh('Your access')}${AGR.map(g=>`<div class="agc"><div class="agh"><div><b>${g.t}</b></div></div>${g.p.map(([k,t])=>`<span class="ach${mine.includes(k)?'':' x'}">${t}</span>`).join('')}</div>`).join('')}<small style="opacity:.6">Limits: ${l.coin} orbs per action, up to ${l.deal}% off, ${l.days?'timers up to '+l.days+' days':'no timer limit'}.</small>`},
 badges(){const u=S.bu,bs=u?.badges||[];return`<p class="sub">Badges show on a person's profile.</p>${fnd('bfu','bfind','Name#1234')}${u?`<div class="agc"><div class="row" style="cursor:default">${av(u,40,0)}<div class="gr"><b>${esc(u.name)}</b><small>#${esc(u.tag)}</small></div></div>${Object.entries(BADGES).map(([k,[i,n,d]])=>`<label class="agt"><span>${i} <b>${n}</b><small>${d}</small></span><input type="checkbox" class="sw" id="bd_${k}"${bs.includes(k)?' checked':''}></label>`).join('')}<label>Organization (Authorized Representative)</label><input class="in" id="bdo" maxlength="40" value="${esc(u.badgeOrg||'')}"><div class="cbt"><button class="btn" data-a="bsave">Save badges</button></div></div>`:''}`},
-coins(){const u=S.cu,w=S.cw,L=apl(),mx=Math.min(100000,L.coin);return`<p class="sub">Find a person, then adjust their balance. Your limit is ${mx} coins per action.</p>${fnd('cfu','cfind','Name#1234')}${u?`<div class="agc"><div class="row" style="cursor:default">${av(u,40,0)}<div class="gr"><b>${esc(u.name)}</b><small>#${esc(u.tag)}</small></div><div style="text-align:right"><b style="color:#fff;font-size:20px">${w.coins}</b><small style="display:block;opacity:.6">Aura Coins</small></div></div><label>Amount</label><input class="in" id="cam" type="number" min="1" max="${mx}" value="${Math.min(100,mx)}"><div class="cbt">${[10,100,1000,mx].filter((x,i,a)=>x>0&&x<=mx&&a.indexOf(x)===i).map(x=>`<button class="btn g sm" data-a="camq" data-v="${x}">${x===mx?'Max':x}</button>`).join('')}</div><div class="cbt">${aperm('coins')?'<button class="btn" data-a="csend" data-v="+">Send coins</button>':''}${aperm('ctake')?'<button class="btn g" data-a="csend" data-v="-">Take coins</button>':''}</div></div>`:''}`},
+coins(){const u=S.cu,w=S.cw,L=apl(),mx=Math.min(100000,L.coin);return`<p class="sub">Find a person, then adjust their balance. Your limit is ${mx} orbs per action.</p>${fnd('cfu','cfind','Name#1234')}${u?`<div class="agc"><div class="row" style="cursor:default">${av(u,40,0)}<div class="gr"><b>${esc(u.name)}</b><small>#${esc(u.tag)}</small></div><div style="text-align:right"><b style="color:#fff;font-size:20px">${w.coins}</b><small style="display:block;opacity:.6">Aura Orbs</small></div></div><label>Amount</label><input class="in" id="cam" type="number" min="1" max="${mx}" value="${Math.min(100,mx)}"><div class="cbt">${[10,100,1000,mx].filter((x,i,a)=>x>0&&x<=mx&&a.indexOf(x)===i).map(x=>`<button class="btn g sm" data-a="camq" data-v="${x}">${x===mx?'Max':x}</button>`).join('')}</div><div class="cbt">${aperm('coins')?'<button class="btn" data-a="csend" data-v="+">Send orbs</button>':''}${aperm('ctake')?'<button class="btn g" data-a="csend" data-v="-">Take orbs</button>':''}</div></div>`:''}`},
 deals(){return`<div class="agc">${dealsTab()}</div>`},
 servers(){return`<p class="sub">An Official badge marks a recognized community. It does not verify every member.</p><input class="in" id="asq" placeholder="Search public servers" value="${esc(S.asq||'')}" autocomplete="off" style="margin-bottom:10px"><div id="asl">${adSrv()}</div>`},
 help(){const h=(S.pubS||[]).find(s=>s.id==='helpdesk');return`<p class="sub">Official support for members.</p><div class="agc">${h?'<p>The official Help Desk exists. Members can find it in Discover.</p><div class="cbt"><button class="btn" data-a="adsrv" data-v="helpdesk">Open Help Desk</button></div>':'<p>Create the official Aura Help Desk with a Q&A channel and a private ticket channel. You will own it, and admins can answer questions everywhere.</p><div class="cbt"><button class="btn" data-a="mkhelp">Create Help Desk</button></div>'}</div>`},
@@ -3175,7 +3497,7 @@ async rcode(c){if(!aperm('acodes'))return;await B.del('adminCodes',c);await load
 async rsave(v){if((S.alv||0)<5)return;const lv=+v;if(!RDEF[lv])return;const cl=(id,m)=>Math.max(0,Math.min(m,Math.floor(+$('#'+id).value||0)));S.rc={...(S.rc||{}),[lv]:{v:2,n:($('#pr_n').value.trim()||RDEF[lv].n).slice(0,20),p:ALLP().filter(k=>$('#pr_'+k).checked),l:{coin:cl('pr_lc',100000),deal:cl('pr_ld',100),days:cl('pr_ly',365)}}};await B.patch('adminConfig','levels',{roles:S.rc});syncLvn();toast('Level '+lv+' preset saved.');admm()},
 async rreset(v){if((S.alv||0)<5)return;const lv=+v;if(!RDEF[lv])return;S.rc={...(S.rc||{}),[lv]:{v:2,n:RDEF[lv].n,p:[...RDEF[lv].p],l:{...RDEF[lv].l}}};await B.patch('adminConfig','levels',{roles:S.rc});syncLvn();toast('Level '+lv+' reset.');admm()},
 aresign(){adAsk('Step down as admin? You will lose your admin access and level.',async()=>{await B.del('adminClaims',S.me.id);S.admin=false;S.alv=0;S.myc=null;$('#adp').hidden=true;draw();toast('You are no longer an admin.')})},
-async csend(v){const u=S.cu,w=S.cw,mx=Math.min(100000,apl().coin),n=Math.floor(+$('#cam').value);if(!u||!(n>0)||n>mx||!aperm(v==='-'?'ctake':'coins'))return toast('Enter an amount from 1 to '+mx+'.');const c=Math.min(1000000,Math.max(0,w.coins+(v==='-'?-n:n)));await B.patch('wallets',u.id,{coins:c,owned:w.owned||[],eq:w.eq||{}});S.cw={...w,coins:c};toast((v==='-'?'Took ':'Sent ')+n+' Aura Coins.');admm()}});
+async csend(v){const u=S.cu,w=S.cw,mx=Math.min(100000,apl().coin),n=Math.floor(+$('#cam').value);if(!u||!(n>0)||n>mx||!aperm(v==='-'?'ctake':'coins'))return toast('Enter an amount from 1 to '+mx+'.');const c=Math.min(1000000,Math.max(0,w.coins+(v==='-'?-n:n)));await B.patch('wallets',u.id,{coins:c,owned:w.owned||[],eq:w.eq||{}});S.cw={...w,coins:c};toast((v==='-'?'Took ':'Sent ')+n+' Aura Orbs.');admm()}});
 
 /* ===== extra admin tools: default theme, announcement, user tools, item grants, activity log ===== */
 document.head.insertAdjacentHTML('beforeend','<style>#annc{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:9998;max-width:min(640px,92vw);display:flex;gap:12px;align-items:center;padding:10px 14px;border-radius:12px;background:rgba(0,0,0,.88);border:1px solid var(--accent,#f00);color:#fff;font-size:14px;box-shadow:0 6px 30px rgba(0,0,0,.5)}#annc button{background:none;border:0;color:#fff;font-size:20px;cursor:pointer;line-height:1;opacity:.7}</style>');
@@ -3262,45 +3584,510 @@ function vpSync(){if(B.name!=='Firebase'||!B.raw)return;const{F,db}=B.raw,want=n
 let vpT=0;const vpDraw=()=>{clearTimeout(vpT);vpT=setTimeout(()=>{if(S.sec==='server')draw()},120)};
 const vpList=ch=>{const now=Date.now(),sv=SRV(ch.server||S.cur)||{},real=(VP[ch.id]||[]).filter(p=>now-(p.hb||p.t||0)<75000).sort((a,b)=>(a.t||0)-(b.t||0)).map(p=>({id:p.id,u:S.U[p.id]||{name:p.name||'User'},mute:!!p.mute,cam:!!p.cam})),mk=((sv.mockv||{})[ch.id]||[]).map((id,i)=>{const m=(sv.mockm||[]).find(x=>x.id===id);return m&&{id,u:{...m,mock:1},mute:i%2===1,cam:false}}).filter(Boolean);return[...real,...mk]};
 const vpH=ch=>{const l=vpList(ch);return l.length?`<div class="vcl">${l.map(p=>`<div class="vcu" data-a="card" data-v="${esc(p.id)}">${av(p.u,22,0)}<b>${esc(dn(p.u)||'User')}</b>${p.cam?IK.video:''}${p.mute?IK.micoff:''}</div>`).join('')}</div>`:''};
-const CALL={room:null,P:{},streams:{},local:null,subs:[],mini:false},ICEC={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
-const callOK=()=>{if(B.name!=='Firebase'||!B.raw){toast('Calls need the Firebase connection (not local demo mode).');return false}if(!navigator.mediaDevices||!window.RTCPeerConnection){toast('This browser does not support calls.');return false}return true};
-const callB=()=>'<button class="btn g sm" data-a="vcall" data-v="a" title="Voice call">'+IK.phone+'</button><button class="btn g sm" data-a="vcall" data-v="v" title="Video call">'+IK.video+'</button>';
-async function callJoin(room,video,ring,label){if(S.me&&S.me.id==='guest')return toast('The Guest account cannot chat or call.');if(CALL.room)return toast('You are already in a call.');if(!callOK())return;const{F,db}=B.raw,me=S.me.id;
- try{CALL.local=await navigator.mediaDevices.getUserMedia({audio:true,video:video?{width:640,height:360}:false})}catch(e){if(video){try{CALL.local=await navigator.mediaDevices.getUserMedia({audio:true});video=false;toast('Camera unavailable, joining with audio only.')}catch(e2){return toast('Microphone access was blocked.')}}else return toast('Microphone access was blocked.')}
- Object.assign(CALL,{room,vid:video,mute:false,cam:video,mini:false,t:Date.now(),P:{},streams:{},label:label||'Call',subs:[]});
- const peers=F.collection(db,'calls',room,'peers'),sig=F.collection(db,'calls',room,'sig');
- try{for(const f of ['from','to']){const old=await F.getDocs(F.query(sig,F.where(f,'==',me)));old.docs.forEach(d=>F.deleteDoc(d.ref))}await F.setDoc(F.doc(peers,me),{name:S.me.name,t:CALL.t,hb:Date.now(),mute:false,cam:!!video});if(ring&&ring.length)await F.setDoc(F.doc(db,'calls',room),{ring,host:me,hn:S.me.name,type:video?'video':'voice',t:Date.now(),label:label||''},{merge:true})}catch(e){toast('Could not start the call. Check your Firestore rules.');return callLeave()}
- CALL.subs.push(F.onSnapshot(peers,s=>{s.docChanges().forEach(ch=>{const id=ch.doc.id;if(id===me)return;const d=ch.doc.data();if(ch.type==='removed'){callDrop(id);return}if(!CALL.P[id]&&d.t<CALL.t&&Date.now()-d.t<432e5)callPeer(id,true)})}));
- CALL.subs.push(F.onSnapshot(F.query(sig,F.where('to','==',me)),s=>s.docChanges().forEach(ch=>{if(ch.type!=='removed')callSig(ch.doc.data())})));
- CALL.hbt=setInterval(()=>callFlags(),20000);
- CALL.tick=setInterval(()=>{const e=$('#ctm');if(e){const s=(Date.now()-CALL.t)/1e3|0;e.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}},1000);
- callUI()}
-function callPeer(id,init){const{F,db}=B.raw,me=S.me.id,sig=F.collection(db,'calls',CALL.room,'sig'),pc=new RTCPeerConnection(ICEC),P=CALL.P[id]={pc,seen:0,rd:false};
- CALL.local.getTracks().forEach(t=>pc.addTrack(t,CALL.local));
- pc.ontrack=e=>{CALL.streams[id]=e.streams[0];callUI()};
- pc.onicecandidate=e=>{if(e.candidate)F.setDoc(F.doc(sig,me+'_'+id),{from:me,to:id,ice:F.arrayUnion(JSON.stringify(e.candidate))},{merge:true}).catch(()=>{})};
- pc.onconnectionstatechange=()=>{if(['failed','closed'].includes(pc.connectionState))callDrop(id)};
- if(init)(async()=>{try{const o=await pc.createOffer();await pc.setLocalDescription(o);await F.setDoc(F.doc(sig,me+'_'+id),{from:me,to:id,kind:'offer',sdp:o.sdp},{merge:true})}catch(e){}})();
- callUI();return P}
-async function callSig(d){const{F,db}=B.raw,me=S.me.id,id=d.from;if(!CALL.room)return;let P=CALL.P[id];
- try{if(d.kind==='offer'&&!P){P=callPeer(id,false);await P.pc.setRemoteDescription({type:'offer',sdp:d.sdp});P.rd=true;const a=await P.pc.createAnswer();await P.pc.setLocalDescription(a);await F.setDoc(F.doc(F.collection(db,'calls',CALL.room,'sig'),me+'_'+id),{from:me,to:id,kind:'answer',sdp:a.sdp},{merge:true})}
- else if(d.kind==='answer'&&P&&!P.rd&&P.pc.signalingState==='have-local-offer'){await P.pc.setRemoteDescription({type:'answer',sdp:d.sdp});P.rd=true}
- if(P&&P.rd&&Array.isArray(d.ice)){while(P.seen<d.ice.length){try{await P.pc.addIceCandidate(JSON.parse(d.ice[P.seen]))}catch(e){}P.seen++}}}catch(e){}}
-function callFlags(){if(!CALL.room||!B.raw)return;const{F,db}=B.raw;F.setDoc(F.doc(db,'calls',CALL.room,'peers',S.me.id),{hb:Date.now(),mute:!!CALL.mute,cam:!!CALL.cam},{merge:true}).catch(()=>{})}
-function callDrop(id){const P=CALL.P[id];if(P){try{P.pc.close()}catch(e){}}delete CALL.P[id];delete CALL.streams[id];callUI()}
-async function callLeave(){const{F,db}=B.raw||{},me=S.me?.id,room=CALL.room;CALL.subs.forEach(u=>u());clearInterval(CALL.tick);clearInterval(CALL.hbt);Object.keys(CALL.P).forEach(id=>{try{CALL.P[id].pc.close()}catch(e){}});CALL.local?.getTracks().forEach(t=>t.stop());Object.assign(CALL,{room:null,P:{},streams:{},local:null,subs:[]});callUI();
- if(room&&F){try{await F.deleteDoc(F.doc(db,'calls',room,'peers',me));for(const f of ['from','to']){const sg=await F.getDocs(F.query(F.collection(db,'calls',room,'sig'),F.where(f,'==',me)));sg.docs.forEach(d=>F.deleteDoc(d.ref))}await F.setDoc(F.doc(db,'calls',room),{ring:[]},{merge:true})}catch(e){}}}
-function callUI(){let el=$('#call');if(!CALL.room){el&&el.remove();return}
- if(!el){el=document.createElement('div');el.id='call';el.innerHTML='<div class="cbar"><b id="clb"></b><span id="ctm">0:00</span></div><div class="cgrid"></div><div class="cctl"><div class="cg"><button data-a="cmute" id="cbm" title="Mute">'+IK.mic+'</button><button data-a="ccam" id="cbc" title="Camera">'+IK.video+'</button></div><div class="cg"><button data-a="cmini" id="cbx" title="Minimize">⤡</button></div><button data-a="cend" class="end" title="Leave call">'+IK.phone+'</button></div>';document.body.appendChild(el);dragCall(el)}
- el.className=CALL.mini?'mini':'full';$('#clb').textContent=CALL.label;$('#cbm').innerHTML=CALL.mute?IK.micoff:IK.mic;$('#cbc').innerHTML=CALL.cam?IK.video:IK.videooff;$('#cbx').textContent=CALL.mini?'⤢':'⤡';$('#cbx').title=CALL.mini?'Expand':'Minimize';$('#cbm').classList.toggle('off',!!CALL.mute);$('#cbc').classList.toggle('off',!CALL.cam);
- const g=el.querySelector('.cgrid'),ids=['me',...Object.keys(CALL.P)],want=new Set(ids);[...g.children].forEach(c=>{if(!want.has(c.dataset.t))c.remove()});
- ids.forEach(id=>{let t=g.querySelector(`[data-t="${id}"]`);if(!t){t=document.createElement('div');t.className='ct';t.dataset.t=id;t.innerHTML='<video autoplay playsinline></video><div class="cav"></div><span class="nm"></span>';g.appendChild(t)}
-  const v=t.querySelector('video'),st=id==='me'?CALL.local:CALL.streams[id],u=id==='me'?S.me:S.U[id];if(v.srcObject!==st)v.srcObject=st||null;v.muted=id==='me';
-  const hv=!!st&&st.getVideoTracks().some(x=>x.enabled&&x.readyState==='live');t.classList.toggle('nov',!hv);t.querySelector('.cav').innerHTML=av(u||{name:'?'},CALL.mini?44:96,0);t.querySelector('.nm').textContent=id==='me'?'You':(dn(u)||'Connecting...')});
- g.dataset.n=ids.length}
-function dragCall(el){const h=el.querySelector('.cbar');let d=null;h.onpointerdown=e=>{if(!CALL.mini)return;const r=el.getBoundingClientRect();d={x:e.clientX-r.left,y:e.clientY-r.top};h.setPointerCapture(e.pointerId)};h.onpointermove=e=>{if(!d)return;el.style.left=Math.max(0,Math.min(innerWidth-el.offsetWidth,e.clientX-d.x))+'px';el.style.top=Math.max(0,Math.min(innerHeight-el.offsetHeight,e.clientY-d.y))+'px';el.style.right='auto';el.style.bottom='auto'};h.onpointerup=()=>{d=null}}
-function callIn(r){const me=S.me.id,c=r.find(x=>(x.ring||[]).includes(me)&&x.host!==me&&Date.now()-(x.t||0)<6e4);let e=$('#cring');if(!c||CALL.room){e&&e.remove();return}if(e&&e.dataset.id===c.id)return;e&&e.remove();e=document.createElement('div');e.id='cring';e.dataset.id=c.id;e.innerHTML=`<b>${esc(c.hn||'Someone')}</b> is calling you<small>${c.type==='video'?'Video call':'Voice call'}${c.label?' · '+esc(c.label):''}</small><div class="cbt"><button class="btn" data-a="cacc" data-v="${esc(c.id)}|${c.type}">Accept</button><button class="btn g" data-a="cdec" data-v="${esc(c.id)}">Decline</button></div>`;document.body.appendChild(e);if(SET.sound)ping()}
-function bootC(){S.scl=B.sub('calls',S.me.id,callIn)}
+/* ===================================================================
+   CALLS
+   =================================================================== */
+
+const CALL = {
+  room: null,
+  P: {},
+  streams: {},
+  local: null,
+  subs: [],
+  mini: false
+};
+
+const ICEC = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+  ]
+};
+
+
+const callOK = () => {
+  if (B.name !== 'Firebase' || !B.raw) {
+    toast('Calls need the Firebase connection (not local demo mode).');
+    return false;
+  }
+
+  if (!navigator.mediaDevices || !window.RTCPeerConnection) {
+    toast('This browser does not support calls.');
+    return false;
+  }
+
+  return true;
+};
+
+
+const callB = () =>
+  '<button class="btn g sm" data-a="vcall" data-v="a" title="Voice call">' + IK.phone + '</button>' +
+  '<button class="btn g sm" data-a="vcall" data-v="v" title="Video call">' + IK.video + '</button>';
+
+
+
+/* ---------- joining ---------- */
+
+/* wrapper stops a double tap from joining the same call twice */
+async function callJoin(room, video, ring, label) {
+  if (S.me && S.me.id === 'guest') return toast('The Guest account cannot chat or call.');
+  if (CALL.room || CALL.joining) return toast('You are already in a call.');
+  if (!callOK()) return;
+
+  CALL.joining = true;
+
+  try {
+    await callStart(room, video, ring, label);
+  } finally {
+    CALL.joining = false;
+  }
+}
+
+
+async function callStart(room, video, ring, label) {
+  const { F, db } = B.raw;
+  const me = S.me.id;
+
+  /* microphone (and camera for video calls); fall back to audio only */
+  const audio = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+
+  try {
+    CALL.local = await navigator.mediaDevices.getUserMedia({
+      audio,
+      video: video ? { width: { ideal: 640 }, height: { ideal: 360 }, facingMode: 'user' } : false
+    });
+  } catch (e) {
+    if (!video) return toast('Microphone access was blocked.');
+
+    try {
+      CALL.local = await navigator.mediaDevices.getUserMedia({ audio });
+      video = false;
+      toast('Camera unavailable, joining with audio only.');
+    } catch (e2) {
+      return toast('Microphone access was blocked.');
+    }
+  }
+
+  Object.assign(CALL, {
+    room,
+    vid: video,
+    mute: false,
+    cam: video,
+    mini: false,
+    t: Date.now(),
+    P: {},
+    streams: {},
+    label: label || 'Call',
+    subs: []
+  });
+
+  const peers = F.collection(db, 'calls', room, 'peers');
+  const sig = F.collection(db, 'calls', room, 'sig');
+
+  try {
+    /* clear out anything left over from an earlier call */
+    for (const f of ['from', 'to']) {
+      const old = await F.getDocs(F.query(sig, F.where(f, '==', me)));
+      old.docs.forEach(d => F.deleteDoc(d.ref));
+    }
+
+    await F.setDoc(F.doc(peers, me), {
+      name: S.me.name,
+      t: CALL.t,
+      hb: Date.now(),
+      mute: false,
+      cam: !!video
+    });
+
+    if (ring && ring.length) {
+      await F.setDoc(F.doc(db, 'calls', room), {
+        ring,
+        host: me,
+        hn: S.me.name,
+        type: video ? 'video' : 'voice',
+        t: Date.now(),
+        label: label || ''
+      }, { merge: true });
+    }
+  } catch (e) {
+    toast('Could not start the call. Check your Firestore rules.');
+    return callLeave();
+  }
+
+  /* people in the call */
+  CALL.subs.push(F.onSnapshot(peers, s => {
+    s.docChanges().forEach(ch => {
+      const id = ch.doc.id;
+      if (id === me) return;
+
+      const d = ch.doc.data();
+
+      if (ch.type === 'removed') {
+        callDrop(id);
+        return;
+      }
+
+      /* only call people who were here first and are still alive */
+      const alive = Date.now() - (d.hb || d.t || 0) < 75000;
+
+      if (!CALL.P[id] && d.t < CALL.t && alive) callPeer(id, true);
+    });
+  }));
+
+  /* connection messages sent to me */
+  CALL.subs.push(F.onSnapshot(F.query(sig, F.where('to', '==', me)), s => {
+    s.docChanges().forEach(ch => {
+      if (ch.type !== 'removed') callSig(ch.doc.data());
+    });
+  }));
+
+  CALL.hbt = setInterval(() => {
+    callFlags();
+    callSweep();
+  }, 20000);
+
+  CALL.tick = setInterval(() => {
+    const e = $('#ctm');
+    if (!e) return;
+
+    const s = (Date.now() - CALL.t) / 1e3 | 0;
+    e.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }, 1000);
+
+  callUI();
+}
+
+
+
+/* ---------- one connection per person ---------- */
+
+function callPeer(id, init) {
+  const { F, db } = B.raw;
+  const me = S.me.id;
+  const sig = F.collection(db, 'calls', CALL.room, 'sig');
+  const pc = new RTCPeerConnection(ICEC);
+  const P = CALL.P[id] = { pc, seen: 0, rd: false, busy: false, last: null, born: Date.now() };
+
+  CALL.local.getTracks().forEach(t => pc.addTrack(t, CALL.local));
+
+  pc.ontrack = e => {
+    CALL.streams[id] = e.streams[0];
+    callUI();
+  };
+
+  pc.onicecandidate = e => {
+    if (!e.candidate) return;
+
+    F.setDoc(F.doc(sig, me + '_' + id), {
+      from: me,
+      to: id,
+      ice: F.arrayUnion(JSON.stringify(e.candidate))
+    }, { merge: true }).catch(() => {});
+  };
+
+  pc.onconnectionstatechange = () => {
+    if (['failed', 'closed'].includes(pc.connectionState)) callDrop(id);
+  };
+
+  if (init) {
+    (async () => {
+      try {
+        const o = await pc.createOffer();
+        await pc.setLocalDescription(o);
+
+        await F.setDoc(F.doc(sig, me + '_' + id), {
+          from: me,
+          to: id,
+          kind: 'offer',
+          sdp: o.sdp
+        }, { merge: true });
+      } catch (e) {}
+    })();
+  }
+
+  callUI();
+  return P;
+}
+
+
+async function callSig(d) {
+  const { F, db } = B.raw;
+  const me = S.me.id;
+  const id = d.from;
+
+  if (!CALL.room) return;
+
+  let P = CALL.P[id];
+  if (P) P.last = d;
+
+  try {
+    if (d.kind === 'offer' && !P) {
+      P = callPeer(id, false);
+      P.last = d;
+
+      await P.pc.setRemoteDescription({ type: 'offer', sdp: d.sdp });
+      P.rd = true;
+
+      const a = await P.pc.createAnswer();
+      await P.pc.setLocalDescription(a);
+
+      await F.setDoc(F.doc(F.collection(db, 'calls', CALL.room, 'sig'), me + '_' + id), {
+        from: me,
+        to: id,
+        kind: 'answer',
+        sdp: a.sdp
+      }, { merge: true });
+
+    } else if (d.kind === 'answer' && P && !P.rd && P.pc.signalingState === 'have-local-offer') {
+      await P.pc.setRemoteDescription({ type: 'answer', sdp: d.sdp });
+      P.rd = true;
+    }
+
+    callIce(P);
+  } catch (e) {}
+}
+
+
+/* adds every network candidate we have received, including ones that arrived mid-handshake */
+async function callIce(P) {
+  if (!P || !P.rd || P.busy) return;
+
+  P.busy = true;
+
+  try {
+    while (P.last && Array.isArray(P.last.ice) && P.seen < P.last.ice.length) {
+      try {
+        await P.pc.addIceCandidate(JSON.parse(P.last.ice[P.seen]));
+      } catch (e) {}
+
+      P.seen++;
+    }
+  } finally {
+    P.busy = false;
+  }
+}
+
+
+/* drop anyone who never managed to connect */
+function callSweep() {
+  Object.keys(CALL.P).forEach(id => {
+    const P = CALL.P[id];
+
+    if (P.pc.connectionState !== 'connected' && Date.now() - P.born > 60000) callDrop(id);
+  });
+}
+
+
+function callFlags() {
+  if (!CALL.room || !B.raw) return;
+
+  const { F, db } = B.raw;
+
+  F.setDoc(F.doc(db, 'calls', CALL.room, 'peers', S.me.id), {
+    hb: Date.now(),
+    mute: !!CALL.mute,
+    cam: !!CALL.cam
+  }, { merge: true }).catch(() => {});
+}
+
+
+function callDrop(id) {
+  const P = CALL.P[id];
+
+  if (P) {
+    try { P.pc.close(); } catch (e) {}
+  }
+
+  delete CALL.P[id];
+  delete CALL.streams[id];
+  callUI();
+}
+
+
+async function callLeave() {
+  const { F, db } = B.raw || {};
+  const me = S.me?.id;
+  const room = CALL.room;
+
+  CALL.subs.forEach(u => u());
+  clearInterval(CALL.tick);
+  clearInterval(CALL.hbt);
+
+  Object.keys(CALL.P).forEach(id => {
+    try { CALL.P[id].pc.close(); } catch (e) {}
+  });
+
+  CALL.local?.getTracks().forEach(t => t.stop());
+
+  Object.assign(CALL, { room: null, P: {}, streams: {}, local: null, subs: [] });
+  callUI();
+
+  if (!room || !F) return;
+
+  try {
+    await F.deleteDoc(F.doc(db, 'calls', room, 'peers', me));
+
+    for (const f of ['from', 'to']) {
+      const sg = await F.getDocs(F.query(F.collection(db, 'calls', room, 'sig'), F.where(f, '==', me)));
+      sg.docs.forEach(d => F.deleteDoc(d.ref));
+    }
+
+    await F.setDoc(F.doc(db, 'calls', room), { ring: [] }, { merge: true });
+  } catch (e) {}
+}
+
+
+
+/* ---------- the call window ---------- */
+
+function callUI() {
+  let el = $('#call');
+
+  if (!CALL.room) {
+    el && el.remove();
+    return;
+  }
+
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'call';
+
+    el.innerHTML =
+      '<div class="cbar"><b id="clb"></b><span id="ctm">0:00</span></div>' +
+      '<div class="cgrid"></div>' +
+      '<div class="cctl">' +
+        '<div class="cg">' +
+          '<button data-a="cmute" id="cbm" title="Mute">' + IK.mic + '</button>' +
+          '<button data-a="ccam" id="cbc" title="Camera">' + IK.video + '</button>' +
+        '</div>' +
+        '<div class="cg"><button data-a="cmini" id="cbx" title="Minimize">⤡</button></div>' +
+        '<button data-a="cend" class="end" title="Leave call">' + IK.phone + '</button>' +
+      '</div>';
+
+    document.body.appendChild(el);
+    dragCall(el);
+  }
+
+  el.className = CALL.mini ? 'mini' : 'full';
+
+  $('#clb').textContent = CALL.label;
+  $('#cbm').innerHTML = CALL.mute ? IK.micoff : IK.mic;
+  $('#cbc').innerHTML = CALL.cam ? IK.video : IK.videooff;
+  $('#cbx').textContent = CALL.mini ? '⤢' : '⤡';
+  $('#cbx').title = CALL.mini ? 'Expand' : 'Minimize';
+  $('#cbm').classList.toggle('off', !!CALL.mute);
+  $('#cbc').classList.toggle('off', !CALL.cam);
+
+  const g = el.querySelector('.cgrid');
+  const ids = ['me', ...Object.keys(CALL.P)];
+  const want = new Set(ids);
+
+  [...g.children].forEach(c => {
+    if (!want.has(c.dataset.t)) c.remove();
+  });
+
+  ids.forEach(id => {
+    let t = g.querySelector(`[data-t="${id}"]`);
+
+    if (!t) {
+      t = document.createElement('div');
+      t.className = 'ct';
+      t.dataset.t = id;
+      t.innerHTML = '<video autoplay playsinline></video><div class="cav"></div><span class="nm"></span>';
+      g.appendChild(t);
+    }
+
+    const v = t.querySelector('video');
+    const st = id === 'me' ? CALL.local : CALL.streams[id];
+    const u = id === 'me' ? S.me : S.U[id];
+
+    if (v.srcObject !== st) {
+      v.srcObject = st || null;
+      if (st) v.play().catch(() => {});
+    }
+
+    v.muted = id === 'me';
+
+    const hasVideo = !!st && st.getVideoTracks().some(x => x.enabled && x.readyState === 'live');
+
+    t.classList.toggle('nov', !hasVideo);
+    t.querySelector('.cav').innerHTML = av(u || { name: '?' }, CALL.mini ? 44 : 96, 0);
+    t.querySelector('.nm').textContent = id === 'me' ? 'You' : (dn(u) || 'Connecting...');
+  });
+
+  g.dataset.n = ids.length;
+}
+
+
+/* drag the small call window around (mouse, finger or pen) */
+function dragCall(el) {
+  const h = el.querySelector('.cbar');
+  let d = null;
+
+  h.onpointerdown = e => {
+    if (!CALL.mini) return;
+
+    const r = el.getBoundingClientRect();
+    d = { x: e.clientX - r.left, y: e.clientY - r.top };
+    h.setPointerCapture(e.pointerId);
+  };
+
+  h.onpointermove = e => {
+    if (!d) return;
+
+    el.style.left = Math.max(0, Math.min(innerWidth - el.offsetWidth, e.clientX - d.x)) + 'px';
+    el.style.top = Math.max(0, Math.min(innerHeight - el.offsetHeight, e.clientY - d.y)) + 'px';
+    el.style.right = 'auto';
+    el.style.bottom = 'auto';
+  };
+
+  h.onpointerup = () => { d = null; };
+}
+
+
+
+/* ---------- incoming calls ---------- */
+
+function callIn(r) {
+  const me = S.me.id;
+  const c = r.find(x => (x.ring || []).includes(me) && x.host !== me && Date.now() - (x.t || 0) < 6e4);
+  let e = $('#cring');
+
+  if (!c || CALL.room) {
+    e && e.remove();
+    return;
+  }
+
+  if (e && e.dataset.id === c.id) return;
+
+  e && e.remove();
+
+  e = document.createElement('div');
+  e.id = 'cring';
+  e.dataset.id = c.id;
+
+  e.innerHTML =
+    `<b>${esc(c.hn || 'Someone')}</b> is calling you` +
+    `<small>${c.type === 'video' ? 'Video call' : 'Voice call'}${c.label ? ' · ' + esc(c.label) : ''}</small>` +
+    `<div class="cbt">` +
+      `<button class="btn" data-a="cacc" data-v="${esc(c.id)}|${c.type}">Accept</button>` +
+      `<button class="btn g" data-a="cdec" data-v="${esc(c.id)}">Decline</button>` +
+    `</div>`;
+
+  document.body.appendChild(e);
+
+  /* the ring stops by itself once the call is a minute old */
+  clearTimeout(callIn.t);
+  callIn.t = setTimeout(() => $('#cring')?.remove(), Math.max(1000, 6e4 - (Date.now() - (c.t || 0))));
+
+  if (SET.sound) ping();
+}
+
+
+function bootC() {
+  S.scl = B.sub('calls', S.me.id, callIn);
+}
+
 Object.assign(A,{
  vcall(v){const s=S.sel;if(!s)return;const room=s.id;let ring=[],label='Call';if(s.kind==='dm'){ring=[s.uid];label=dn(S.U[s.uid])||'Call'}else{const r=RM();ring=(r?.members||[]).filter(x=>x!==S.me.id).slice(0,20);label=r?.name||'Group call'}callJoin(room,v==='v',ring,label)},
  vjoin(){const r=RM();if(r)callJoin(r.id,false,[],r.name)},
@@ -3744,11 +4531,11 @@ const slotOf=it=>it.k;
 function prevHtml(it,o={}){it=symV(it,o.syc);const me=S.me||{};
  if(it.k==='deco')return av({av:{c1:'#26262b',c2:'#26262b'},name:' ',decor:{deco:it.id}},o.z||92,0);
  if(it.k==='peff')return `<div class="zmini"><div class="mb" style="background:${pfOf(me).bc}"></div><div class="ma"></div><i class="ml" style="top:84px;width:55%"></i><i class="ml" style="top:98px;width:38%"></i><i class="ml" style="top:122px"></i><i class="ml" style="top:134px;width:70%"></i>${pfxCv(it.id)}</div>`;
- if(it.k==='npl')return `<div class="mnp${it.an?' npl-'+it.an:''}" style="--np:${it.bg}"><i></i><u></u></div>`;
+ if(it.k==='npl')return `<div class="mnp${nplCls(it,1)}" style="${nplSt(it)}">${NPX}<i></i><u></u></div>`;
  if(it.k==='frm')return `<div class="zmini frm ${it.an?'frm-'+it.an:''}" style="${frmStyle(it.id)}"><div class="mb" style="background:${pfOf(me).bc}"></div><div class="ma"></div><i class="ml" style="top:84px;width:55%"></i><i class="ml" style="top:98px;width:38%"></i><i class="ml" style="top:122px"></i></div>`;
  if(it.k==='nst')return `<div class="nsp nst nst-${it.key}">${esc(dn(me)||'Display Name')}</div>`;
- if(it.k==='bundle'&&o.shop){const g=it.items.map(i=>symV(IT[i],o.syc));const d=g.find(i=>i.k==='deco'),n=g.find(i=>i.k==='npl'),p=g.find(i=>i.k==='peff'),cb=COL[it.c]?.bg||'linear-gradient(120deg,#222,#445)',moon=it.c==='witching'?'radial-gradient(circle at 48% 44%,#fffdf2 0 15%,#d5deeb 17%,#8da0bb 24%,rgba(141,160,187,.3) 36%,transparent 54%)':'radial-gradient(circle at 60% 55%,rgba(255,255,255,.4),transparent 55%)';return `<div class="bnp"><div class="bpe" style="--cb:${cb};--bg2:${moon}">${p?pfxCv(p.id):''}</div>${d?`<div class="bav">${av({av:{c1:'#26262b',c2:'#26262b'},name:' ',decor:{deco:d.id}},74,0)}</div>`:''}${n?`<div class="bnm"><div class="mnp${n.an?' npl-'+n.an:''}" style="--np:${n.bg}"><i></i><u></u></div></div>`:''}</div>`}
- if(it.k==='bundle'){const g=it.items.map(i=>symV(IT[i],o.syc));const d=g.find(i=>i.k==='deco'),n=g.find(i=>i.k==='npl'),p=g.find(i=>i.k==='peff');return `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;position:relative">${d?av({...me,decor:{deco:d.id}},78,0):''}${n?`<div class="mnp${n.an?' npl-'+n.an:''}" style="--np:${n.bg};width:190px;height:38px"><i></i><u></u></div>`:''}${p?`<div style="position:absolute;inset:-40px -30px;pointer-events:none">${pfxCv(p.id)}</div>`:''}</div>`}
+ if(it.k==='bundle'&&o.shop){const g=it.items.map(i=>symV(IT[i],o.syc));const d=g.find(i=>i.k==='deco'),n=g.find(i=>i.k==='npl'),p=g.find(i=>i.k==='peff'),cb=COL[it.c]?.bg||'linear-gradient(120deg,#222,#445)',moon=it.c==='witching'?'radial-gradient(circle at 48% 44%,#fffdf2 0 15%,#d5deeb 17%,#8da0bb 24%,rgba(141,160,187,.3) 36%,transparent 54%)':'radial-gradient(circle at 60% 55%,rgba(255,255,255,.4),transparent 55%)';return `<div class="bnp"><div class="bpe" style="--cb:${cb};--bg2:${moon}">${p?pfxCv(p.id):''}</div>${d?`<div class="bav">${av({av:{c1:'#26262b',c2:'#26262b'},name:' ',decor:{deco:d.id}},74,0)}</div>`:''}${n?`<div class="bnm"><div class="mnp${nplCls(n,1)}" style="${nplSt(n)}">${NPX}<i></i><u></u></div></div>`:''}</div>`}
+ if(it.k==='bundle'){const g=it.items.map(i=>symV(IT[i],o.syc));const d=g.find(i=>i.k==='deco'),n=g.find(i=>i.k==='npl'),p=g.find(i=>i.k==='peff');return `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;position:relative">${d?av({...me,decor:{deco:d.id}},78,0):''}${n?`<div class="mnp${nplCls(n,1)}" style="${nplSt(n)};width:190px;height:38px">${NPX}<i></i><u></u></div>`:''}${p?`<div style="position:absolute;inset:-40px -30px;pointer-events:none">${pfxCv(p.id)}</div>`:''}</div>`}
  return''}
 const bunCost=it=>it.items.filter(i=>!S.wal.owned.includes(i)).reduce((a,i)=>a+Math.ceil(IT[i].pr*(1-dp(it)/100)),0);
 const ownSel=()=>`<select data-sh="own">${[['all','Show all'],['new','Not purchased'],['owned','Purchased']].map(([v,l])=>`<option value="${v}"${S.sh.own===v?' selected':''}>${l}</option>`).join('')}</select>`;
@@ -3791,7 +4578,7 @@ function shBody(){const t=S.sh.tab,me=S.me;
 function shDraw(){const el=$('#shp');if(!el||el.hidden||!S.me||!S.wal)return;const y=el.scrollTop,t=S.sh.tab,qf=document.activeElement&&document.activeElement.id==='shq';
  const nav=(k,l)=>`<div class="shn${t===k&&!S.sh.col?' on':''}" data-a="shtab" data-v="${k}">${l}</div>`;
  const br=[['deco','Avatar Decorations'],['npl','Nameplates'],['peff','Profile Effects'],['frm','Profile Frames'],['nst','Display Name Styles'],['bun','Bundles'],['col','Collabs'],['all','Shop All']];
- el.innerHTML=`<div class="shb"><div class="shl">${IK.apps}</div>${nav('feat','Featured')}<div class="shn dd${S.sh.dd?' open':''}${br.some(b=>b[0]===t)&&!S.sh.col?' on':''}" data-a="shdd">Browse ⌄<div class="ddm">${br.map(([k,l])=>`<div data-a="shtab" data-v="${k}">${l}</div>`).join('')}</div></div><div class="shsp"></div><label class="shs">${IK.search}<input id="shq" placeholder="Search the Shop" value="${esc(S.sh.q)}" autocomplete="off"></label><div class="shic${t==='wish'?' on':''}" data-a="shtab" data-v="wish" title="Wishlist">♥</div><div class="shic" title="Your Aura Coins">${CN}${S.wal.coins}</div><button class="btn g sm" data-a="shx" title="Close">${IK.x}</button></div><div class="shw">${shBody()}</div>`;
+ el.innerHTML=`<div class="shb"><div class="shl">${IK.apps}</div>${nav('feat','Featured')}<div class="shn dd${S.sh.dd?' open':''}${br.some(b=>b[0]===t)&&!S.sh.col?' on':''}" data-a="shdd">Browse ⌄<div class="ddm">${br.map(([k,l])=>`<div data-a="shtab" data-v="${k}">${l}</div>`).join('')}</div></div><div class="shsp"></div><label class="shs">${IK.search}<input id="shq" placeholder="Search the Shop" value="${esc(S.sh.q)}" autocomplete="off"></label><div class="shic${t==='wish'?' on':''}" data-a="shtab" data-v="wish" title="Wishlist">♥</div><div class="shic" title="Your Aura Orbs">${CN}${S.wal.coins}</div><button class="btn g sm" data-a="shx" title="Close">${IK.x}</button></div><div class="shw">${shBody()}</div>`;
  el.scrollTop=y;if(qf){const i=$('#shq');i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
 const symRow=sc=>{const cur=DCO.SYC.find(c=>c[0]===sc)||DCO.SYC[0];return `<div class="syc"><div class="syl">Symbiote colour: <b>${cur[1]}</b></div><div class="syb">${DCO.SYC.map(([k,n,col,body])=>`<button class="sycb${k===cur[0]?' on':''}" data-a="sycol" data-v="${k}" title="${n}"><i style="background:${col?(body?`linear-gradient(135deg,${body} 50%,${col} 50%)`:`linear-gradient(135deg,#07070b 50%,${col} 50%)`):'conic-gradient(#8a5cff,#ff2a4a,#ff8a1a,#5cff7a,#22e6ff,#ff4fd8,#8a5cff)'}"></i>${n}</button>`).join('')}</div></div>`};
 async function saveSyc(v){if(!S.me)return;v=v==='spectrum'?'':(v||'');S.me={...S.me,syc:v};S.U[S.me.id]=S.me;await B.patch('users',S.me.id,{syc:v});try{draw();drawMsgs()}catch(e){}}
@@ -3799,7 +4586,7 @@ function pdOpen(id,sel){const it=IT[id];if(!it||!S.wal)return;const sy=isSy(it),
  /* the preview shows ONE item at a time, on the viewer's own profile picture */
  const one=x=>{const d={[x.k]:x.id};
   if(x.k==='deco')return `<div class="pv1">${av({...me,decor:d},132,0)}</div>`;
-  if(x.k==='npl')return `<div class="pv1"><div class="row npl${x.an?' npl-'+x.an:''}" style="--np:${symV(x,sc).bg};width:250px">${av({...me,decor:d},36,1)}<div class="gr"><b>${esc(dn(me))}</b><small>${esc(me.activity||'Online')}</small></div></div></div>`;
+  if(x.k==='npl')return `<div class="pv1"><div class="row${nplCls(symV(x,sc),1)}" style="${nplSt(symV(x,sc))};width:250px">${NPX}${av({...me,decor:d},36,1)}<div class="gr"><b>${esc(dn(me))}</b><small>${esc(me.activity||'Online')}</small></div></div></div>`;
   if(x.k==='nst')return `<div class="pv1">${prevHtml(x,{syc:sc})}</div>`;
   return `<div class="prvwrap pvc">${card({...me,decor:d},1,{pv:1})}</div>`};
  const thumb=x=>x.k==='deco'?prevHtml(x,{z:40,syc:sc}):x.k==='nst'?`<span class="nsp nst nst-${symV(x,sc).key}" style="font-size:10px;padding:0">Aa</span>`:`<span class="bts ${x.k}">${prevHtml(x,{syc:sc})}</span>`;
@@ -3809,7 +4596,7 @@ function pdOpen(id,sel){const it=IT[id];if(!it||!S.wal)return;const sy=isSy(it),
  else{on=eqId(it.k)===id;lp=one(it)}
  const incl=strip;
  const cost=it.k==='bundle'?bunCost(it):ep(it),can=S.wal.coins>=cost;
- $('#pdm').innerHTML=`<div class="pdp"><button class="pcl" data-a="pdx">${IK.x}</button><div class="pdl">${lp}</div><div class="pdr"><div class="kd">${it.k==='bundle'?'Bundle':KIND[it.k]} · ${esc(COL[it.c]?.n||'')}</div><h2>${esc(it.n)}</h2><p>${it.k==='bundle'?'Get the whole set and save. Includes '+it.items.length+' items.':it.k==='deco'?'An animated decoration that frames your avatar everywhere you appear.':it.k==='peff'?'An animated effect that plays over your whole profile card.':it.k==='npl'?'A banner behind your name in member lists and DMs.':it.k==='frm'?'A decorative border around your profile card.':'A custom font and effect for your display name.'}</p>${incl}<div class="zbig">${own?'<span style="color:#4ade80">✓ Purchased</span>':CN+cost}${!own&&dp(it)?`<s>${it.k==='bundle'?it.sum:it.pr}</s>`:''}</div><div class="pdb">${own?`<button class="pbtn${on?' g':''}" data-a="seq" data-v="${id}|${on?0:1}">${on?'Unequip':it.k==='bundle'?'Equip all':'Equip'}</button>`:`<button class="pbtn" data-a="sbuy" data-v="${id}"${can?'':' disabled'}>${can?'Buy':'Not enough coins'}</button>`}<button class="pbtn g" data-a="wish" data-v="${id}" style="flex:0 0 52px;${w?'color:#ff4d6d':''}">♥</button></div>${!own&&!can?`<small style="opacity:.6">You have ${S.wal.coins} Aura Coins. Admins can send you more.</small>`:''}${sy?symRow(sc):''}</div></div>`;
+ $('#pdm').innerHTML=`<div class="pdp"><button class="pcl" data-a="pdx">${IK.x}</button><div class="pdl">${lp}</div><div class="pdr"><div class="kd">${it.k==='bundle'?'Bundle':KIND[it.k]} · ${esc(COL[it.c]?.n||'')}</div><h2>${esc(it.n)}</h2><p>${it.k==='bundle'?'Get the whole set and save. Includes '+it.items.length+' items.':it.k==='deco'?'An animated decoration that frames your avatar everywhere you appear.':it.k==='peff'?'An animated effect that plays over your whole profile card.':it.k==='npl'?'A banner behind your name in member lists and DMs.':it.k==='frm'?'A decorative border around your profile card.':'A custom font and effect for your display name.'}</p>${incl}<div class="zbig">${own?'<span style="color:#4ade80">✓ Purchased</span>':CN+cost}${!own&&dp(it)?`<s>${it.k==='bundle'?it.sum:it.pr}</s>`:''}</div><div class="pdb">${own?`<button class="pbtn${on?' g':''}" data-a="seq" data-v="${id}|${on?0:1}">${on?'Unequip':it.k==='bundle'?'Equip all':'Equip'}</button>`:`<button class="pbtn" data-a="sbuy" data-v="${id}"${can?'':' disabled'}>${can?'Buy':'Not enough coins'}</button>`}<button class="pbtn g" data-a="wish" data-v="${id}" style="flex:0 0 52px;${w?'color:#ff4d6d':''}">♥</button></div>${!own&&!can?`<small style="opacity:.6">You have ${S.wal.coins} Aura Orbs. Admins can send you more.</small>`:''}${sy?symRow(sc):''}</div></div>`;
  $('#pdm').hidden=false}
 async function walEq(eq){try{await B.patch('wallets',S.me.id,{eq})}catch(e){toast('Could not save your equipped items.');return false}await B.patch('users',S.me.id,{decor:eq});S.wal.eq=eq;S.me.decor=eq;if(S.pd)S.pd.decor={...eq};try{draw();drawMsgs()}catch(e){}return true}
 const shOpenFn=async()=>{await loadDeals();let d;try{d=await B.get('wallets',S.me.id)}catch(e){toast('Could not load your coins and items yet. Check your connection and try again.');return false}S.wal={coins:0,owned:[],eq:{},...(d||{})};S.wal.owned=Array.isArray(S.wal.owned)?S.wal.owned:[];S.wal.eq=S.wal.eq||{};return true};
@@ -3838,10 +4625,10 @@ Object.assign(A,{
  async sycol(v){S.sh.syc=v;const id=S.sh.pdId,it=IT[id];if(it&&ownedI(it)&&(it.k==='bundle'?it.items:[id]).some(i=>eqId(IT[i].k)===i))await saveSyc(v);pdOpen(id,S.sh.pdSel);if(S.shOn)shDraw();if(S.prOn)prDraw()},
  wish(id,el){try{event&&event.stopPropagation&&event.stopPropagation();event&&event.preventDefault&&event.preventDefault()}catch(e){}let w=WL();w=w.includes(id)?w.filter(x=>x!==id):[...w,id];setWL(w);if(!$('#pdm').hidden)pdOpen(id);if(S.shOn)shDraw();if(S.prOn)prDraw()},
  async sbuy(id){const it=IT[id];if(!it||!S.wal)return;
-  if(it.k==='bundle'){const un=it.items.filter(i=>!S.wal.owned.includes(i));if(!un.length)return;if(S.wal.coins<bunCost(it))return toast('Not enough Aura Coins.');
+  if(it.k==='bundle'){const un=it.items.filter(i=>!S.wal.owned.includes(i));if(!un.length)return;if(S.wal.coins<bunCost(it))return toast('Not enough Aura Orbs.');
    for(const i of un){const c=Math.ceil(IT[i].pr*(1-dp(it)/100)),w=S.wal;if(w.coins<c){toast('Ran out of coins part-way through the bundle.');break}const n={coins:w.coins-c,owned:[...w.owned,i]};try{await B.patch('wallets',S.me.id,n)}catch(e){toast('Purchase failed.');break}S.wal={...w,...n}}
    toast('Purchased '+it.n+'!')}
-  else{const w=S.wal;if(w.owned.includes(id))return;if(w.coins<ep(it))return toast('Not enough Aura Coins.');const n={coins:w.coins-ep(it),owned:[...w.owned,id]};try{await B.patch('wallets',S.me.id,n)}catch(e){return toast('Purchase failed.')}S.wal={...w,...n};toast('Purchased '+it.n+'!')}
+  else{const w=S.wal;if(w.owned.includes(id))return;if(w.coins<ep(it))return toast('Not enough Aura Orbs.');const n={coins:w.coins-ep(it),owned:[...w.owned,id]};try{await B.patch('wallets',S.me.id,n)}catch(e){return toast('Purchase failed.')}S.wal={...w,...n};toast('Purchased '+it.n+'!')}
   if(S.shOn)shDraw();if(S.prOn)prDraw();pdOpen(id)},
  async seq(v){const[id,on]=v.split('|'),it=IT[id];if(!it||!S.wal||!ownedI(it))return;const eq={...S.wal.eq};if(it.k==='bundle')it.items.forEach(i=>{eq[IT[i].k]=on==='1'?i:''});else eq[it.k]=on==='1'?id:'';if(!await walEq(eq))return;if(on==='1'&&isSy(it))await saveSyc(S.sh.syc||S.me.syc||'');if(!$('#pdm').hidden)pdOpen(id);if(S.shOn)shDraw();if(S.prOn)prDraw()},
  pickeq(v){const[k,id]=v.split('|');const it=IT[id];if(!it)return;if(!S.wal.owned.includes(id)){pdOpen(id);return}S.pd.decor[k]=S.pd.decor[k]===id?'':id;prDraw();A.close()}
@@ -3853,7 +4640,7 @@ function prMake(){const m=S.me;return{name:m.name,bio:m.bio||'',activity:m.activ
 const prDirty=()=>JSON.stringify(S.pd)!==S.pd0;
 const prUser=()=>({...S.me,...S.pd,name:S.pd.name||S.me.name});
 function prPick(k,cap){const it=IT[S.pd.decor[k]];const me=prUser();
- if(k==='npl')return it?`<div class="mnp${it.an?' npl-'+it.an:''}" style="--np:${it.bg};transform:none;width:100%;height:54px;border-radius:0"><i></i><u></u></div><span class="cap" style="color:#fff">${esc(it.n)}</span>`:`<span style="opacity:.6">Choose a nameplate</span><span class="plus">+</span>`;
+ if(k==='npl')return it?`<div class="mnp${nplCls(it,1)}" style="${nplSt(it)};transform:none;width:100%;height:54px;--nr:8px">${NPX}<i></i><u></u></div><span class="cap" style="color:#fff">${esc(it.n)}</span>`:`<span style="opacity:.6">Choose a nameplate</span><span class="plus">+</span>`;
  if(k==='nst')return it?`<span class="nst nst-${it.key}" style="font-size:22px">${esc(me.name)}</span><span class="cap">${esc(it.n)}</span>`:`<span style="opacity:.6">Choose a style</span><span class="plus">+</span>`;
  if(k==='deco')return it?av({...me,decor:{deco:it.id}},54,0)+`<span class="cap">${esc(it.n)}</span>`:`<span style="opacity:.55;font-size:12px">No decoration</span><span class="plus">+</span>`;
  if(k==='peff')return it?`<div class="zmini" style="transform:scale(.6);margin:-30px">${'<div class="mb" style="background:'+pfOf(me).bc+'"></div><div class="ma"></div>'+pfxCv(it.id)}</div><span class="cap">${esc(it.n)}</span>`:`<span style="opacity:.55;font-size:12px">No effect</span><span class="plus">+</span>`;
@@ -3930,12 +4717,44 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#mpop')?.remove()
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='mpi'){const n=$('#mpn');if(n)n.textContent=e.target.value.length+'/128'}});
 
 /* pause SVG (SMIL) animations on shop cards until hovered; bundles never play on cards */
-(()=>{const sync=c=>{const live=c.matches(':hover')&&!c.querySelector('.scp.bun');c.querySelectorAll('svg').forEach(v=>{try{live?v.unpauseAnimations():v.pauseAnimations()}catch(e){}})};
-const all=()=>document.querySelectorAll('.zsc').forEach(sync);
-new MutationObserver(()=>{clearTimeout(all.t);all.t=setTimeout(all,30)}).observe(document.body,{childList:true,subtree:true});
-document.addEventListener('mouseover',e=>{const c=e.target.closest&&e.target.closest('.zsc');if(c)sync(c)});
-document.addEventListener('mouseout',e=>{const c=e.target.closest&&e.target.closest('.zsc');if(c&&!(e.relatedTarget&&c.contains(e.relatedTarget)))setTimeout(()=>sync(c),0)});
-setInterval(all,1500)})();
+(() => {
+
+  const sync = card => {
+    const live = card.matches(':hover') && !card.querySelector('.scp.bun');
+
+    card.querySelectorAll('svg').forEach(v => {
+      try {
+        live ? v.unpauseAnimations() : v.pauseAnimations();
+      } catch (e) {}
+    });
+  };
+
+  const all = () => document.querySelectorAll('.zsc').forEach(sync);
+
+
+  /* re-check whenever the shop redraws */
+  new MutationObserver(() => {
+    clearTimeout(all.t);
+    all.t = setTimeout(all, 30);
+  }).observe(document.body, { childList: true, subtree: true });
+
+
+  document.addEventListener('mouseover', e => {
+    const card = e.target.closest && e.target.closest('.zsc');
+    if (card) sync(card);
+  });
+
+  document.addEventListener('mouseout', e => {
+    const card = e.target.closest && e.target.closest('.zsc');
+
+    if (card && !(e.relatedTarget && card.contains(e.relatedTarget))) {
+      setTimeout(() => sync(card), 0);
+    }
+  });
+
+  setInterval(() => { if (!document.hidden) all(); }, 1500);
+
+})();
 
 /* ===== chat QoL: undo delete, quote/copy, better search, jump to unread ===== */
 /* --- undo bar (used by delete) --- */
@@ -4029,12 +4848,29 @@ Object.assign(A,{
   tx.value=(tx.value?tx.value+'\n':'')+q+'\n';
   tx.focus();tx.setSelectionRange(tx.value.length,tx.value.length);
   tx.dispatchEvent(new Event('input'))},
- cpy(v){
+ cpm(v){
   const m=S.msgs.find(x=>x.id===v);if(!m||!m.x)return;
   (navigator.clipboard?navigator.clipboard.writeText(m.x):Promise.reject()).then(()=>toast('Copied.')).catch(()=>toast('Could not copy.'))},
  unj(){const d=document.querySelector('#ml .dv.nw');if(d)d.scrollIntoView({block:'start'});else toast('The unread line is not loaded.')},
  unx(){S.unDis=S.sel.id+':'+S.rdAt;S.rdAt=0;drawMsgs()}
 });
+
+/* ===== touch screens: tap a message to show its toolbar (there is no hover) ===== */
+
+document.addEventListener('click', e => {
+  if (!matchMedia('(hover:none)').matches) return;
+
+  const m = e.target.closest('#ml .m');
+
+  document.querySelectorAll('#ml .m.tap').forEach(x => {
+    if (x !== m) x.classList.remove('tap');
+  });
+
+  if (!m || e.target.closest('[data-a],a,button,img,audio,video,input,textarea')) return;
+
+  m.classList.toggle('tap');
+});
+
 </script><style>
 /* shop cards: still until hovered; bundle cards stay still until previewed */
 .zsc *,.zsc *::before,.zsc *::after{animation-play-state:paused!important}
@@ -4077,4 +4913,100 @@ Object.assign(A,{
 #undo button{background:var(--accent);color:#100;border:0;border-radius:7px;padding:5px 14px;font-weight:800;cursor:pointer}
 #undo i{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--accent);transform-origin:left}
 @keyframes undobar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+/* ===================================================================
+   ALL DEVICES  (phone, tablet, laptop, desktop)
+   =================================================================== */
+
+/* real viewport height on phones (address bar shrinks and grows) */
+@supports (height:100dvh) {
+  #app { height: 100dvh; }
+}
+
+html, body { overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+img, video, canvas { max-width: 100%; }
+
+
+/* tablets in portrait */
+@media (min-width: 761px) and (max-width: 900px) {
+  #app, #app.nomem { grid-template-columns: 72px minmax(200px, 240px) 1fr; }
+}
+
+
+/* phones and small tablets */
+@media (max-width: 760px) {
+  #app, #app.nomem {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .m { padding-left: 10px; padding-right: 10px; gap: 8px; }
+  .m.c { padding-left: 56px; }
+  .m .tb { right: 8px; max-width: calc(100vw - 24px); }
+
+  #mb { max-width: 96vw; max-height: 92vh; max-height: 92dvh; overflow: auto; }
+  #toast { max-width: 92vw; }
+
+  #undo {
+    bottom: calc(86px + env(safe-area-inset-bottom));
+    max-width: 92vw;
+  }
+
+  #cx { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+
+/* calls on small screens */
+@media (max-width: 700px) {
+  #call .cbar { padding-top: max(12px, env(safe-area-inset-top)); }
+
+  #call .cgrid {
+    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    overflow: auto;
+    justify-content: flex-start;
+  }
+
+  #call .ct:not(.nov) { width: min(94vw, 640px); }
+
+  #call .cctl { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  #call .cg button { width: 44px; height: 44px; }
+
+  #call.mini {
+    width: min(300px, 64vw);
+    right: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+
+  #cring {
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    min-width: 0;
+  }
+}
+
+
+/* phones turned sideways */
+@media (max-height: 480px) and (orientation: landscape) {
+  #call .cgrid { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 8px; }
+  #call .ct:not(.nov) { width: min(40vw, 360px); }
+  #call .cctl { padding-bottom: 8px; }
+}
+
+
+/* fingers and pens: bigger targets, no iOS zoom on inputs */
+@media (pointer: coarse) {
+  .btn, .row, .ci, .slr { min-height: 40px; }
+  input, textarea, select { font-size: 16px; }
+  .tb button { width: 38px; height: 36px; }
+}
+
+
+/* no hover on touch: a tapped message shows its toolbar */
+@media (hover: none) {
+  .m.tap .tb { display: flex; }
+  .m.tap { background: rgba(255, 255, 255, .06); }
+}
 </style></body></html>
